@@ -24,26 +24,75 @@ var __importStar = (this && this.__importStar) || function (mod) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.activate = activate;
-exports.deactivate = deactivate;
-// The module 'vscode' contains the VS Code extensibility API
-// Import the module and reference it with the alias vscode in your code below
+exports.openLoginPage = openLoginPage;
+exports.openSignUpPage = openSignUpPage;
+exports.activateCodeCommands = activateCodeCommands;
 const vscode = __importStar(require("vscode"));
-// This method is called when your extension is activated
-// Your extension is activated the very first time the command is executed
-function activate(context) {
-    // Use the console to output diagnostic information (console.log) and errors (console.error)
-    // This line of code will only be executed once when your extension is activated
-    console.log('Congratulations, your extension "genie-vscode" is now active!');
-    // The command has been defined in the package.json file
-    // Now provide the implementation of the command with registerCommand
-    // The commandId parameter must match the command field in package.json
-    const disposable = vscode.commands.registerCommand('genie-vscode.helloWorld', () => {
-        // The code you place here will be executed every time your command is executed
-        // Display a message box to the user
-        vscode.window.showInformationMessage('Hello World from Genie_vscode!');
-    });
-    context.subscriptions.push(disposable);
+const GenieCommandsProvider_1 = require("./commands/sidebarCommandRegister/GenieCommandsProvider");
+const codeReview_1 = require("./commands/review/codeReview");
+const overallReview_1 = require("./commands/review/overallReview");
+const performanceReview_1 = require("./commands/review/performanceReview");
+const securityReview_1 = require("./commands/review/securityReview");
+const syntaxReview_1 = require("./commands/review/syntaxReview");
+const showLoginRegisterWebview_1 = require("./commands/webview/auth_webview/showLoginRegisterWebview");
+const showUrlWebview_1 = require("./commands/webview/auth_webview/showUrlWebview");
+const authDialog_1 = require("./auth/authDialog");
+const owaspReview_1 = require("./commands/review/owaspReview");
+let isLoggedIn = false;
+let authToken;
+async function activate(context) {
+    // Reset auth token on activation
+    context.globalState.update("authToken", undefined);
+    context.globalState.update("urlSubmitted", false);
+    let urlSubmitted = context.globalState.get("urlSubmitted", false);
+    if (!urlSubmitted) {
+        (0, showUrlWebview_1.showUrlWebview)(context);
+        // Wait for the URL submission to complete
+        const waitForSubmission = async () => {
+            while (!context.globalState.get("urlSubmitted", false)) {
+                await new Promise((resolve) => setTimeout(resolve, 100)); // Small delay for polling
+            }
+        };
+        await waitForSubmission();
+    }
+    // Proceed after the URL is submitted
+    urlSubmitted = context.globalState.get("urlSubmitted", false);
+    if (urlSubmitted) {
+        (0, authDialog_1.showLoginPrompt)(context);
+    }
+    // Load previously stored auth token if available
+    const storedToken = context.globalState.get("authToken");
+    if (storedToken) {
+        authToken = storedToken;
+        isLoggedIn = true;
+        activateCodeCommands(context);
+    }
+    // Register the sidebar provider for Genie commands
+    const genieProvider = new GenieCommandsProvider_1.GenieCommandsProvider();
+    vscode.window.registerTreeDataProvider("genieCommands", genieProvider);
 }
-// This method is called when your extension is deactivated
-function deactivate() { }
+function openLoginPage(context) {
+    (0, showLoginRegisterWebview_1.showLoginRegisterWebview)(context, "login");
+}
+function openSignUpPage(context) {
+    (0, showLoginRegisterWebview_1.showLoginRegisterWebview)(context, "register");
+}
+/**
+ * Activates all code-related commands using the stored auth token.
+ * If the auth token is not available, an error message is shown.
+ */
+function activateCodeCommands(context) {
+    const authToken = context.globalState.get("authToken");
+    if (!authToken) {
+        vscode.window.showErrorMessage("Authentication is required to activate code commands.");
+        return;
+    }
+    // Register all review commands
+    (0, codeReview_1.registerCodeReviewCommand)(context, authToken);
+    (0, performanceReview_1.registerPerformanceReviewCommand)(context, authToken);
+    (0, securityReview_1.registerSecurityReviewCommand)(context, authToken);
+    (0, syntaxReview_1.registerSyntaxReviewCommand)(context, authToken);
+    (0, overallReview_1.registerOverallReviewCommand)(context, authToken);
+    (0, owaspReview_1.registerOwaspReviewCommand)(context, authToken);
+}
 //# sourceMappingURL=extension.js.map
