@@ -38,6 +38,14 @@ const showLoginRegisterWebview_1 = require("./commands/webview/auth_webview/show
 const showUrlWebview_1 = require("./commands/webview/auth_webview/showUrlWebview");
 const authDialog_1 = require("./auth/authDialog");
 const owaspReview_1 = require("./commands/review/owaspReview");
+const cyclometric_cx_1 = require("./commands/review/cyclometric_cx");
+const addDocstringAssistant_1 = require("./commands/assistant/addDocstringAssistant");
+const codeGenerationAssistant_1 = require("./commands/assistant/codeGenerationAssistant");
+const addCommentsCodeAssistant_1 = require("./commands/assistant/addCommentsCodeAssistant");
+const orgStdReview_1 = require("./commands/review/orgStdReview");
+const addLoggingAssistant_1 = require("./commands/assistant/addLoggingAssistant");
+const addErrorHandlingAssistant_1 = require("./commands/assistant/addErrorHandlingAssistant");
+const refactorCodeAssistant_1 = require("./commands/assistant/refactorCodeAssistant");
 let isLoggedIn = false;
 let authToken;
 async function activate(context) {
@@ -94,5 +102,14 @@ function activateCodeCommands(context) {
     (0, syntaxReview_1.registerSyntaxReviewCommand)(context, authToken);
     (0, overallReview_1.registerOverallReviewCommand)(context, authToken);
     (0, owaspReview_1.registerOwaspReviewCommand)(context, authToken);
+    (0, cyclometric_cx_1.registerCyclometricCXReviewCommand)(context, authToken);
+    (0, orgStdReview_1.registerOrgStdReviewCommand)(context, authToken);
+    //Register all Assistant Commands
+    (0, addCommentsCodeAssistant_1.registerAddCommentsAssistantCommand)(context, authToken);
+    (0, addDocstringAssistant_1.registerAddDocstringsAssistantCommand)(context, authToken);
+    (0, codeGenerationAssistant_1.registerCodeGenerationAssistantCommand)(context, authToken);
+    (0, addErrorHandlingAssistant_1.registerErrorHandlingAssistantCommand)(context, authToken);
+    (0, addLoggingAssistant_1.registerAddLoggingAssistantCommand)(context, authToken);
+    (0, refactorCodeAssistant_1.registerRefactorCodeAssistantCommand)(context, authToken);
 }
 //# sourceMappingURL=extension.js.map

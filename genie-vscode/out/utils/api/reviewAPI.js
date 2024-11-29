@@ -9,6 +9,8 @@ exports.postSecurityReview = postSecurityReview;
 exports.postSyntaxReview = postSyntaxReview;
 exports.postOverallReview = postOverallReview;
 exports.postOwaspReview = postOwaspReview;
+exports.postCyclometricCXReview = postCyclometricCXReview;
+exports.postOrgStdReview = postOrgStdReview;
 const axios_1 = __importDefault(require("axios"));
 const config_1 = require("../../auth/config");
 const apiHeaders_1 = require("../../auth/apiHeaders");
@@ -44,6 +46,18 @@ async function postOverallReview(code, language, authToken) {
 }
 async function postOwaspReview(code, language, authToken) {
     const response = await axios_1.default.post(`${config_1.BASE_API}/review/owasp`, { code, language }, {
+        headers: (0, apiHeaders_1.getAuthHeaders)(authToken),
+    });
+    return response.data;
+}
+async function postCyclometricCXReview(code, language, authToken) {
+    const response = await axios_1.default.post(`${config_1.BASE_API}/review/cyclometric-cx`, { code, language }, {
+        headers: (0, apiHeaders_1.getAuthHeaders)(authToken),
+    });
+    return response.data;
+}
+async function postOrgStdReview(code, language, authToken) {
+    const response = await axios_1.default.post(`${config_1.BASE_API}/review/org-std-review`, { code, language }, {
         headers: (0, apiHeaders_1.getAuthHeaders)(authToken),
     });
     return response.data;

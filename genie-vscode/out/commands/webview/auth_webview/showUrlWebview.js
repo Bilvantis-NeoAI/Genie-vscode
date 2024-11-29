@@ -71,7 +71,7 @@ function showUrlWebview(context, error_message, success_message) {
             <form id="authForm">
                 <div class="form-group">
                     <label for="url">Domain:</label>
-                    <input type="text" id="url" name="url" class="form-control" required>
+                    <input type="text" id="url" name="url" class="form-control" value="http://localhost:3000" required>
                 </div>
                 
                 <button type="submit" class="btn btn-primary btn-block">URL</button>

@@ -49,6 +49,46 @@
       {
         "command": "extension.reviewOwasp",
         "title": "Owasp Review Selected"
+      },
+      {
+        "command": "extension.reviewCyclometricCX",
+        "title": "Cyclometric-CX Review Selected"
+      },
+      {
+        "command": "extension.reviewOrgStd",
+        "title": "Org Std Review Selected"
+      },
+      {
+        "command": "extension.addComments",
+        "title": "Add Comments To Selected Code"
+      },
+      {
+        "command": "extension.codeGeneration",
+        "title": "Code Generation"
+      },
+      {
+        "command": "extension.addDocstrings",
+        "title": "Add Docstring"
+      },
+      {
+        "command": "extension.explainCode",
+        "title": "Explain Code"
+      },
+      {
+        "command": "extension.unittestCode",
+        "title": "Unit Test Code"
+      },
+      {
+        "command": "extension.errorHandling",
+        "title": "Error Handling"
+      },
+      {
+        "command": "extension.addLogging",
+        "title": "Add Logging"
+      },
+      {
+        "command": "extension.refactorCode",
+        "title": "Refactor Code"
       }
     ],
     "keybindings": [
@@ -81,7 +121,58 @@
         "command": "extension.reviewOwasp",
         "key": "ctrl+shift+w",
         "when": "editorTextFocus"
+      },
+      {
+        "command": "extension.reviewCyclometricCX",
+        "key": "ctrl+shift+c",
+        "when": "editorTextFocus"
+      },
+      {
+        "command": "extension.reviewOrgStd",
+        "key": "ctrl+shift+g",
+        "when": "editorTextFocus"
+      },
+      {
+        "command": "extension.addComments",
+        "key": "ctrl+alt+c",
+        "when": "editorTextFocus"
+      },
+      {
+        "command": "extension.codeGeneration",
+        "key": "ctrl+alt+g",
+        "when": "editorTextFocus"
+      },
+      {
+        "command": "extension.addDocstrings",
+        "key": "ctrl+alt+d",
+        "when": "editorTextFocus"
+      },
+      {
+        "command": "extension.explainCode",
+        "key": "ctrl+alt+x",
+        "when": "editorTextFocus"
+      },
+      {
+        "command": "extension.unittestCode",
+        "key": "ctrl+alt+u",
+        "when": "editorTextFocus"
+      },
+      {
+        "command": "extension.errorHandling",
+        "key": "ctrl+alt+e",
+        "when": "editorTextFocus"
+      },
+      {
+        "command": "extension.addLogging",
+        "key": "ctrl+alt+l",
+        "when": "editorTextFocus"
+      },
+      {
+        "command": "extension.refactorCode",
+        "key": "ctrl+alt+r",
+        "when": "editorTextFocus"
       }
+      
     ],
     "viewsContainers": {
       "activitybar": [

@@ -69,3 +69,25 @@ export async function postOwaspReview(code: string, language: string, authToken:
   );
   return response.data;
 }
+
+export async function postCyclometricCXReview(code: string, language: string, authToken: string): Promise<any> {
+  const response = await axios.post(
+    `${BASE_API}/review/cyclometric-cx`,
+    { code, language },
+    {
+      headers: getAuthHeaders(authToken),
+    }
+  );
+  return response.data;
+}
+
+export async function postOrgStdReview(code: string, language: string, authToken: string): Promise<any> {
+  const response = await axios.post(
+    `${BASE_API}/review/org-std-review`,
+    { code, language },
+    {
+      headers: getAuthHeaders(authToken),
+    }
+  );
+  return response.data;
+}

@@ -39,12 +39,21 @@ class GenieCommandsProvider {
             // Top-level categories
             return Promise.resolve([
                 new GenieCategory("Assistant"),
-                new GenieCategory("Review"),
+                new GenieCategory("Review")
+                // new GenieCategory("Git - Knowledge Base"),
+                // new GenieCategory("Knowledge Base")
             ]);
         }
         else if (element.label === "Assistant") {
             // Commands under the "Assistant" category
-            return Promise.resolve([]);
+            return Promise.resolve([
+                new GenieCommand("Comment Code", "extension.addComments", "(Ctrl+Alt+C)"),
+                new GenieCommand("Add Docstring", "extension.addDocstrings", "(Ctrl+Alt+D)"),
+                new GenieCommand("Code Generation", "extension.codeGeneration", "(Ctrl+Alt+G)"),
+                new GenieCommand("Add Error Handler", "extension.errorHandling", "(Ctrl+Alt+E)"),
+                new GenieCommand("Add Logging", "extension.addLogging", "(Ctrl+Alt+L)"),
+                new GenieCommand("Refactor Code", "extension.refactorCode", "(Ctrl+Alt+R)")
+            ]);
         }
         else if (element.label === "Review") {
             // Commands under the "Review" category
@@ -55,6 +64,8 @@ class GenieCommandsProvider {
                 new GenieCommand("Syntax Review", "extension.reviewSyntax", "(Ctrl+Shift+Y)"),
                 new GenieCommand("Owasp Review", "extension.reviewOwasp", "(Ctrl+Shift+W)"),
                 new GenieCommand("Code Overall Review", "extension.reviewOverall", "(Ctrl+Shift+O)"),
+                new GenieCommand("CyclometricCX Review", "extension.reviewCyclometricCX", "(Ctrl+Shift+C)"),
+                new GenieCommand("Org Std Review", "extension.reviewOrgStd", "(Ctrl+Shift+G)"),
             ]);
         }
         return Promise.resolve([]);

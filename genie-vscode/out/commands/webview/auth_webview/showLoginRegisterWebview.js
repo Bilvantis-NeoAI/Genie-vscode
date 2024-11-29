@@ -85,13 +85,13 @@ function showLoginRegisterWebview(context, mode, error_message, success_message)
                 <div class="form-group">
                     <!-- Email Field -->
                     <label for="email">Email:</label>
-                    <input type="email" id="email" name="email" class="form-control" required>
+                    <input type="email" id="email" name="email" class="form-control" value="rahul97@gmail.com" required>
                 </div>
                 <div class="form-group">
                 <!-- Password Field -->
                 <label for="password">Password:</label>
                 <div class="input-group">
-                    <input type="password" id="password" name="password" class="form-control" required>
+                    <input type="password" id="password" name="password" class="form-control" value="Test@123" required>
                     <div class="input-group-append">
                         <button class="btn btn-outline-secondary toggle-password" type="button" tabindex="-1">
                             <i class="fas fa-eye"></i>
@@ -211,6 +211,7 @@ function showLoginRegisterWebview(context, mode, error_message, success_message)
                             email:document.getElementById('email').value,
                             full_name: document.getElementById('full_name').value,
                             password: document.getElementById('password').value,
+                            confirm_password: document.getElementById('confirm_password').value,
                             username: document.getElementById('username').value,
                             company_name: document.getElementById('company_name').value,
 

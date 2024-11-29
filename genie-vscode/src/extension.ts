@@ -9,6 +9,15 @@ import { showLoginRegisterWebview } from "./commands/webview/auth_webview/showLo
 import { showUrlWebview } from "./commands/webview/auth_webview/showUrlWebview";
 import { showLoginPrompt } from "./auth/authDialog";
 import { registerOwaspReviewCommand } from "./commands/review/owaspReview";
+import { registerCyclometricCXReviewCommand } from "./commands/review/cyclometric_cx";
+import { registerAddDocstringsAssistantCommand } from "./commands/assistant/addDocstringAssistant";
+import { registerCodeGenerationAssistantCommand } from "./commands/assistant/codeGenerationAssistant";
+import { registerAddCommentsAssistantCommand } from "./commands/assistant/addCommentsCodeAssistant";
+import { registerOrgStdReviewCommand } from "./commands/review/orgStdReview";
+import { registerAddLoggingAssistantCommand } from "./commands/assistant/addLoggingAssistant";
+import { registerErrorHandlingAssistantCommand } from "./commands/assistant/addErrorHandlingAssistant";
+import { registerRefactorCodeAssistantCommand } from "./commands/assistant/refactorCodeAssistant";
+
 let isLoggedIn = false;
 let authToken: string | undefined;
 
@@ -79,4 +88,14 @@ export function activateCodeCommands(context: vscode.ExtensionContext) {
   registerSyntaxReviewCommand(context, authToken);
   registerOverallReviewCommand(context, authToken);
   registerOwaspReviewCommand(context, authToken);
+  registerCyclometricCXReviewCommand(context, authToken);
+  registerOrgStdReviewCommand(context, authToken);
+  
+  //Register all Assistant Commands
+  registerAddCommentsAssistantCommand(context, authToken);
+  registerAddDocstringsAssistantCommand(context, authToken);
+  registerCodeGenerationAssistantCommand(context, authToken);
+  registerErrorHandlingAssistantCommand(context, authToken);
+  registerAddLoggingAssistantCommand(context, authToken);
+  registerRefactorCodeAssistantCommand(context, authToken);
 }
