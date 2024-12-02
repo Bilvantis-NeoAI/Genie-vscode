@@ -19,20 +19,32 @@ export class GenieCommandsProvider implements vscode.TreeDataProvider<GenieComma
       return Promise.resolve([
         new GenieCategory("Assistant"),
         new GenieCategory("Review"),
+        new GenieCategory("Git - Knowledge Base"),
+        new GenieCategory("Knowledge Base")
       ]);
     } else if (element.label === "Assistant") {
       // Commands under the "Assistant" category
       return Promise.resolve([
+        new GenieCommand("Add Docstring", "extension.addDocstrings", "(Ctrl+Alt+D)"),
+        new GenieCommand("Add Error Handler", "extension.errorHandling", "(Ctrl+Alt+E)"),
+        new GenieCommand("Add Logging", "extension.addLogging", "(Ctrl+Alt+L)"),
+        new GenieCommand("Code Generation", "extension.codeGeneration", "(Ctrl+Alt+G)"),
+        new GenieCommand("Comment Code", "extension.addComments", "(Ctrl+Alt+C)"),
+        new GenieCommand("Explain Code", "extension.explainCode", "(Ctrl+Alt+X)"),
+        new GenieCommand("Refactor Code", "extension.refactorCode", "(Ctrl+Alt+R)"),
+        new GenieCommand("Unit Test Code", "extension.unittestCode", "(Ctrl+Alt+U)")
       ]);
     } else if (element.label === "Review") {
       // Commands under the "Review" category
       return Promise.resolve([
+        new GenieCommand("Code Overall Review", "extension.reviewOverall", "(Ctrl+Shift+O)"),
         new GenieCommand("Code Review", "extension.reviewCode", "(Ctrl+Shift+R)"),
+        new GenieCommand("CyclometricCX Review", "extension.reviewCyclometricCX", "(Ctrl+Shift+C)"),
+        new GenieCommand("Org Std Review", "extension.reviewOrgStd", "(Ctrl+Shift+G)"),
+        new GenieCommand("Owasp Review", "extension.reviewOwasp", "(Ctrl+Shift+W)"),
         new GenieCommand("Performance Review", "extension.reviewPerformance", "(Ctrl+Shift+P)"),
         new GenieCommand("Security Review", "extension.reviewSecurity", "(Ctrl+Shift+S)"),
         new GenieCommand("Syntax Review", "extension.reviewSyntax", "(Ctrl+Shift+Y)"),
-        new GenieCommand("Owasp Review", "extension.reviewOwasp", "(Ctrl+Shift+W)"),
-        new GenieCommand("Code Overall Review", "extension.reviewOverall", "(Ctrl+Shift+O)"),
       ]);
     }
 
