@@ -1,5 +1,5 @@
 import * as vscode from "vscode";
-import { assistantGetWebViewContent } from "../webview/assistant_webview/assistantWebviewContent";
+import { codeGenerationAssistantWebviewContent } from "../webview/assistant_webview/codeGenerationAssistantWebviewContent";
 import { postCodeGenerationAssistant } from "../../utils/api/assistantAPI";
  
 export function registerCodeGenerationAssistantCommand(context: vscode.ExtensionContext, authToken: string) {
@@ -13,7 +13,7 @@ export function registerCodeGenerationAssistantCommand(context: vscode.Extension
       try {
         const progressOptions: vscode.ProgressOptions = {
           location: vscode.ProgressLocation.Notification,
-          title: "Code Generation Code",
+          title: "Code Generation",
           cancellable: false,
         };
  
@@ -26,7 +26,7 @@ export function registerCodeGenerationAssistantCommand(context: vscode.Extension
             enableScripts: true,
           });
  
-          panel.webview.html = assistantGetWebViewContent(formattedContent, "Code Generation Assistant");
+          panel.webview.html = codeGenerationAssistantWebviewContent(formattedContent, "Code Generation Assistant");
  
           // Listen for messages from the webview
           panel.webview.onDidReceiveMessage((message) => {
@@ -34,7 +34,7 @@ export function registerCodeGenerationAssistantCommand(context: vscode.Extension
               case 'accept':
                 // Replace the code in the editor with the commented code
                 editor.edit(editBuilder => {
-                  editBuilder.replace(selection, response.commentedCode);
+                  editBuilder.replace(selection, response.generatedCode);
                 });
                 panel.dispose(); // Close the webview after accepting
                 break;

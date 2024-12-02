@@ -17,6 +17,8 @@ import { registerOrgStdReviewCommand } from "./commands/review/orgStdReview";
 import { registerAddLoggingAssistantCommand } from "./commands/assistant/addLoggingAssistant";
 import { registerErrorHandlingAssistantCommand } from "./commands/assistant/addErrorHandlingAssistant";
 import { registerRefactorCodeAssistantCommand } from "./commands/assistant/refactorCodeAssistant";
+import { registerExplainCodeAssistantCommand } from "./commands/assistant/explainCodeAssistant";
+import { registerUnittestCodeAssistantCommand } from "./commands/assistant/unittestCodeAssistant";
 
 let isLoggedIn = false;
 let authToken: string | undefined;
@@ -98,4 +100,6 @@ export function activateCodeCommands(context: vscode.ExtensionContext) {
   registerErrorHandlingAssistantCommand(context, authToken);
   registerAddLoggingAssistantCommand(context, authToken);
   registerRefactorCodeAssistantCommand(context, authToken);
+  registerExplainCodeAssistantCommand(context, authToken);
+  registerUnittestCodeAssistantCommand(context, authToken);
 }

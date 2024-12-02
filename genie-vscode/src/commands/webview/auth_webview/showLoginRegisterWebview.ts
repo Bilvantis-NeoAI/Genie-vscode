@@ -266,7 +266,7 @@ export function showLoginRegisterWebview(
                     if (message.token) {
                         context.globalState.update('authToken', message.token).then(() => {
                             vscode.window.showInformationMessage('Login Successful!');
-                            vscode.commands.executeCommand('workbench.action.closeActiveEditor');
+                            vscode.commands.executeCommand('workbench.action.closeAllEditors'); //closeActiveEditor
                             panel.dispose();
                         });
                         activateCodeCommands(context);

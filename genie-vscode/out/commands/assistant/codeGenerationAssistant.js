@@ -25,7 +25,7 @@ var __importStar = (this && this.__importStar) || function (mod) {
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.registerCodeGenerationAssistantCommand = registerCodeGenerationAssistantCommand;
 const vscode = __importStar(require("vscode"));
-const assistantWebviewContent_1 = require("../webview/assistant_webview/assistantWebviewContent");
+const codeGenerationAssistantWebviewContent_1 = require("../webview/assistant_webview/codeGenerationAssistantWebviewContent");
 const assistantAPI_1 = require("../../utils/api/assistantAPI");
 function registerCodeGenerationAssistantCommand(context, authToken) {
     const codeGeneration = vscode.commands.registerCommand("extension.codeGeneration", async () => {
@@ -37,7 +37,7 @@ function registerCodeGenerationAssistantCommand(context, authToken) {
             try {
                 const progressOptions = {
                     location: vscode.ProgressLocation.Notification,
-                    title: "Code Generation Code",
+                    title: "Code Generation",
                     cancellable: false,
                 };
                 await vscode.window.withProgress(progressOptions, async () => {
@@ -46,14 +46,14 @@ function registerCodeGenerationAssistantCommand(context, authToken) {
                     const panel = vscode.window.createWebviewPanel("codeGenerationAssistant", "Code Generation Assistant", vscode.ViewColumn.Beside, {
                         enableScripts: true,
                     });
-                    panel.webview.html = (0, assistantWebviewContent_1.assistantGetWebViewContent)(formattedContent, "Code Generation Assistant");
+                    panel.webview.html = (0, codeGenerationAssistantWebviewContent_1.codeGenerationAssistantWebviewContent)(formattedContent, "Code Generation Assistant");
                     // Listen for messages from the webview
                     panel.webview.onDidReceiveMessage((message) => {
                         switch (message.command) {
                             case 'accept':
                                 // Replace the code in the editor with the commented code
                                 editor.edit(editBuilder => {
-                                    editBuilder.replace(selection, response.commentedCode);
+                                    editBuilder.replace(selection, response.generatedCode);
                                 });
                                 panel.dispose(); // Close the webview after accepting
                                 break;

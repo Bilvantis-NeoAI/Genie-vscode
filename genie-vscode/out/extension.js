@@ -46,6 +46,8 @@ const orgStdReview_1 = require("./commands/review/orgStdReview");
 const addLoggingAssistant_1 = require("./commands/assistant/addLoggingAssistant");
 const addErrorHandlingAssistant_1 = require("./commands/assistant/addErrorHandlingAssistant");
 const refactorCodeAssistant_1 = require("./commands/assistant/refactorCodeAssistant");
+const explainCodeAssistant_1 = require("./commands/assistant/explainCodeAssistant");
+const unittestCodeAssistant_1 = require("./commands/assistant/unittestCodeAssistant");
 let isLoggedIn = false;
 let authToken;
 async function activate(context) {
@@ -111,5 +113,7 @@ function activateCodeCommands(context) {
     (0, addErrorHandlingAssistant_1.registerErrorHandlingAssistantCommand)(context, authToken);
     (0, addLoggingAssistant_1.registerAddLoggingAssistantCommand)(context, authToken);
     (0, refactorCodeAssistant_1.registerRefactorCodeAssistantCommand)(context, authToken);
+    (0, explainCodeAssistant_1.registerExplainCodeAssistantCommand)(context, authToken);
+    (0, unittestCodeAssistant_1.registerUnittestCodeAssistantCommand)(context, authToken);
 }
 //# sourceMappingURL=extension.js.map
