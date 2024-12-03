@@ -1,11 +1,11 @@
-export function queAnsRepositoryGitKBWebviewContent(q: string): string {
+export function getCodeGitKBWebviewContent(question: string, title: string): string {
     interface ParsedContent {
-        response: string;
+        code: string;
       }
    
       let parsedContent: ParsedContent;
       try {
-        parsedContent = JSON.parse(q);
+        parsedContent = JSON.parse(question);
     } catch (e) {
         const errorMessage = e instanceof Error ? e.message : String(e);
         return `<h1>Error parsing content</h1><p>${errorMessage}</p>`;
@@ -18,6 +18,7 @@ export function queAnsRepositoryGitKBWebviewContent(q: string): string {
       <head>
         <meta charset="UTF-8">
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>${title}</title>
         <link href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.24.1/themes/prism-tomorrow.min.css" rel="stylesheet" />
         <style>
           body {
@@ -84,10 +85,12 @@ export function queAnsRepositoryGitKBWebviewContent(q: string): string {
       </head>
       <body>
         <div id="floating-window">
+          <div id="header">${title}</div>
           <div id="content">
+            
             <div class="section">
-              <h3>Generated Response From the GitKB:</h3>
-              <pre><code>${parsedContent.response}</code></pre>
+              <h3>Get Code:</h3>
+              <pre><code>${parsedContent.code}</code></pre>
             </div>
           </div>
           <div id="buttons">

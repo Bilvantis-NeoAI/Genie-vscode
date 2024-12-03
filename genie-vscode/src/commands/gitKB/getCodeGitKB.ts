@@ -1,9 +1,8 @@
 import * as vscode from "vscode";
-import { queAnsRepositoryGitKBWebviewContent } from "../webview/gitKB_webview/queAnsRepositoryGitKBWebviewContent";
-import { postQueAnsRepositoryGitKB } from "../../utils/api/gitKBAPI";
-
-export function registerQueAnsRepositoryGitKBCommand(context: vscode.ExtensionContext, authToken: string) {
-  const queAnsRepoGitKB = vscode.commands.registerCommand("extension.queAnsRepoGitKB", async () => {
+import { getCodeGitKBWebviewContent } from "../webview/gitKB_webview/getCodeGitKBWebviewContent";
+import { postGetCodeGitKB } from "../../utils/api/gitKBAPI";
+export function registerGetCodeGitKBCommand(context: vscode.ExtensionContext, authToken: string) {
+  const getCodeGitKB = vscode.commands.registerCommand("extension.getCodeGitKB", async () => {
     const editor = vscode.window.activeTextEditor;
     if (editor) {
       const selection = editor.selection;
@@ -12,20 +11,20 @@ export function registerQueAnsRepositoryGitKBCommand(context: vscode.ExtensionCo
       try {
         const progressOptions: vscode.ProgressOptions = {
           location: vscode.ProgressLocation.Notification,
-          title: "Get Response From Git KB",
+          title: "Get Code From Git KB",
           cancellable: false,
         };
  
         await vscode.window.withProgress(progressOptions, async () => {
-          const GitKBresponse = await postQueAnsRepositoryGitKB(text, authToken);
+          const response = await postGetCodeGitKB(text, authToken);
          
-          const formattedContent = JSON.stringify(GitKBresponse, null, 2);
+          const formattedContent = JSON.stringify(response, null, 2);
        
-          const panel = vscode.window.createWebviewPanel("queAnsRepoGitKB", "Que Ans Repo GitKB", vscode.ViewColumn.Beside, {
+          const panel = vscode.window.createWebviewPanel("getCodeFromGitKB", "Get Code From Git KB", vscode.ViewColumn.Beside, {
             enableScripts: true,
           });
  
-          panel.webview.html = queAnsRepositoryGitKBWebviewContent(formattedContent);
+          panel.webview.html = getCodeGitKBWebviewContent(formattedContent, "Get Code From Git KB");
  
           // Listen for messages from the webview
           panel.webview.onDidReceiveMessage((message) => {
@@ -33,7 +32,7 @@ export function registerQueAnsRepositoryGitKBCommand(context: vscode.ExtensionCo
               case 'accept':
                 // Replace the code in the editor with the commented code
                 editor.edit(editBuilder => {
-                  editBuilder.replace(selection, GitKBresponse.response);
+                  editBuilder.replace(selection, response.code);
                 });
                 panel.dispose(); // Close the webview after accepting
                 break;
@@ -51,7 +50,7 @@ export function registerQueAnsRepositoryGitKBCommand(context: vscode.ExtensionCo
     }
   });
  
-  context.subscriptions.push(queAnsRepoGitKB);
+  context.subscriptions.push(getCodeGitKB);
 }
  
  

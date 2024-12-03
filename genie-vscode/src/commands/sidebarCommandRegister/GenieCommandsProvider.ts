@@ -48,7 +48,8 @@ export class GenieCommandsProvider implements vscode.TreeDataProvider<GenieComma
       ]);
     } else if (element.label === "Git - Knowledge Base") {
       return Promise.resolve([
-        new GenieCommand("Get Response From Git KB", "extension.queAnsRepoGitKB", "(Ctrl+Shift+A)")
+        new GenieCommand("Explain", "extension.explainGitKB", "(Ctrl+Shift+A)"),
+        new GenieCommand("Get Code", "extension.getCodeGitKB", "(Ctrl+Shift+B)")
       ]);
     }
 

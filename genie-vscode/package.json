@@ -91,8 +91,12 @@
         "title": "Refactor Code"
       },
       {
-        "command": "extension.queAnsRepoGitKB",
+        "command": "extension.explainGitKB",
         "title": "Get Response From Git KB"
+      },
+      {
+        "command": "extension.getCodeGitKB",
+        "title": "Get Code From Git KB"
       }
     ],
     "keybindings": [
@@ -177,8 +181,13 @@
         "when": "editorTextFocus"
       },
       {
-        "command": "extension.queAnsRepoGitKB",
+        "command": "extension.explainGitKB",
         "key": "ctrl+shift+a",
+        "when": "editorTextFocus"
+      },
+      {
+        "command": "extension.getCodeGitKB",
+        "key": "ctrl+shift+b",
         "when": "editorTextFocus"
       }
       

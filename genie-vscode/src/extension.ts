@@ -19,8 +19,8 @@ import { registerErrorHandlingAssistantCommand } from "./commands/assistant/addE
 import { registerRefactorCodeAssistantCommand } from "./commands/assistant/refactorCodeAssistant";
 import { registerExplainCodeAssistantCommand } from "./commands/assistant/explainCodeAssistant";
 import { registerUnittestCodeAssistantCommand } from "./commands/assistant/unittestCodeAssistant";
-import { registerQueAnsRepositoryGitKBCommand } from "./commands/gitKB/queAnsRepositoryGitKB";
-
+import { registerExplainGitKBCommand } from "./commands/gitKB/explainGitKB";
+import { registerGetCodeGitKBCommand } from "./commands/gitKB/getCodeGitKB";
 let isLoggedIn = false;
 let authToken: string | undefined;
 
@@ -106,5 +106,6 @@ export function activateCodeCommands(context: vscode.ExtensionContext) {
   registerUnittestCodeAssistantCommand(context, authToken);
 
   //Register Git KB Commands
-  registerQueAnsRepositoryGitKBCommand(context, authToken);
+  registerExplainGitKBCommand(context, authToken);
+  registerGetCodeGitKBCommand(context, authToken);
 }
