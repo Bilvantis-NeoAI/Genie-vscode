@@ -89,6 +89,10 @@
       {
         "command": "extension.refactorCode",
         "title": "Refactor Code"
+      },
+      {
+        "command": "extension.queAnsRepoGitKB",
+        "title": "Get Response From Git KB"
       }
     ],
     "keybindings": [
@@ -170,6 +174,11 @@
       {
         "command": "extension.refactorCode",
         "key": "ctrl+alt+r",
+        "when": "editorTextFocus"
+      },
+      {
+        "command": "extension.queAnsRepoGitKB",
+        "key": "ctrl+shift+a",
         "when": "editorTextFocus"
       }
       

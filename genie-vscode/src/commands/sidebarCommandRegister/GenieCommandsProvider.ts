@@ -20,7 +20,7 @@ export class GenieCommandsProvider implements vscode.TreeDataProvider<GenieComma
         new GenieCategory("Assistant"),
         new GenieCategory("Review"),
         new GenieCategory("Git - Knowledge Base"),
-        new GenieCategory("Knowledge Base")
+        new GenieCategory("Knowledge Base"),
       ]);
     } else if (element.label === "Assistant") {
       // Commands under the "Assistant" category
@@ -45,6 +45,10 @@ export class GenieCommandsProvider implements vscode.TreeDataProvider<GenieComma
         new GenieCommand("Performance Review", "extension.reviewPerformance", "(Ctrl+Shift+P)"),
         new GenieCommand("Security Review", "extension.reviewSecurity", "(Ctrl+Shift+S)"),
         new GenieCommand("Syntax Review", "extension.reviewSyntax", "(Ctrl+Shift+Y)"),
+      ]);
+    } else if (element.label === "Git - Knowledge Base") {
+      return Promise.resolve([
+        new GenieCommand("Get Response From Git KB", "extension.queAnsRepoGitKB", "(Ctrl+Shift+A)")
       ]);
     }
 

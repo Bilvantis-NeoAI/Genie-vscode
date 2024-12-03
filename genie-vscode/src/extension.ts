@@ -19,11 +19,13 @@ import { registerErrorHandlingAssistantCommand } from "./commands/assistant/addE
 import { registerRefactorCodeAssistantCommand } from "./commands/assistant/refactorCodeAssistant";
 import { registerExplainCodeAssistantCommand } from "./commands/assistant/explainCodeAssistant";
 import { registerUnittestCodeAssistantCommand } from "./commands/assistant/unittestCodeAssistant";
+import { registerQueAnsRepositoryGitKBCommand } from "./commands/gitKB/queAnsRepositoryGitKB";
 
 let isLoggedIn = false;
 let authToken: string | undefined;
 
 export async function activate(context: vscode.ExtensionContext) {
+
   // Reset auth token on activation
   context.globalState.update("authToken", undefined);
   context.globalState.update("urlSubmitted", false);
@@ -102,4 +104,7 @@ export function activateCodeCommands(context: vscode.ExtensionContext) {
   registerRefactorCodeAssistantCommand(context, authToken);
   registerExplainCodeAssistantCommand(context, authToken);
   registerUnittestCodeAssistantCommand(context, authToken);
+
+  //Register Git KB Commands
+  registerQueAnsRepositoryGitKBCommand(context, authToken);
 }
