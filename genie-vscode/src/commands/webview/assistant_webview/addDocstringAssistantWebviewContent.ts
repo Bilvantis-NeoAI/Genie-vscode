@@ -1,9 +1,7 @@
 export function addDocstringsAssistantWebviewContent(content: string, title: string): string {
     interface ParsedContent {
-        quality: string;
-        remarks: string;
+        details: string;
         innerMonologue: string;
-        overallSeverity: string;
         documentationAdded: string;
       }
    
@@ -92,19 +90,11 @@ export function addDocstringsAssistantWebviewContent(content: string, title: str
           <div id="header">${title}</div>
           <div id="content">
             <div class="section">
-              <h3>Quality:</h3>
-              <p>${parsedContent.quality}</p>
+              <h3>Details:</h3>
+              <p>${parsedContent.details}</p>
             </div>
             <div class="section">
-              <h3>Remarks:</h3>
-              <p>${parsedContent.remarks}</p>
-            </div>
-            <div class="section">
-              <h3>Overall Severity:</h3>
-              <p>${parsedContent.overallSeverity}</p>
-            </div>
-            <div class="section">
-              <h3>Looging added Code:</h3>
+              <h3>Documentation Added:</h3>
               <pre><code>${parsedContent.documentationAdded}</code></pre>
             </div>
           </div>
