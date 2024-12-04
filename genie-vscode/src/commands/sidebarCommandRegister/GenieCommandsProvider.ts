@@ -53,6 +53,12 @@ export class GenieCommandsProvider implements vscode.TreeDataProvider<GenieComma
       ]);
     }
 
+    else if (element.label === "Knowledge Base") {
+      return Promise.resolve([
+        new GenieCommand("Get Response From KB", "extension.knowledgeBaseQueAns", "(Ctrl+Shift+K)"),
+      ]);
+    }
+
     return Promise.resolve([]);
   }
 
@@ -81,3 +87,4 @@ class GenieCommand extends vscode.TreeItem {
     this.description = shortcut; // Show shortcut as the description
   }
 }
+

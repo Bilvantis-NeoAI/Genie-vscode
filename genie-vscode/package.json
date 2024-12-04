@@ -97,6 +97,10 @@
       {
         "command": "extension.getCodeGitKB",
         "title": "Get Code From Git KB"
+      },
+      {
+        "command": "extension.knowledgeBaseQueAns",
+        "title": "Get Response From KB"
       }
     ],
     "keybindings": [
@@ -189,8 +193,12 @@
         "command": "extension.getCodeGitKB",
         "key": "ctrl+shift+b",
         "when": "editorTextFocus"
-      }
-      
+      },
+      {
+        "command": "extension.knowledgeBaseQueAns",
+        "key": "ctrl+shift+k",
+        "when": "editorTextFocus"
+      }      
     ],
     "viewsContainers": {
       "activitybar": [
