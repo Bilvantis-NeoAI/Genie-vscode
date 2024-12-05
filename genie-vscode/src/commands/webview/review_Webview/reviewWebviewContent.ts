@@ -1,4 +1,3 @@
-// // filter icon getting based on data
 export function reviewGetWebViewContent(content: string, title: string): string {
     interface Issue {
         identification: string;
@@ -10,9 +9,10 @@ export function reviewGetWebViewContent(content: string, title: string): string 
     }
 
     interface ParsedContent {
-        quality: string;
+        quality?: string;
+        standardsAdherence?: string; 
         remarks: string;
-        overallSeverity: string;
+        overallSeverity?: string;
         issues: Issue[];
     }
 
@@ -23,6 +23,14 @@ export function reviewGetWebViewContent(content: string, title: string): string 
         const errorMessage = e instanceof Error ? e.message : String(e);
         return `<h1>Error parsing content</h1><p>${errorMessage}</p>`;
     }
+
+
+    // Check if `overallSeverity` exists
+    const hasOverallSeverity = parsedContent.hasOwnProperty('overallSeverity');
+    
+     // Determine which column to display
+     const showQuality = parsedContent.hasOwnProperty('quality');
+     const showStandardsAdherence = parsedContent.hasOwnProperty('standardsAdherence');
 
     // Extract unique severities from the issues
     const uniqueSeverities = [...new Set(parsedContent.issues.map(issue => issue.severity.toLowerCase()))];
@@ -126,14 +134,18 @@ export function reviewGetWebViewContent(content: string, title: string): string 
         <h2>Summary</h2>
         <table>
             <tr>
-                <th>Quality</th>
+                
+                 ${showQuality ? '<th>Quality</th>' : ''}
+                ${showStandardsAdherence ? '<th>Quality</th>' : ''}
+                
                 <th>Remarks</th>
-                <th>Overall Severity</th>
+                ${hasOverallSeverity ? '<th>Overall Severity</th>' : ''}
             </tr>
             <tr>
-                <td>${parsedContent.quality}</td>
+                ${showQuality ? `<td>${parsedContent.quality}</td>` : ''}
+                ${showStandardsAdherence ? `<td>${parsedContent.standardsAdherence}</td>` : ''}
                 <td>${parsedContent.remarks}</td>
-                <td>${parsedContent.overallSeverity}</td>
+                ${hasOverallSeverity ? `<td>${parsedContent.overallSeverity}</td>` : ''}
             </tr>
         </table>
         <h2>Issues</h2>

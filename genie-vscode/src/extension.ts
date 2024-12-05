@@ -1,5 +1,5 @@
 import * as vscode from "vscode";
-import { GenieCommandsProvider } from "./commands/sidebarCommandRegister/GenieCommandsProvider";
+import { GenieCommandsProvider } from "./commands/SidebarCommandRegister/GenieCommandsProvider";
 import { registerCodeReviewCommand } from "./commands/review/codeReview";
 import { registerOverallReviewCommand } from "./commands/review/overallReview";
 import { registerPerformanceReviewCommand } from "./commands/review/performanceReview";

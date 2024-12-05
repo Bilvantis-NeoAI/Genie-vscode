@@ -1,7 +1,7 @@
 
 import * as vscode from "vscode";
 import { postSyntaxReview } from "../../utils/api/reviewAPI";
-import { reviewGetWebViewContent } from "../webview/review_Webview/reviewWebviewContent";
+import { reviewGetWebViewContent } from "../webview/review_webview/reviewWebviewContent";
 
 export function registerSyntaxReviewCommand(context: vscode.ExtensionContext, authToken: string) {
   const reviewSyntax = vscode.commands.registerCommand("extension.reviewSyntax", async () => {
