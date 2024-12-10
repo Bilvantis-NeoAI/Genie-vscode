@@ -1,7 +1,7 @@
 
 import * as vscode from "vscode";
 import { postOwaspReview } from "../../utils/api/reviewAPI";
-import { reviewGetWebViewContent } from "../webview/review_webview/reviewWebviewContent";
+import { reviewGetWebViewContent } from "../webview/review_Webview/reviewWebviewContent";
 
 export function registerOwaspReviewCommand(context: vscode.ExtensionContext, authToken: string) {
   const reviewOwasp = vscode.commands.registerCommand("extension.reviewOwasp", async () => {

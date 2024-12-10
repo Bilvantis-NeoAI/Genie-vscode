@@ -1,5 +1,4 @@
 import * as vscode from "vscode";
-import { GenieCommandsProvider } from "./commands/SidebarCommandRegister/GenieCommandsProvider";
 import { registerCodeReviewCommand } from "./commands/review/codeReview";
 import { registerOverallReviewCommand } from "./commands/review/overallReview";
 import { registerPerformanceReviewCommand } from "./commands/review/performanceReview";
@@ -31,10 +30,14 @@ export async function activate(context: vscode.ExtensionContext) {
   // Reset auth token on activation
   context.globalState.update("authToken", undefined);
   context.globalState.update("urlSubmitted", false);
+    
+  // // Register commands that do not require authentication
+  // registerNonAuthenticatedCommands(context);
 
   let urlSubmitted = context.globalState.get("urlSubmitted", false);
   if (!urlSubmitted) {
     showUrlWebview(context);
+
 
 
 	// Wait for the URL submission to complete
@@ -52,6 +55,7 @@ export async function activate(context: vscode.ExtensionContext) {
     showLoginPrompt(context);
   }
   
+
   // Load previously stored auth token if available
   const storedToken = context.globalState.get<string>("authToken");
 
@@ -62,8 +66,8 @@ export async function activate(context: vscode.ExtensionContext) {
   } 
 
   // Register the sidebar provider for Genie commands
-  const genieProvider = new GenieCommandsProvider();
-  vscode.window.registerTreeDataProvider("genieCommands", genieProvider);
+  // const genieProvider = new GenieCommandsProvider();
+  // vscode.window.registerTreeDataProvider("genieCommands", genieProvider);
 }
 
 export function openLoginPage(context: vscode.ExtensionContext) {
@@ -87,6 +91,7 @@ export function activateCodeCommands(context: vscode.ExtensionContext) {
   }
 
 
+    
   // Register all review commands
   registerCodeReviewCommand(context, authToken);
   registerPerformanceReviewCommand(context, authToken);
@@ -114,3 +119,4 @@ export function activateCodeCommands(context: vscode.ExtensionContext) {
   //Register KB Commands
   registerKnowledgeBaseQACommand(context, authToken);
 }
+

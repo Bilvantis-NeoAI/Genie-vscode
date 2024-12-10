@@ -1,7 +1,8 @@
 import * as vscode from 'vscode';
 import { activateCodeCommands } from '../../../extension';
 import { BASE_API } from '../../../auth/config';
- 
+
+import { GenieCommandsProvider } from '../../sidebarCommandRegister/GenieCommandsProvider';
 let activeWebview: vscode.WebviewPanel | null = null; // Keep track of the active webview
  
  
@@ -266,6 +267,8 @@ export function showLoginRegisterWebview(
                     if (message.token) {
                         context.globalState.update('authToken', message.token).then(() => {
                             vscode.window.showInformationMessage('Login Successful!');
+                            const genieProvider = new GenieCommandsProvider();
+                            vscode.window.registerTreeDataProvider("genieCommands", genieProvider);
                             vscode.commands.executeCommand('workbench.action.closeAllEditors'); //closeActiveEditor
                             panel.dispose();
                         });

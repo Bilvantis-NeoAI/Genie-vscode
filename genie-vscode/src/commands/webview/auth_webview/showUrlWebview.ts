@@ -7,7 +7,7 @@ export function showUrlWebview(
 ) {
     const panel = vscode.window.createWebviewPanel(
         'urlWebview',
-        'URL',
+        'Server Link',
         vscode.ViewColumn.One,
         {
             enableScripts: true,

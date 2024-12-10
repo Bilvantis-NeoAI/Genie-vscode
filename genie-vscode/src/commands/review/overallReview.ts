@@ -1,7 +1,7 @@
 
 import * as vscode from "vscode";
 import { postOverallReview } from "../../utils/api/reviewAPI";
-import { reviewGetWebViewContent } from "../webview/review_webview/reviewWebviewContent";
+import { reviewGetWebViewContent } from "../webview/review_Webview/reviewWebviewContent";
 
 export function registerOverallReviewCommand(context: vscode.ExtensionContext, authToken: string) {
   const reviewOverall = vscode.commands.registerCommand("extension.reviewOverall", async () => {
