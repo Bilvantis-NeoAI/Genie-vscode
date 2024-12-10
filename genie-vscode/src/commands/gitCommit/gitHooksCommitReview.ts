@@ -46,7 +46,7 @@ exit /b 0
     vscode.window.showInformationMessage("Pre-commit hook installed.");
  
     // Install post-commit hook
-    const postCommitHookPath = path.join(hooksDir, "post-commit");
+    const postCommitHookPath = path.join(hooksDir, "post-commit.bat");
     const postCommitHook = `
 # Global Git post-commit hook in PowerShell with embedded Python logic
 
