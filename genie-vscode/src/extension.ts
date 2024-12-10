@@ -21,19 +21,41 @@ import { registerUnittestCodeAssistantCommand } from "./commands/assistant/unitt
 import { registerExplainGitKBCommand } from "./commands/gitKB/explainGitKB";
 import { registerGetCodeGitKBCommand } from "./commands/gitKB/getCodeGitKB";
 import { registerKnowledgeBaseQACommand } from "./commands/KB/queAnsFromKB";
-
+import { LoginRegisterCommandsProvider } from "./commands/sidebarCommandRegister/LoginRegisterCommandsProvider";
 let isLoggedIn = false;
 let authToken: string | undefined;
 
 export async function activate(context: vscode.ExtensionContext) {
-
   // Reset auth token on activation
   context.globalState.update("authToken", undefined);
   context.globalState.update("urlSubmitted", false);
-    
-  // // Register commands that do not require authentication
-  // registerNonAuthenticatedCommands(context);
+  
 
+  const loginRegisterProvider = new LoginRegisterCommandsProvider();
+  // Replace the openLoginPage command registration
+  vscode.window.registerTreeDataProvider("loginRegisterCommands", loginRegisterProvider);
+
+  // Register sidebar commands
+  context.subscriptions.push(
+    vscode.commands.registerCommand("extension.url", () => {
+      // Directly show the login webview
+      showUrlWebview(context);
+    })
+  );
+  context.subscriptions.push(
+    vscode.commands.registerCommand("extension.login", () => {
+      // Directly show the login webview
+      showLoginRegisterWebview(context, "login");
+    })
+  );
+
+  context.subscriptions.push(
+    vscode.commands.registerCommand("extension.register", () => {
+      showLoginRegisterWebview(context, "register");
+    })
+  );
+
+  
   let urlSubmitted = context.globalState.get("urlSubmitted", false);
   if (!urlSubmitted) {
     showUrlWebview(context);

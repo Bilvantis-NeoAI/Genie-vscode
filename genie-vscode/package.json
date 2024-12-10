@@ -212,9 +212,13 @@
     "views": {
       "genieSidebar": [
         {
+          "id": "loginRegisterCommands",
+        "name": "Login/Register"
+        },
+        {
           "id": "genieCommands",
           "name": "Genie Commands"
-        }
+        }        
       ]
     }
   },
