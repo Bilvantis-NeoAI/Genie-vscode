@@ -1,7 +1,7 @@
 
 import * as vscode from "vscode";
 import { postSecurityReview } from "../../utils/api/reviewAPI";
-import { reviewGetWebViewContent } from "../webview/review_Webview/reviewWebviewContent";
+import { reviewGetWebViewContent } from "../webview/review_webview/reviewWebviewContent"
 
 export function registerSecurityReviewCommand(context: vscode.ExtensionContext, authToken: string) {
   const reviewSecurity = vscode.commands.registerCommand("extension.reviewSecurity", async () => {

@@ -21,6 +21,7 @@ import { registerUnittestCodeAssistantCommand } from "./commands/assistant/unitt
 import { registerExplainGitKBCommand } from "./commands/gitKB/explainGitKB";
 import { registerGetCodeGitKBCommand } from "./commands/gitKB/getCodeGitKB";
 import { registerKnowledgeBaseQACommand } from "./commands/KB/queAnsFromKB";
+import {gitHooksCommitReview} from "./commands/gitCommit/gitHooksCommitReview";
 
 let isLoggedIn = false;
 let authToken: string | undefined;
@@ -53,8 +54,13 @@ export async function activate(context: vscode.ExtensionContext) {
   urlSubmitted = context.globalState.get("urlSubmitted", false);
   if (urlSubmitted) {
     showLoginPrompt(context);
+
+
+    
   }
+
   
+ 
 
   // Load previously stored auth token if available
   const storedToken = context.globalState.get<string>("authToken");
@@ -63,11 +69,11 @@ export async function activate(context: vscode.ExtensionContext) {
     authToken = storedToken;
     isLoggedIn = true;
     activateCodeCommands(context);
+
+
+    
   } 
 
-  // Register the sidebar provider for Genie commands
-  // const genieProvider = new GenieCommandsProvider();
-  // vscode.window.registerTreeDataProvider("genieCommands", genieProvider);
 }
 
 export function openLoginPage(context: vscode.ExtensionContext) {
@@ -118,5 +124,8 @@ export function activateCodeCommands(context: vscode.ExtensionContext) {
 
   //Register KB Commands
   registerKnowledgeBaseQACommand(context, authToken);
+
+  // Register gitHooksCommitReview
+  gitHooksCommitReview(context, authToken);
 }
 

@@ -2,7 +2,7 @@ import * as vscode from 'vscode';
 import { activateCodeCommands } from '../../../extension';
 import { BASE_API } from '../../../auth/config';
 
-import { GenieCommandsProvider } from '../../sidebarCommandRegister/GenieCommandsProvider';
+import { GenieCommandsProvider } from "../../SidebarCommandRegister/GenieCommandsProvider"
 let activeWebview: vscode.WebviewPanel | null = null; // Keep track of the active webview
  
  

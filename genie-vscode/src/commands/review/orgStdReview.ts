@@ -1,7 +1,7 @@
 
 import * as vscode from "vscode";
 import { postOrgStdReview } from "../../utils/api/reviewAPI";
-import { reviewGetWebViewContent } from "../webview/review_Webview/reviewWebviewContent";
+import { reviewGetWebViewContent } from "../webview/review_webview/reviewWebviewContent"
 
 export function registerOrgStdReviewCommand(context: vscode.ExtensionContext, authToken: string) {
   const reviewOrgStd = vscode.commands.registerCommand("extension.reviewOrgStd", async () => {
