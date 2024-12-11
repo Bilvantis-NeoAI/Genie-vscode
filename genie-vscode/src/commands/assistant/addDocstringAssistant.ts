@@ -1,0 +1,58 @@
+import * as vscode from "vscode";
+import { postAddDocStringsAssistant } from "../../utils/api/assistantAPI";
+import { addDocstringsAssistantWebviewContent } from "../webview/assistant_webview/addDocstringAssistantWebviewContent";
+
+export function registerAddDocstringsAssistantCommand(context: vscode.ExtensionContext, authToken: string) {
+  const addDocstrings = vscode.commands.registerCommand("extension.addDocstrings", async () => {
+    const editor = vscode.window.activeTextEditor;
+    if (editor) {
+      const selection = editor.selection;
+      const text = editor.document.getText(selection);
+      const language = editor.document.languageId;
+ 
+      try {
+        const progressOptions: vscode.ProgressOptions = {
+          location: vscode.ProgressLocation.Notification,
+          title: "Add Docstrings",
+          cancellable: false,
+        };
+ 
+        await vscode.window.withProgress(progressOptions, async () => {
+          const response = await postAddDocStringsAssistant(text, language, authToken);
+         
+          const formattedContent = JSON.stringify(response, null, 2);
+       
+          const panel = vscode.window.createWebviewPanel("addDocstringsAssistant", "Add Docstrings Assistant", vscode.ViewColumn.Beside, {
+            enableScripts: true,
+          });
+ 
+          panel.webview.html = addDocstringsAssistantWebviewContent(formattedContent, "Add Docstrings Assistant");
+ 
+          // Listen for messages from the webview
+          panel.webview.onDidReceiveMessage((message) => {
+            switch (message.command) {
+              case 'accept':
+                // Replace the code in the editor with the commented code
+                editor.edit(editBuilder => {
+                  editBuilder.replace(selection, response.documentationAdded);
+                });
+                panel.dispose(); // Close the webview after accepting
+                break;
+              case 'reject':
+                // Just close the webview without making any changes
+                panel.dispose();
+                break;
+            }
+          });
+        });
+ 
+      } catch (error) {
+        vscode.window.showErrorMessage("Error Docstring code.");
+      }
+    }
+  });
+ 
+  context.subscriptions.push(addDocstrings);
+}
+ 
+ 

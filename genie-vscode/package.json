@@ -3,6 +3,8 @@
   "displayName": "Genie_vscode",
   "description": "A VS extension to comment code, review code, generate docstrings, unit tests, analyze code metrics, generate logs, and handle errors",
   "version": "0.0.1",
+  "publisher": "Bilvantis",
+  "type": "commonjs",
   "engines": {
     "vscode": "^1.60.0"
   },
@@ -10,34 +12,237 @@
     "Other"
   ],
   "activationEvents": [
-    "onCommand:genie.helloWorld"
+    "*"
   ],
   "main": "./out/extension.js",
   "contributes": {
     "commands": [
       {
-        "command": "genie-vscode.helloWorld",
-        "title": "Hello World"
+        "command": "extension.showCommandList",
+        "title": "Show Command List",
+        "category": "Genie"
+      },
+      {
+        "command": "extension.showLoginPage",
+        "title": "Show Login Page"
+      },
+      {
+        "command": "extension.reviewCode",
+        "title": " code Review Selected"
+      },
+      {
+        "command": "extension.reviewPerformance",
+        "title": "Performance Review Selected"
+      },
+      {
+        "command": "extension.reviewSecurity",
+        "title": "Security Review Selected"
+      },
+      {
+        "command": "extension.reviewSyntax",
+        "title": "Syntax Review Selected"
+      },
+      {
+        "command": "extension.reviewOverall",
+        "title": "Overall Review Selected"
+      },
+      {
+        "command": "extension.reviewOwasp",
+        "title": "Owasp Review Selected"
+      },
+      {
+        "command": "extension.reviewCyclometricCX",
+        "title": "Cyclometric-CX Review Selected"
+      },
+      {
+        "command": "extension.reviewOrgStd",
+        "title": "Org Std Review Selected"
+      },
+      {
+        "command": "extension.addComments",
+        "title": "Add Comments To Selected Code"
+      },
+      {
+        "command": "extension.codeGeneration",
+        "title": "Code Generation"
+      },
+      {
+        "command": "extension.addDocstrings",
+        "title": "Add Docstring"
+      },
+      {
+        "command": "extension.explainCode",
+        "title": "Explain Code"
+      },
+      {
+        "command": "extension.unittestCode",
+        "title": "Unit Test Code"
+      },
+      {
+        "command": "extension.errorHandling",
+        "title": "Error Handling"
+      },
+      {
+        "command": "extension.addLogging",
+        "title": "Add Logging"
+      },
+      {
+        "command": "extension.refactorCode",
+        "title": "Refactor Code"
+      },
+      {
+        "command": "extension.explainGitKB",
+        "title": "Get Response From Git KB"
+      },
+      {
+        "command": "extension.getCodeGitKB",
+        "title": "Get Code From Git KB"
+      },
+      {
+        "command": "extension.knowledgeBaseQueAns",
+        "title": "Get Response From KB"
       }
-    ]
+    ],
+    "keybindings": [
+      {
+        "command": "extension.reviewCode",
+        "key": "ctrl+shift+r",
+        "when": "editorTextFocus"
+      },
+      {
+        "command": "extension.reviewPerformance",
+        "key": "ctrl+shift+p",
+        "when": "editorTextFocus"
+      },
+      {
+        "command": "extension.reviewSecurity",
+        "key": "ctrl+shift+s",
+        "when": "editorTextFocus"
+      },
+      {
+        "command": "extension.reviewSyntax",
+        "key": "ctrl+shift+y",
+        "when": "editorTextFocus"
+      },
+      {
+        "command": "extension.reviewOverall",
+        "key": "ctrl+shift+o",
+        "when": "editorTextFocus"
+      },
+      {
+        "command": "extension.reviewOwasp",
+        "key": "ctrl+shift+w",
+        "when": "editorTextFocus"
+      },
+      {
+        "command": "extension.reviewCyclometricCX",
+        "key": "ctrl+shift+c",
+        "when": "editorTextFocus"
+      },
+      {
+        "command": "extension.reviewOrgStd",
+        "key": "ctrl+shift+g",
+        "when": "editorTextFocus"
+      },
+      {
+        "command": "extension.addComments",
+        "key": "ctrl+alt+c",
+        "when": "editorTextFocus"
+      },
+      {
+        "command": "extension.codeGeneration",
+        "key": "ctrl+alt+g",
+        "when": "editorTextFocus"
+      },
+      {
+        "command": "extension.addDocstrings",
+        "key": "ctrl+alt+d",
+        "when": "editorTextFocus"
+      },
+      {
+        "command": "extension.explainCode",
+        "key": "ctrl+alt+x",
+        "when": "editorTextFocus"
+      },
+      {
+        "command": "extension.unittestCode",
+        "key": "ctrl+alt+u",
+        "when": "editorTextFocus"
+      },
+      {
+        "command": "extension.errorHandling",
+        "key": "ctrl+alt+e",
+        "when": "editorTextFocus"
+      },
+      {
+        "command": "extension.addLogging",
+        "key": "ctrl+alt+l",
+        "when": "editorTextFocus"
+      },
+      {
+        "command": "extension.refactorCode",
+        "key": "ctrl+alt+r",
+        "when": "editorTextFocus"
+      },
+      {
+        "command": "extension.explainGitKB",
+        "key": "ctrl+shift+a",
+        "when": "editorTextFocus"
+      },
+      {
+        "command": "extension.getCodeGitKB",
+        "key": "ctrl+shift+b",
+        "when": "editorTextFocus"
+      },
+      {
+        "command": "extension.knowledgeBaseQueAns",
+        "key": "ctrl+shift+k",
+        "when": "editorTextFocus"
+      }      
+    ],
+    "viewsContainers": {
+      "activitybar": [
+        {
+          "id": "genieSidebar",
+          "title": "Genie",
+          "icon": "media/Genie-lamp.svg"
+        }
+      ]
+    },
+    "views": {
+      "genieSidebar": [
+        {
+          "id": "loginRegisterCommands",
+        "name": "Login/Register"
+        },
+        {
+          "id": "genieCommands",
+          "name": "Genie Commands"
+        }        
+      ]
+    }
   },
   "scripts": {
     "vscode:prepublish": "npm run compile",
-    "compile": "tsc -p ./",
-    "watch": "tsc -watch -p ./",
+    "compile": "tsc",
+    "watch": "tsc -w",
     "pretest": "npm run compile && npm run lint",
     "lint": "eslint src",
     "test": "vscode-test"
   },
   "devDependencies": {
-    "@types/vscode": "^1.95.0",
     "@types/mocha": "^10.0.9",
     "@types/node": "20.x",
+    "@types/vscode": "^1.95.0",
     "@typescript-eslint/eslint-plugin": "^8.10.0",
     "@typescript-eslint/parser": "^8.7.0",
-    "eslint": "^9.13.0",
-    "typescript": "^5.6.3",
     "@vscode/test-cli": "^0.0.10",
-    "@vscode/test-electron": "^2.4.1"
+    "@vscode/test-electron": "^2.4.1",
+    "eslint": "^9.13.0",
+    "typescript": "^5.6.3"
+  },
+  "dependencies": {
+    "axios": "^1.7.7",
+    "puppeteer": "^23.9.0"
   }
 }

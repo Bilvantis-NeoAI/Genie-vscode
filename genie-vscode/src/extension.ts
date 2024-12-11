@@ -1,26 +1,144 @@
-// The module 'vscode' contains the VS Code extensibility API
-// Import the module and reference it with the alias vscode in your code below
-import * as vscode from 'vscode';
+import * as vscode from "vscode";
+import { registerCodeReviewCommand } from "./commands/review/codeReview";
+import { registerOverallReviewCommand } from "./commands/review/overallReview";
+import { registerPerformanceReviewCommand } from "./commands/review/performanceReview";
+import { registerSecurityReviewCommand } from "./commands/review/securityReview";
+import { registerSyntaxReviewCommand } from "./commands/review/syntaxReview";
+import { showLoginRegisterWebview } from "./commands/webview/auth_webview/showLoginRegisterWebview";
+import { showUrlWebview } from "./commands/webview/auth_webview/showUrlWebview";
+import { showLoginPrompt } from "./auth/authDialog";
+import { registerOwaspReviewCommand } from "./commands/review/owaspReview";
+import { registerCyclometricCXReviewCommand } from "./commands/review/cyclometric_cx";
+import { registerAddDocstringsAssistantCommand } from "./commands/assistant/addDocstringAssistant";
+import { registerCodeGenerationAssistantCommand } from "./commands/assistant/codeGenerationAssistant";
+import { registerAddCommentsAssistantCommand } from "./commands/assistant/addCommentsCodeAssistant";
+import { registerOrgStdReviewCommand } from "./commands/review/orgStdReview";
+import { registerAddLoggingAssistantCommand } from "./commands/assistant/addLoggingAssistant";
+import { registerErrorHandlingAssistantCommand } from "./commands/assistant/addErrorHandlingAssistant";
+import { registerRefactorCodeAssistantCommand } from "./commands/assistant/refactorCodeAssistant";
+import { registerExplainCodeAssistantCommand } from "./commands/assistant/explainCodeAssistant";
+import { registerUnittestCodeAssistantCommand } from "./commands/assistant/unittestCodeAssistant";
+import { registerExplainGitKBCommand } from "./commands/gitKB/explainGitKB";
+import { registerGetCodeGitKBCommand } from "./commands/gitKB/getCodeGitKB";
+import { registerKnowledgeBaseQACommand } from "./commands/KB/queAnsFromKB";
+import { LoginRegisterCommandsProvider } from "./commands/sidebarCommandRegister/LoginRegisterCommandsProvider";
+let isLoggedIn = false;
+let authToken: string | undefined;
 
-// This method is called when your extension is activated
-// Your extension is activated the very first time the command is executed
-export function activate(context: vscode.ExtensionContext) {
+export async function activate(context: vscode.ExtensionContext) {
+  // Reset auth token on activation
+  context.globalState.update("authToken", undefined);
+  context.globalState.update("urlSubmitted", false);
+  
 
-	// Use the console to output diagnostic information (console.log) and errors (console.error)
-	// This line of code will only be executed once when your extension is activated
-	console.log('Congratulations, your extension "genie-vscode" is now active!');
+  const loginRegisterProvider = new LoginRegisterCommandsProvider();
+  // Replace the openLoginPage command registration
+  vscode.window.registerTreeDataProvider("loginRegisterCommands", loginRegisterProvider);
 
-	// The command has been defined in the package.json file
-	// Now provide the implementation of the command with registerCommand
-	// The commandId parameter must match the command field in package.json
-	const disposable = vscode.commands.registerCommand('genie-vscode.helloWorld', () => {
-		// The code you place here will be executed every time your command is executed
-		// Display a message box to the user
-		vscode.window.showInformationMessage('Hello World from Genie_vscode!');
-	});
+  // Register sidebar commands
+  context.subscriptions.push(
+    vscode.commands.registerCommand("extension.url", () => {
+      // Directly show the login webview
+      showUrlWebview(context);
+    })
+  );
+  context.subscriptions.push(
+    vscode.commands.registerCommand("extension.login", () => {
+      // Directly show the login webview
+      showLoginRegisterWebview(context, "login");
+    })
+  );
 
-	context.subscriptions.push(disposable);
+  context.subscriptions.push(
+    vscode.commands.registerCommand("extension.register", () => {
+      showLoginRegisterWebview(context, "register");
+    })
+  );
+
+  
+  let urlSubmitted = context.globalState.get("urlSubmitted", false);
+  if (!urlSubmitted) {
+    showUrlWebview(context);
+
+
+
+	// Wait for the URL submission to complete
+    const waitForSubmission = async () => {
+		while (!context.globalState.get("urlSubmitted", false)) {
+		  await new Promise((resolve) => setTimeout(resolve, 100)); // Small delay for polling
+		}
+	  };
+	  await waitForSubmission();
+   }
+
+   // Proceed after the URL is submitted
+  urlSubmitted = context.globalState.get("urlSubmitted", false);
+  if (urlSubmitted) {
+    showLoginPrompt(context);
+  }
+  
+
+  // Load previously stored auth token if available
+  const storedToken = context.globalState.get<string>("authToken");
+
+  if (storedToken) {
+    authToken = storedToken;
+    isLoggedIn = true;
+    activateCodeCommands(context);
+  } 
+
+  // Register the sidebar provider for Genie commands
+  // const genieProvider = new GenieCommandsProvider();
+  // vscode.window.registerTreeDataProvider("genieCommands", genieProvider);
 }
 
-// This method is called when your extension is deactivated
-export function deactivate() {}
+export function openLoginPage(context: vscode.ExtensionContext) {
+  showLoginRegisterWebview(context, "login");
+}
+
+export function openSignUpPage(context: vscode.ExtensionContext) {
+  showLoginRegisterWebview(context, "register");
+}
+
+/**
+ * Activates all code-related commands using the stored auth token.
+ * If the auth token is not available, an error message is shown.
+ */
+export function activateCodeCommands(context: vscode.ExtensionContext) {
+  const authToken = context.globalState.get<string>("authToken");
+
+  if (!authToken) {
+    vscode.window.showErrorMessage("Authentication is required to activate code commands.");
+    return;
+  }
+
+
+    
+  // Register all review commands
+  registerCodeReviewCommand(context, authToken);
+  registerPerformanceReviewCommand(context, authToken);
+  registerSecurityReviewCommand(context, authToken);
+  registerSyntaxReviewCommand(context, authToken);
+  registerOverallReviewCommand(context, authToken);
+  registerOwaspReviewCommand(context, authToken);
+  registerCyclometricCXReviewCommand(context, authToken);
+  registerOrgStdReviewCommand(context, authToken);
+  
+  //Register all Assistant Commands
+  registerAddCommentsAssistantCommand(context, authToken);
+  registerAddDocstringsAssistantCommand(context, authToken);
+  registerCodeGenerationAssistantCommand(context, authToken);
+  registerErrorHandlingAssistantCommand(context, authToken);
+  registerAddLoggingAssistantCommand(context, authToken);
+  registerRefactorCodeAssistantCommand(context, authToken);
+  registerExplainCodeAssistantCommand(context, authToken);
+  registerUnittestCodeAssistantCommand(context, authToken);
+
+  //Register Git KB Commands
+  registerExplainGitKBCommand(context, authToken);
+  registerGetCodeGitKBCommand(context, authToken);
+
+  //Register KB Commands
+  registerKnowledgeBaseQACommand(context, authToken);
+}
+
