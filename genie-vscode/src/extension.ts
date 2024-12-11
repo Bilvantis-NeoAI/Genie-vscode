@@ -22,6 +22,9 @@ import { registerExplainGitKBCommand } from "./commands/gitKB/explainGitKB";
 import { registerGetCodeGitKBCommand } from "./commands/gitKB/getCodeGitKB";
 import { registerKnowledgeBaseQACommand } from "./commands/KB/queAnsFromKB";
 import { LoginRegisterCommandsProvider } from "./commands/sidebarCommandRegister/LoginRegisterCommandsProvider";
+import { gitHooksCommitReview } from "./commands/gitCommit/gitHooksCommitReview";
+
+
 let isLoggedIn = false;
 let authToken: string | undefined;
 
@@ -140,5 +143,8 @@ export function activateCodeCommands(context: vscode.ExtensionContext) {
 
   //Register KB Commands
   registerKnowledgeBaseQACommand(context, authToken);
+
+  //gitHooks
+  gitHooksCommitReview(context, authToken);
 }
 

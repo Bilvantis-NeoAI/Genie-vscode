@@ -17,10 +17,10 @@ export class GenieCommandsProvider implements vscode.TreeDataProvider<GenieComma
     if (!element) {
       // Top-level categories
       return Promise.resolve([
-        new GenieCategory("Assistant"),
-        new GenieCategory("Review"),
-        new GenieCategory("Git - Knowledge Base"),
-        new GenieCategory("Knowledge Base"),
+        new GenieCategory("Assistant", "account"),
+        new GenieCategory("Review", "list-unordered"),
+        new GenieCategory("Git - Knowledge Base", "git-merge"),
+        new GenieCategory("Knowledge Base", "book")
       ]);
     } else if (element.label === "Assistant") {
       // Commands under the "Assistant" category
@@ -69,9 +69,10 @@ export class GenieCommandsProvider implements vscode.TreeDataProvider<GenieComma
 }
 
 class GenieCategory extends vscode.TreeItem {
-  constructor(label: string) {
+  constructor(label: string, iconName: string) {
     super(label, vscode.TreeItemCollapsibleState.Collapsed); // Categories are collapsible
     this.contextValue = "category";
+    this.iconPath = new vscode.ThemeIcon(iconName);
   }
 }
 
