@@ -8,9 +8,7 @@ export function unittestCodeAssistantWebViewContent(content: string, title: stri
     }
 
     interface ParsedContent {
-        quality: string;
-        remarks: string;
-        overallSeverity: string;
+        details: string;
         unitTests: unitTests[];
     }
 
@@ -22,16 +20,12 @@ export function unittestCodeAssistantWebViewContent(content: string, title: stri
         return `<h1>Error parsing content</h1><p>${errorMessage}</p>`;
     }
 
-    // Extract unique severities from the issues
-    const uniqueSeverities = [...new Set(parsedContent.unitTests.map(unitTests => unitTests.severity.toLowerCase()))];
-
     return `<!DOCTYPE html>
   <html lang="en">
   <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>${title}</title>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.9.2/html2pdf.bundle.min.js"></script>
     <style>
         body {
             font-family: Arial, sans-serif;
@@ -119,20 +113,15 @@ export function unittestCodeAssistantWebViewContent(content: string, title: stri
   <body>
     <div class="header">
         <h1>${title}</h1>
-        <button class="download-btn" onclick="downloadPDF()">Download as PDF</button>
     </div>
     <div id="content">
         <h2>Summary</h2>
         <table>
             <tr>
-                <th>Quality</th>
-                <th>Remarks</th>
-                <th>Overall Severity</th>
+                <th>Details</th>
             </tr>
             <tr>
-                <td>${parsedContent.quality}</td>
-                <td>${parsedContent.remarks}</td>
-                <td>${parsedContent.overallSeverity}</td>
+                <td>${parsedContent.details}</td>
             </tr>
         </table>
         <h2>Issues</h2>
@@ -145,15 +134,6 @@ export function unittestCodeAssistantWebViewContent(content: string, title: stri
                     <th>Importance</th>
                     <th>
                         Severity
-                        <div class="filter-container">
-                            <span>🔽</span>
-                            <div class="filter-options" id="filterOptions">
-                                <a href="#" onclick="filterSeverity('all')">All</a>
-                                ${uniqueSeverities.map(severity => `
-                                    <a href="#" onclick="filterSeverity('${severity}')">${severity.charAt(0).toUpperCase() + severity.slice(1)}</a>
-                                `).join('')}
-                            </div>
-                        </div>
                     </th>
                     <th>Status</th>
                 </tr>
@@ -187,42 +167,6 @@ export function unittestCodeAssistantWebViewContent(content: string, title: stri
             </tbody>
         </table>
     </div>
-    <script>
-    function downloadPDF() {
-            const element = document.body;
-            const opt = {
-                filename: '${title.replace(/ /g, '_')}.pdf',
-                margin: 0,
-                image: { type: 'jpeg', quality: 0.98 },
-                html2canvas: { scale: 2 },
-                jsPDF: { unit: 'pt', format: 'a4', orientation: 'portrait' },
-            };
-            html2pdf().set(opt).from(element).save();
-        }
-
-    // Function to filter table rows by severity
-    function filterSeverity(severity: string) {
-        const rows = document.querySelectorAll<HTMLTableRowElement>('#issuesBody tr'); // Select all rows in the table body
-        rows.forEach(row => {
-            const rowSeverity = row.getAttribute('data-severity'); // Get the severity level from the row
-            if (severity === 'all' || rowSeverity === severity) {
-                row.style.display = ''; // Show the row if severity matches or 'all' is selected
-            } else {
-                row.style.display = 'none'; // Hide the row otherwise
-            }
-        });
-    }
-
-    // Event Listener for Filter Options
-    document.querySelectorAll<HTMLAnchorElement>('.filter-options a').forEach(option => {
-        option.addEventListener('click', event => {
-            event.preventDefault(); // Prevent default link behavior
-            const severity = option.getAttribute('onclick')!.match(/filterSeverity\\('(.*?)'\\)/)![1]; // Extract severity value
-            filterSeverity(severity); // Call the filter function
-        });
-    });
-    </script>
-
   </body>
   </html>`;
 }

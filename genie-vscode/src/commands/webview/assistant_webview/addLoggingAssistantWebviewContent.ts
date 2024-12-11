@@ -1,9 +1,6 @@
 export function addLoggingAssistantWebviewContent(content: string, title: string): string {
     interface ParsedContent {
-        quality: string;
-        remarks: string;
-        innerMonologue: string;
-        overallSeverity: string;
+        details: string;
         loggedCode: string;
       }
    
@@ -92,19 +89,11 @@ export function addLoggingAssistantWebviewContent(content: string, title: string
           <div id="header">${title}</div>
           <div id="content">
             <div class="section">
-              <h3>Quality:</h3>
-              <p>${parsedContent.quality}</p>
+              <h3>Details:</h3>
+              <p>${parsedContent.details}</p>
             </div>
             <div class="section">
-              <h3>Remarks:</h3>
-              <p>${parsedContent.remarks}</p>
-            </div>
-            <div class="section">
-              <h3>Overall Severity:</h3>
-              <p>${parsedContent.overallSeverity}</p>
-            </div>
-            <div class="section">
-              <h3>Looging added Code:</h3>
+              <h3>Logged Code:</h3>
               <pre><code>${parsedContent.loggedCode}</code></pre>
             </div>
           </div>

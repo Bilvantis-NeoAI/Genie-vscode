@@ -1,13 +1,11 @@
-export function refactorCodeAssistantWebviewContent(content: string, title: string): string {
+export function getCodeGitKBWebviewContent(question: string, title: string): string {
     interface ParsedContent {
-        details: string;
-        innerMonologue: string;
-        refactoredCode: string;
+        code: string;
       }
    
       let parsedContent: ParsedContent;
       try {
-        parsedContent = JSON.parse(content);
+        parsedContent = JSON.parse(question);
     } catch (e) {
         const errorMessage = e instanceof Error ? e.message : String(e);
         return `<h1>Error parsing content</h1><p>${errorMessage}</p>`;
@@ -89,13 +87,10 @@ export function refactorCodeAssistantWebviewContent(content: string, title: stri
         <div id="floating-window">
           <div id="header">${title}</div>
           <div id="content">
+            
             <div class="section">
-              <h3>Details:</h3>
-              <p>${parsedContent.details}</p>
-            </div>
-            <div class="section">
-              <h3>Refactored Code:</h3>
-              <pre><code>${parsedContent.refactoredCode}</code></pre>
+              <h3>Get Code:</h3>
+              <pre><code>${parsedContent.code}</code></pre>
             </div>
           </div>
           <div id="buttons">

@@ -1,9 +1,7 @@
 export function addErrorHandlingAssistantWebviewContent(content: string, title: string): string {
     interface ParsedContent {
-        quality: string;
-        remarks: string;
+        details: string;
         innerMonologue: string;
-        overallSeverity: string;
         exceptionHandlingAdded: string;
       }
    
@@ -92,17 +90,10 @@ export function addErrorHandlingAssistantWebviewContent(content: string, title: 
           <div id="header">${title}</div>
           <div id="content">
             <div class="section">
-              <h3>Quality:</h3>
-              <p>${parsedContent.quality}</p>
+              <h3>Details:</h3>
+              <p>${parsedContent.details}</p>
             </div>
-            <div class="section">
-              <h3>Remarks:</h3>
-              <p>${parsedContent.remarks}</p>
-            </div>
-            <div class="section">
-              <h3>Overall Severity:</h3>
-              <p>${parsedContent.overallSeverity}</p>
-            </div>
+           
             <div class="section">
               <h3>Exception Handled Code:</h3>
               <pre><code>${parsedContent.exceptionHandlingAdded}</code></pre>

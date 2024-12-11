@@ -7,7 +7,7 @@ export function showUrlWebview(
 ) {
     const panel = vscode.window.createWebviewPanel(
         'urlWebview',
-        'URL',
+        'Server Link',
         vscode.ViewColumn.One,
         {
             enableScripts: true,
@@ -56,7 +56,7 @@ export function showUrlWebview(
             <form id="authForm">
                 <div class="form-group">
                     <label for="url">Domain:</label>
-                    <input type="text" id="url" name="url" class="form-control" value="http://localhost:3000" required>
+                    <input type="text" id="url" name="url" class="form-control" value="http://34.27.22.123:3000" required>
                 </div>
                 
                 <button type="submit" class="btn btn-primary btn-block">URL</button>

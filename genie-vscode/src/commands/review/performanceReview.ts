@@ -2,6 +2,7 @@
 import * as vscode from "vscode";
 import { postPerformanceReview } from "../../utils/api/reviewAPI";
 import { reviewGetWebViewContent } from "../webview/review_Webview/reviewWebviewContent";
+
 export function registerPerformanceReviewCommand(context: vscode.ExtensionContext, authToken: string) {
   const reviewPerformance = vscode.commands.registerCommand("extension.reviewPerformance", async () => {
     const editor = vscode.window.activeTextEditor;

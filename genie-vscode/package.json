@@ -89,6 +89,18 @@
       {
         "command": "extension.refactorCode",
         "title": "Refactor Code"
+      },
+      {
+        "command": "extension.explainGitKB",
+        "title": "Get Response From Git KB"
+      },
+      {
+        "command": "extension.getCodeGitKB",
+        "title": "Get Code From Git KB"
+      },
+      {
+        "command": "extension.knowledgeBaseQueAns",
+        "title": "Get Response From KB"
       }
     ],
     "keybindings": [
@@ -171,8 +183,22 @@
         "command": "extension.refactorCode",
         "key": "ctrl+alt+r",
         "when": "editorTextFocus"
-      }
-      
+      },
+      {
+        "command": "extension.explainGitKB",
+        "key": "ctrl+shift+a",
+        "when": "editorTextFocus"
+      },
+      {
+        "command": "extension.getCodeGitKB",
+        "key": "ctrl+shift+b",
+        "when": "editorTextFocus"
+      },
+      {
+        "command": "extension.knowledgeBaseQueAns",
+        "key": "ctrl+shift+k",
+        "when": "editorTextFocus"
+      }      
     ],
     "viewsContainers": {
       "activitybar": [
@@ -186,9 +212,13 @@
     "views": {
       "genieSidebar": [
         {
+          "id": "loginRegisterCommands",
+        "name": "Login/Register"
+        },
+        {
           "id": "genieCommands",
           "name": "Genie Commands"
-        }
+        }        
       ]
     }
   },

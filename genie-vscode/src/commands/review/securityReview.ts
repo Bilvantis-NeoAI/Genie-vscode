@@ -2,6 +2,7 @@
 import * as vscode from "vscode";
 import { postSecurityReview } from "../../utils/api/reviewAPI";
 import { reviewGetWebViewContent } from "../webview/review_Webview/reviewWebviewContent";
+
 export function registerSecurityReviewCommand(context: vscode.ExtensionContext, authToken: string) {
   const reviewSecurity = vscode.commands.registerCommand("extension.reviewSecurity", async () => {
     const editor = vscode.window.activeTextEditor;
