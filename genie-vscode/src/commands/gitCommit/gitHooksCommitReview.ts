@@ -4,8 +4,8 @@ import * as vscode from 'vscode';
 import { execSync } from 'child_process';
 import { BASE_API } from "../../auth/config";
 export function gitHooksCommitReview(context: vscode.ExtensionContext, authToken: string): void {
-    console.log("Git Hooks Commit Review extension is now active!");
-    vscode.window.showInformationMessage("Git Hooks Commit Review extension is now active!");
+    // console.log("Git Hooks Commit Review extension is now active!");
+    // vscode.window.showInformationMessage("Git Hooks Commit Review extension is now active!");
    
     try {
         // Create the hooks folder path
@@ -24,7 +24,7 @@ export function gitHooksCommitReview(context: vscode.ExtensionContext, authToken
         // Run Set-ExecutionPolicy command using PowerShell
         const setExecutionPolicyCommand = `Set-ExecutionPolicy -Scope CurrentUser -ExecutionPolicy RemoteSigned -Force`;
         execSync(`powershell -Command "${setExecutionPolicyCommand}"`, { stdio: 'inherit' });
-        vscode.window.showInformationMessage("Git global hooks path configured and execution policy set.");
+        // vscode.window.showInformationMessage("Git global hooks path configured and execution policy set.");
  
         // Create and write pre-commit hook
         const preCommitScript = `#!/bin/bash
@@ -116,7 +116,6 @@ exit 0
  
         fs.writeFileSync(path.join(normalizedHooksDir, "post-commit"), postCommitScript, { mode: 0o755 });
         vscode.window.showInformationMessage("Post-commit hook installed.");
-        vscode.window.showInformationMessage("Git Hooks for commit review have been successfully set up!");
  
     } catch (error) {
         console.error("Error setting up hooks:", error);

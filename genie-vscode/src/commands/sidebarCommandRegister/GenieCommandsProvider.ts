@@ -17,7 +17,7 @@ export class GenieCommandsProvider implements vscode.TreeDataProvider<GenieComma
     if (!element) {
       // Top-level categories
       return Promise.resolve([
-        new GenieCategory("Assistant", "account"),
+        new GenieCategory("Assistant", "extensions"),
         new GenieCategory("Review", "list-unordered"),
         new GenieCategory("Git - Knowledge Base", "git-merge"),
         new GenieCategory("Knowledge Base", "book")

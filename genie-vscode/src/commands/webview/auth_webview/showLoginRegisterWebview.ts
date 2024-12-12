@@ -77,13 +77,13 @@ export function showLoginRegisterWebview(
                 <div class="form-group">
                     <!-- Email Field -->
                     <label for="email">Email:</label>
-                    <input type="email" id="email" name="email" class="form-control" required>
+                    <input type="email" id="email" name="email" class="form-control" value="rahul97@gmail.com" required>
                 </div>
                 <div class="form-group">
                 <!-- Password Field -->
                 <label for="password">Password:</label>
                 <div class="input-group">
-                    <input type="password" id="password" name="password" class="form-control" required>
+                    <input type="password" id="password" name="password" class="form-control" value="Test@123" required>
                     <div class="input-group-append">
                         <button class="btn btn-outline-secondary toggle-password" type="button" tabindex="-1">
                             <i class="fas fa-eye"></i>
