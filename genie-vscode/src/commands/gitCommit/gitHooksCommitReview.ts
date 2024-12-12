@@ -2,7 +2,7 @@ import * as fs from 'fs';
 import * as path from 'path';
 import * as vscode from 'vscode';
 import { execSync } from 'child_process';
- 
+import { BASE_API } from "../../auth/config";
 export function gitHooksCommitReview(context: vscode.ExtensionContext, authToken: string): void {
     console.log("Git Hooks Commit Review extension is now active!");
     vscode.window.showInformationMessage("Git Hooks Commit Review extension is now active!");
@@ -100,9 +100,11 @@ json_payload=$(cat <<EOF
 }
 EOF
 )
- 
-# Send the commit data to the review API
-api_url="http://34.27.22.123:3000/review/commit-review"
+
+# Use the BASE_API environment variable
+echo "Using BASE_API: $BASE_API"
+# Use BASE_API in the URL
+api_url="${BASE_API}/review/commit-review"
 response=$(curl -s -X POST -H "Content-Type: application/json" -d "$json_payload" "$api_url")
  
 # Output the response from the API
