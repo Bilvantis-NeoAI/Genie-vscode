@@ -107,6 +107,7 @@ response=$(curl -s -X POST -H "Content-Type: application/json" -d "$json_payload
  
 # Output the response from the API
 echo "API response for commit $commit_id: $response"
+echo "$response" | python -m json.tool
  
 exit 0
  `;
