@@ -1,10 +1,10 @@
 
 import * as vscode from "vscode";
-import { postCyclometricCXReview } from "../../utils/api/reviewAPI";
+import { postTechDepthReview } from "../../utils/api/reviewAPI";
 import { reviewGetWebViewContent } from "../webview/review_Webview/reviewWebviewContent";
 
-export function registerCyclometricCXReviewCommand(context: vscode.ExtensionContext, authToken: string) {
-  const reviewCyclometricCX = vscode.commands.registerCommand("extension.reviewCyclometricCX", async () => {
+export function registerTechDepthReviewCommand(context: vscode.ExtensionContext, authToken: string) {
+  const reviewTechDepth = vscode.commands.registerCommand("extension.reviewTechDepth", async () => {
     const editor = vscode.window.activeTextEditor;
     if (editor) {
       const selection = editor.selection;
@@ -14,17 +14,17 @@ export function registerCyclometricCXReviewCommand(context: vscode.ExtensionCont
       try {
         const progressOptions: vscode.ProgressOptions = {
           location: vscode.ProgressLocation.Notification,
-          title: "CyclometricCX Reviewing",
+          title: "TechDepth Reviewing",
           cancellable: false,
         };
 
         await vscode.window.withProgress(progressOptions, async () => {
-          const reviewCyclometricCX = await postCyclometricCXReview(text, language, authToken);
-          const formattedContent = JSON.stringify(reviewCyclometricCX, null, 2);
+          const reviewTechDepth = await postTechDepthReview(text, language, authToken);
+          const formattedContent = JSON.stringify(reviewTechDepth, null, 2);
 
-          const panel = vscode.window.createWebviewPanel("cyclometricCXReview", "Cyclometric-CX Review", vscode.ViewColumn.One, {});
+          const panel = vscode.window.createWebviewPanel("techDepthReview", "TechDepth Review", vscode.ViewColumn.One, {});
           // panel.webview.html = reviewGetWebViewContent(reviewPerformance);
-          panel.webview.html = reviewGetWebViewContent(formattedContent, "Cyclometric-CX Review");
+          panel.webview.html = reviewGetWebViewContent(formattedContent, "TechDepth Review");
         });
       } catch (error) {
         vscode.window.showErrorMessage("Error reviewing code.");
@@ -32,6 +32,6 @@ export function registerCyclometricCXReviewCommand(context: vscode.ExtensionCont
     }
   });
 
-  context.subscriptions.push(reviewCyclometricCX);
+  context.subscriptions.push(reviewTechDepth);
 }
 

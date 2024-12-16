@@ -39,7 +39,7 @@ export class GenieCommandsProvider implements vscode.TreeDataProvider<GenieComma
       return Promise.resolve([
         new GenieCommand("Code Overall Review", "extension.reviewOverall", "(Ctrl+Shift+O)"),
         new GenieCommand("Code Review", "extension.reviewCode", "(Ctrl+Shift+R)"),
-        new GenieCommand("CyclometricCX Review", "extension.reviewCyclometricCX", "(Ctrl+Shift+C)"),
+        new GenieCommand("Tech Depth Review", "extension.reviewTechDepth", "(Ctrl+Shift+C)"),
         new GenieCommand("Org Std Review", "extension.reviewOrgStd", "(Ctrl+Shift+G)"),
         new GenieCommand("Owasp Review", "extension.reviewOwasp", "(Ctrl+Shift+W)"),
         new GenieCommand("Performance Review", "extension.reviewPerformance", "(Ctrl+Shift+P)"),

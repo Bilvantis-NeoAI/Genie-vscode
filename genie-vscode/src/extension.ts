@@ -8,7 +8,7 @@ import { showLoginRegisterWebview } from "./commands/webview/auth_webview/showLo
 import { showUrlWebview } from "./commands/webview/auth_webview/showUrlWebview";
 import { showLoginPrompt } from "./auth/authDialog";
 import { registerOwaspReviewCommand } from "./commands/review/owaspReview";
-import { registerCyclometricCXReviewCommand } from "./commands/review/cyclometric_cx";
+import { registerTechDepthReviewCommand } from "./commands/review/techDepthReview";
 import { registerAddDocstringsAssistantCommand } from "./commands/assistant/addDocstringAssistant";
 import { registerCodeGenerationAssistantCommand } from "./commands/assistant/codeGenerationAssistant";
 import { registerAddCommentsAssistantCommand } from "./commands/assistant/addCommentsCodeAssistant";
@@ -124,7 +124,7 @@ export function activateCodeCommands(context: vscode.ExtensionContext) {
   registerSyntaxReviewCommand(context, authToken);
   registerOverallReviewCommand(context, authToken);
   registerOwaspReviewCommand(context, authToken);
-  registerCyclometricCXReviewCommand(context, authToken);
+  registerTechDepthReviewCommand(context, authToken);
   registerOrgStdReviewCommand(context, authToken);
   
   //Register all Assistant Commands
