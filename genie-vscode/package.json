@@ -12,7 +12,7 @@
     "Other"
   ],
   "activationEvents": [
-    "*"
+
   ],
   "main": "./out/extension.js",
   "contributes": {
@@ -51,8 +51,8 @@
         "title": "Owasp Review Selected"
       },
       {
-        "command": "extension.reviewCyclometricCX",
-        "title": "Cyclometric-CX Review Selected"
+        "command": "extension.reviewTechDepth",
+        "title": "Tech Depth Review Selected"
       },
       {
         "command": "extension.reviewOrgStd",
@@ -135,7 +135,7 @@
         "when": "editorTextFocus"
       },
       {
-        "command": "extension.reviewCyclometricCX",
+        "command": "extension.reviewTechDepth",
         "key": "ctrl+shift+c",
         "when": "editorTextFocus"
       },

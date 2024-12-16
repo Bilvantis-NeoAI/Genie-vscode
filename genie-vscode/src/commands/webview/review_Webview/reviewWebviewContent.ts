@@ -128,7 +128,6 @@ export function reviewGetWebViewContent(content: string, title: string): string 
   <body>
     <div class="header">
         <h1>${title}</h1>
-        <button class="download-btn" onclick="downloadPDF()">Download as PDF</button>
     </div>
     <div id="content">
         <h2>Summary</h2>
