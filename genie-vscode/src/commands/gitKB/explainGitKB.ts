@@ -1,5 +1,5 @@
 import * as vscode from "vscode";
-import { postExplainCodeAssistant } from "../../utils/api/assistantAPI";
+import { postQueAnsRepositoryGitKB } from "../../utils/api/gitKBAPI";
 import { explainGitKBWebViewContent } from "../webview/gitKB_webview/explainGitKBWebviewContent";
 export function registerExplainGitKBCommand(context: vscode.ExtensionContext, authToken: string) {
   const explainGitKB = vscode.commands.registerCommand("extension.explainGitKB", async () => {
@@ -7,7 +7,6 @@ export function registerExplainGitKBCommand(context: vscode.ExtensionContext, au
     if (editor) {
       const selection = editor.selection;
       const text = editor.document.getText(selection);
-      const language = editor.document.languageId;
       
 
       try {
@@ -18,7 +17,7 @@ export function registerExplainGitKBCommand(context: vscode.ExtensionContext, au
         };
 
         await vscode.window.withProgress(progressOptions, async () => {
-          const explainCodes = await postExplainCodeAssistant(text, language, authToken);
+          const explainCodes = await postQueAnsRepositoryGitKB(text, authToken);
           const formattedContent = JSON.stringify(explainCodes, null, 2);
 
           const panel = vscode.window.createWebviewPanel("explainFromGitKB", "Explain From Git KB", vscode.ViewColumn.One, {});

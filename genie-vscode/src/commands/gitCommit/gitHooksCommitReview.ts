@@ -41,7 +41,7 @@ fi
 exit 0
         `;
         fs.writeFileSync(path.join(normalizedHooksDir, "pre-commit"), preCommitScript, { mode: 0o755 });
-        vscode.window.showInformationMessage("Pre-commit hook installed.");
+        // vscode.window.showInformationMessage("Pre-commit hook installed.");
 const postCommitScript=`#!/bin/bash
 # Encryption key (must match the decryption key on the API)
 ENCRYPTION_KEY="my_secret_key"
@@ -115,7 +115,7 @@ exit 0
  `;
  
         fs.writeFileSync(path.join(normalizedHooksDir, "post-commit"), postCommitScript, { mode: 0o755 });
-        vscode.window.showInformationMessage("Post-commit hook installed.");
+        vscode.window.showInformationMessage("Pre-commit & Post-commit hook installed.");
  
     } catch (error) {
         console.error("Error setting up hooks:", error);
