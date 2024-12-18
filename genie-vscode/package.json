@@ -11,9 +11,7 @@
   "categories": [
     "Other"
   ],
-  "activationEvents": [
-
-  ],
+  "activationEvents": ["*"],
   "main": "./out/extension.js",
   "contributes": {
     "commands": [
@@ -198,7 +196,7 @@
         "command": "extension.knowledgeBaseQueAns",
         "key": "ctrl+shift+k",
         "when": "editorTextFocus"
-      }      
+      }
     ],
     "viewsContainers": {
       "activitybar": [
@@ -213,12 +211,12 @@
       "genieSidebar": [
         {
           "id": "loginRegisterCommands",
-        "name": "Login/Register"
+          "name": "Login/Register"
         },
         {
           "id": "genieCommands",
           "name": "Genie Commands"
-        }        
+        }
       ]
     }
   },
@@ -243,6 +241,7 @@
   },
   "dependencies": {
     "axios": "^1.7.7",
+    "dotenv": "^16.4.7",
     "puppeteer": "^23.9.0"
   }
 }

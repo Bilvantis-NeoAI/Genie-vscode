@@ -29,6 +29,7 @@ export function showUrlWebview(
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
         <title>URL Submit</title>
         <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
+        <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600&display=swap" rel="stylesheet">
         <style>
             body {
                 display: flex;
@@ -36,7 +37,7 @@ export function showUrlWebview(
                 justify-content: center;
                 height: 100vh;
                 margin: 0;
-                font-family: Arial, sans-serif;
+                font-family: 'Poppins', sans-serif;
                 background-color: #f0f2f5;
             }
             .auth-form {
@@ -59,7 +60,7 @@ export function showUrlWebview(
                     <input type="text" id="url" name="url" class="form-control" value="http://34.46.36.105:3000" required>
                 </div>
                 
-                <button type="submit" class="btn btn-primary btn-block">URL</button>
+                <button type="submit" class="btn btn-primary btn-block">Submit</button>
             </form>
         </div>
         <script>

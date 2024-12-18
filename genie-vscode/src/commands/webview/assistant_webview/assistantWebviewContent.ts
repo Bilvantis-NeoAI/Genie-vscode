@@ -4,6 +4,14 @@ export function assistantGetWebViewContent(content: string, title: string): stri
       innerMonologue: string;
       commentedCode: string;
     }
+    // Utility to escape HTML special characters
+    function escapeHtml(html: string): string {
+      return html.replace(/&/g, "&amp;")
+                .replace(/</g, "&lt;")
+                .replace(/>/g, "&gt;")
+                .replace(/"/g, "&quot;")
+                .replace(/'/g, "&#039;");
+    }
   
     let parsedContent: ParsedContent;
     try {
@@ -95,7 +103,7 @@ export function assistantGetWebViewContent(content: string, title: string): stri
           </div>
           <div class="section">
             <h3>Commented Code:</h3>
-            <pre><code>${parsedContent.commentedCode}</code></pre>
+            <pre><code>${escapeHtml(parsedContent.commentedCode)}</code></pre>
           </div>
         </div>
         <div id="buttons">

@@ -38,7 +38,7 @@ export function registerKnowledgeBaseQACommand(
             );
 
              // Log response to the console
-             console.log("Knowledge Base Response:", KBresponse);
+            //  console.log("Knowledge Base Response:", KBresponse);
 
             const formattedContent = JSON.stringify(KBresponse, null, 2);
 

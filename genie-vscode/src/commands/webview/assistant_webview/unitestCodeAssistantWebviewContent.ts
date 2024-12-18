@@ -26,24 +26,30 @@ export function unittestCodeAssistantWebViewContent(content: string, title: stri
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>${title}</title>
+     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600&display=swap" rel="stylesheet">
     <style>
         body {
-            font-family: Arial, sans-serif;
+            font-family: 'Poppins', sans-serif;
             background-color: #f2f0f0;
             color: #333;
             margin: 0;
             padding: 10px;
+            box-sizing: border-box;
         }
         h1, h2 {
-            color: #047ccc;
+            color: #07439C;
         }
         .header {
-            border-bottom: 1px solid #047ccc;
+            border-bottom: 1px solid #07439C;
             margin-bottom: 10px;
             padding-bottom: 5px;
         }
+            .table-container {
+        overflow-x: auto; /* Add horizontal scroll for small screens */
+        }
         table {
             width: 100%;
+            max-width: 100%;
             border-collapse: collapse;
             margin: 10px 0;
         }
@@ -53,13 +59,19 @@ export function unittestCodeAssistantWebViewContent(content: string, title: stri
             border: 1px solid #ddd;
         }
         th {
-            background-color: #047ccc;
+            background-color: #07439C;
             color: white;
+        }
+        td.testcase {
+        max-width: 400px; /* Set a maximum width for the column */
+        overflow-x: auto; /* Enable horizontal scrolling */
+        white-space: nowrap; /* Prevent wrapping */
+        scrollbar-color: white lightgray; /* Thumb color and track color */
+        scrollbar-width: thin; /* Makes the scrollbar thinner */
         }
         td.pre-formatted {
             max-width: 100px;
             word-wrap: break-word;
-            white-space: pre-wrap;
         }
         td.explanation, td.fix {
             max-width: 100px;
@@ -88,26 +100,6 @@ export function unittestCodeAssistantWebViewContent(content: string, title: stri
         button.download-btn:hover {
             background-color: #035f99;
         }
-        .filter-options {
-            display: none;
-            position: absolute;
-            background-color: #f1f1f1;
-            box-shadow: 0px 8px 16px 0px rgba(0,0,0,0.2);
-            z-index: 1;
-            min-width: 150px;
-        }
-        .filter-options a {
-            color: black;
-            padding: 8px 12px;
-            text-decoration: none;
-            display: block;
-        }
-        .filter-options a:hover {
-            background-color: #ddd;
-        }
-        .filter-container:hover .filter-options {
-            display: block;
-        }
     </style>
   </head>
   <body>
@@ -115,7 +107,7 @@ export function unittestCodeAssistantWebViewContent(content: string, title: stri
         <h1>${title}</h1>
     </div>
     <div id="content">
-        <h2>Summary</h2>
+        <h2>Summary:</h2>
         <table>
             <tr>
                 <th>Details</th>
@@ -124,7 +116,7 @@ export function unittestCodeAssistantWebViewContent(content: string, title: stri
                 <td>${parsedContent.details}</td>
             </tr>
         </table>
-        <h2>Issues</h2>
+        <h2>Issues:</h2>
         <table id="issuesTable">
             <thead>
                 <tr>
@@ -150,7 +142,7 @@ export function unittestCodeAssistantWebViewContent(content: string, title: stri
                         (unitTests: unitTests, index: number) => `
                         <tr data-severity="${unitTests.severity.toLowerCase()}">
                             <td>${index + 1}</td>
-                            <td><pre>${unitTests.testCase}</pre></td>
+                            <td class="testcase"><pre>${unitTests.testCase}</pre></td>
                             <td>${unitTests.explanation}
                             <td>${unitTests.importance}</td>
                             <td class="severity severity-${unitTests.severity.toLowerCase()}">${unitTests.severity}</td>

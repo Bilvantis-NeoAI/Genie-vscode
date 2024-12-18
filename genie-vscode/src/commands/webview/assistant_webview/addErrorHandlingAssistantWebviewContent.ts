@@ -4,6 +4,14 @@ export function addErrorHandlingAssistantWebviewContent(content: string, title: 
         innerMonologue: string;
         exceptionHandlingAdded: string;
       }
+      // Utility to escape HTML special characters
+      function escapeHtml(html: string): string {
+        return html.replace(/&/g, "&amp;")
+                  .replace(/</g, "&lt;")
+                  .replace(/>/g, "&gt;")
+                  .replace(/"/g, "&quot;")
+                  .replace(/'/g, "&#039;");
+      }
    
       let parsedContent: ParsedContent;
       try {
@@ -96,7 +104,7 @@ export function addErrorHandlingAssistantWebviewContent(content: string, title: 
            
             <div class="section">
               <h3>Exception Handled Code:</h3>
-              <pre><code>${parsedContent.exceptionHandlingAdded}</code></pre>
+              <pre><code>${escapeHtml(parsedContent.exceptionHandlingAdded)}</code></pre>
             </div>
           </div>
           <div id="buttons">
