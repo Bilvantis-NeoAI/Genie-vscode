@@ -145,6 +145,6 @@ export function activateCodeCommands(context: vscode.ExtensionContext) {
   registerKnowledgeBaseQACommand(context, authToken);
 
   //gitHooks
-  gitHooksCommitReview(context, authToken);
+  gitHooksCommitReview();
 }
 

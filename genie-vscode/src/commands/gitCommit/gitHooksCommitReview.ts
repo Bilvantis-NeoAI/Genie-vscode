@@ -3,7 +3,7 @@ import * as path from 'path';
 import * as vscode from 'vscode';
 import { execSync } from 'child_process';
 import { BASE_API } from "../../auth/config";
-export function gitHooksCommitReview(context: vscode.ExtensionContext, authToken: string): void {
+export function gitHooksCommitReview(): void {
     // console.log("Git Hooks Commit Review extension is now active!");
     // vscode.window.showInformationMessage("Git Hooks Commit Review extension is now active!");
    

@@ -1,6 +1,7 @@
 import * as vscode from "vscode";
 import { postAddDocStringsAssistant } from "../../utils/api/assistantAPI";
 import { addDocstringsAssistantWebviewContent } from "../webview/assistant_webview/addDocstringAssistantWebviewContent";
+import { getGitInfo } from "../gitInfo";
 
 export function registerAddDocstringsAssistantCommand(context: vscode.ExtensionContext, authToken: string) {
   const addDocstrings = vscode.commands.registerCommand("extension.addDocstrings", async () => {
@@ -9,7 +10,11 @@ export function registerAddDocstringsAssistantCommand(context: vscode.ExtensionC
       const selection = editor.selection;
       const text = editor.document.getText(selection);
       const language = editor.document.languageId;
- 
+      // Get workspace folder path
+      const workspacePath = vscode.workspace.workspaceFolders?.[0]?.uri.fsPath || "";
+      // Fetch Git information using the getGitInfo function
+      const { project_name, branch_name } = await getGitInfo(workspacePath);
+      
       try {
         const progressOptions: vscode.ProgressOptions = {
           location: vscode.ProgressLocation.Notification,
@@ -18,7 +23,7 @@ export function registerAddDocstringsAssistantCommand(context: vscode.ExtensionC
         };
  
         await vscode.window.withProgress(progressOptions, async () => {
-          const response = await postAddDocStringsAssistant(text, language, authToken);
+          const response = await postAddDocStringsAssistant(text, language, authToken, project_name, branch_name);
          
           const formattedContent = JSON.stringify(response, null, 2);
        
