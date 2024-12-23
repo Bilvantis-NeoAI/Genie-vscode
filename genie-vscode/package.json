@@ -105,97 +105,192 @@
       {
         "command": "extension.reviewCode",
         "key": "ctrl+shift+r",
-        "when": "editorTextFocus"
+        "when": "editorTextFocus && !isMac"
       },
       {
         "command": "extension.reviewPerformance",
         "key": "ctrl+shift+p",
-        "when": "editorTextFocus"
+        "when": "editorTextFocus && !isMac"
       },
       {
         "command": "extension.reviewSecurity",
         "key": "ctrl+shift+s",
-        "when": "editorTextFocus"
+        "when": "editorTextFocus && !isMac"
       },
       {
         "command": "extension.reviewSyntax",
         "key": "ctrl+shift+y",
-        "when": "editorTextFocus"
+        "when": "editorTextFocus && !isMac"
       },
       {
         "command": "extension.reviewOverall",
         "key": "ctrl+shift+o",
-        "when": "editorTextFocus"
+        "when": "editorTextFocus && !isMac"
       },
       {
         "command": "extension.reviewOwasp",
         "key": "ctrl+shift+w",
-        "when": "editorTextFocus"
+        "when": "editorTextFocus && !isMac"
       },
       {
         "command": "extension.reviewTechDepth",
         "key": "ctrl+shift+c",
-        "when": "editorTextFocus"
+        "when": "editorTextFocus && !isMac"
       },
       {
         "command": "extension.reviewOrgStd",
         "key": "ctrl+shift+g",
-        "when": "editorTextFocus"
+        "when": "editorTextFocus && !isMac"
       },
       {
         "command": "extension.addComments",
         "key": "ctrl+alt+c",
-        "when": "editorTextFocus"
+        "when": "editorTextFocus && !isMac"
       },
       {
         "command": "extension.codeGeneration",
         "key": "ctrl+alt+g",
-        "when": "editorTextFocus"
+        "when": "editorTextFocus && !isMac"
       },
       {
         "command": "extension.addDocstrings",
         "key": "ctrl+alt+d",
-        "when": "editorTextFocus"
+        "when": "editorTextFocus && !isMac"
       },
       {
         "command": "extension.explainCode",
         "key": "ctrl+alt+x",
-        "when": "editorTextFocus"
+        "when": "editorTextFocus && !isMac"
       },
       {
         "command": "extension.unittestCode",
         "key": "ctrl+alt+u",
-        "when": "editorTextFocus"
+        "when": "editorTextFocus && !isMac"
       },
       {
         "command": "extension.errorHandling",
         "key": "ctrl+alt+e",
-        "when": "editorTextFocus"
+        "when": "editorTextFocus && !isMac"
       },
       {
         "command": "extension.addLogging",
         "key": "ctrl+alt+l",
-        "when": "editorTextFocus"
+        "when": "editorTextFocus && !isMac"
       },
       {
         "command": "extension.refactorCode",
         "key": "ctrl+alt+r",
-        "when": "editorTextFocus"
+        "when": "editorTextFocus && !isMac"
       },
       {
         "command": "extension.explainGitKB",
         "key": "ctrl+shift+a",
-        "when": "editorTextFocus"
+        "when": "editorTextFocus && !isMac"
       },
       {
         "command": "extension.getCodeGitKB",
         "key": "ctrl+shift+b",
-        "when": "editorTextFocus"
+        "when": "editorTextFocus && !isMac"
       },
       {
         "command": "extension.knowledgeBaseQueAns",
         "key": "ctrl+shift+k",
-        "when": "editorTextFocus"
+        "when": "editorTextFocus && !isMac"
+      },
+      {
+        "command": "extension.reviewCode",
+        "key": "cmd+shift+r",
+        "when": "editorTextFocus && isMac"
+      },
+      {
+        "command": "extension.reviewPerformance",
+        "key": "cmd+shift+p",
+        "when": "editorTextFocus && isMac"
+      },
+      {
+        "command": "extension.reviewSecurity",
+        "key": "cmd+shift+s",
+        "when": "editorTextFocus && isMac"
+      },
+      {
+        "command": "extension.reviewSyntax",
+        "key": "cmd+shift+y",
+        "when": "editorTextFocus && isMac"
+      },
+      {
+        "command": "extension.reviewOverall",
+        "key": "cmd+shift+o",
+        "when": "editorTextFocus && isMac"
+      },
+      {
+        "command": "extension.reviewOwasp",
+        "key": "cmd+shift+w",
+        "when": "editorTextFocus && isMac"
+      },
+      {
+        "command": "extension.reviewTechDepth",
+        "key": "cmd+shift+c",
+        "when": "editorTextFocus && isMac"
+      },
+      {
+        "command": "extension.reviewOrgStd",
+        "key": "cmd+shift+g",
+        "when": "editorTextFocus && isMac"
+      },
+      {
+        "command": "extension.addComments",
+        "key": "cmd+ctrl+c",
+        "when": "editorTextFocus && isMac"
+      },
+      {
+        "command": "extension.codeGeneration",
+        "key": "cmd+ctrl+g",
+        "when": "editorTextFocus && isMac"
+      },
+      {
+        "command": "extension.addDocstrings",
+        "key": "cmd+ctrl+d",
+        "when": "editorTextFocus && isMac"
+      },
+      {
+        "command": "extension.explainCode",
+        "key": "cmd+ctrl+x",
+        "when": "editorTextFocus && isMac"
+      },
+      {
+        "command": "extension.unittestCode",
+        "key": "cmd+ctrl+u",
+        "when": "editorTextFocus && isMac"
+      },
+      {
+        "command": "extension.errorHandling",
+        "key": "cmd+ctrl+e",
+        "when": "editorTextFocus && isMac"
+      },
+      {
+        "command": "extension.addLogging",
+        "key": "cmd+ctrl+l",
+        "when": "editorTextFocus && isMac"
+      },
+      {
+        "command": "extension.refactorCode",
+        "key": "cmd+ctrl+r",
+        "when": "editorTextFocus && isMac"
+      },
+      {
+        "command": "extension.explainGitKB",
+        "key": "cmd+shift+a",
+        "when": "editorTextFocus && isMac"
+      },
+      {
+        "command": "extension.getCodeGitKB",
+        "key": "cmd+shift+b",
+        "when": "editorTextFocus && isMac"
+      },
+      {
+        "command": "extension.knowledgeBaseQueAns",
+        "key": "cmd+shift+k",
+        "when": "editorTextFocus && isMac"
       }
     ],
     "viewsContainers": {

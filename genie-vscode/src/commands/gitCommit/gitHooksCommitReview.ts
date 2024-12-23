@@ -2,30 +2,73 @@ import * as fs from 'fs';
 import * as path from 'path';
 import * as vscode from 'vscode';
 import { execSync } from 'child_process';
+import * as os from 'os';
 import { BASE_API } from "../../auth/config";
+
+// Function to detect the current OS
+function detectOS() {
+    const platform = os.platform();
+    console.log(`Detected platform: ${platform}`);
+
+    // Return OS type as a string
+    switch (platform) {
+        case 'win32':
+            return 'windows';
+        case 'darwin':
+            return 'mac';
+        case 'linux':
+            return 'linux';
+        default:
+            return 'unknown';
+    }
+}
+
+// Function to handle OS-specific configurations
+function configureForOS(osType: string) {
+    switch (osType) {
+        case 'windows':
+            console.log("Setting up for Windows.");
+            // Set execution policy on Windows using PowerShell
+            const setExecutionPolicyCommand = `Set-ExecutionPolicy -Scope CurrentUser -ExecutionPolicy RemoteSigned -Force`;
+            execSync(`powershell -Command "${setExecutionPolicyCommand}"`, { stdio: 'inherit' });
+            console.log("Execution policy set for Windows.");
+            break;
+        case 'mac':
+        case 'linux':
+            console.log(`Setting up for ${osType}. No PowerShell needed.`);
+            // No additional configuration needed for macOS/Linux
+            break;
+        default:
+            console.error("Unknown OS. Please ensure this platform is supported.");
+            break;
+    }
+}
+
+// Main function to set up Git hooks
 export function gitHooksCommitReview(): void {
-    // console.log("Git Hooks Commit Review extension is now active!");
-    // vscode.window.showInformationMessage("Git Hooks Commit Review extension is now active!");
-   
     try {
         // Create the hooks folder path
-        const hooksDir = path.join(require("os").homedir(), "hooks-folder");
-        // Ensure path uses backslashes on Windows
-        const normalizedHooksDir = hooksDir.replace(/\//g, '\\');  
- 
+        const hooksDir = path.join(os.homedir(), "hooks-folder");
+        const normalizedHooksDir = hooksDir.replace(/\//g, path.sep); // Correct path separator for current OS
+
+        console.log(`Creating hooks directory at: ${normalizedHooksDir}`);
         if (!fs.existsSync(hooksDir)) {
             fs.mkdirSync(hooksDir, { recursive: true });
-            // vscode.window.showInformationMessage("Hooks directory created.");
+            vscode.window.showInformationMessage("Hooks directory created.");
+            console.log("Hooks directory created.");
+        } else {
+            console.log("Hooks directory already exists.");
         }
- 
+
         // Set Git global hooks path
+        console.log(`Setting Git global hooks path to: ${normalizedHooksDir}`);
         execSync(`git config --global core.hooksPath ${normalizedHooksDir}`);
- 
-        // Run Set-ExecutionPolicy command using PowerShell
-        const setExecutionPolicyCommand = `Set-ExecutionPolicy -Scope CurrentUser -ExecutionPolicy RemoteSigned -Force`;
-        execSync(`powershell -Command "${setExecutionPolicyCommand}"`, { stdio: 'ignore' });
-        // vscode.window.showInformationMessage("Git global hooks path configured and execution policy set.");
- 
+        console.log("Git global hooks path configured.");
+
+        // Detect OS and apply platform-specific configurations
+        const osType = detectOS();
+        configureForOS(osType);
+
         // Create and write pre-commit hook
         const preCommitScript = `#!/bin/bash
 # Global pre-commit hook to check for Python installation
@@ -40,17 +83,20 @@ fi
 # Allow the commit to proceed
 exit 0
         `;
+        console.log("Creating pre-commit hook script.");
         fs.writeFileSync(path.join(normalizedHooksDir, "pre-commit"), preCommitScript, { mode: 0o755 });
-        // vscode.window.showInformationMessage("Pre-commit hook installed.");
-const postCommitScript=`#!/bin/bash
+        console.log("Pre-commit hook installed.");
+
+        // Create and write post-commit hook
+        const postCommitScript = `#!/bin/bash
 # Encryption key (must match the decryption key on the API)
 ENCRYPTION_KEY="my_secret_key"
- 
+
 # Generate encrypted diff content
 encrypt_diff_content() {
     echo -n "$1" | openssl enc -aes-256-cbc -a -salt -pass pass:"$ENCRYPTION_KEY"
 }
- 
+
 # Check for Python availability
 if command -v python3 > /dev/null 2>&1; then
     PYTHON_INTERPRETER="python3"
@@ -60,7 +106,7 @@ else
     echo "Python interpreter not found! Cannot execute post-commit script." >&2
     exit 1
 fi
- 
+
 # Get commit details using Git commands
 commit_id=$(git rev-parse HEAD)
 parent_commit_id=$(git rev-parse HEAD^)
@@ -69,20 +115,20 @@ commit_message=$(git log --format=%B -n 1 "$commit_id")
 branch=$(git rev-parse --abbrev-ref HEAD)
 username=$(git config user.name)
 repo_name=$(git config --get remote.origin.url | sed 's#.*/##;s/.git//')
- 
+
 # Validate mandatory fields
 if [[ -z "$diff_content" ]]; then
     diff_content="No changes detected"
 fi
- 
+
 if [[ -z "$commit_message" ]]; then
     commit_message="No commit message provided"
 fi
- 
+
 # Encrypt diff_content and commit_message
 encrypted_diff_content=$(encrypt_diff_content "$diff_content")
 encrypted_message=$(encrypt_diff_content "$commit_message")
- 
+
 # Escape special characters in commit_message using Python
 escaped_commit_message=$(printf '%s' "$commit_message" | python -c "import json, sys; print(json.dumps(sys.stdin.read()))")
 escaped_diff_content=$(printf '%s' "$diff_content" | python -c "import json, sys; print(json.dumps(sys.stdin.read()))")
@@ -106,23 +152,23 @@ echo "Using BASE_API: $BASE_API"
 # Use BASE_API in the URL
 api_url="${BASE_API}/review/commit-review"
 response=$(curl -s -X POST -H "Content-Type: application/json" -d "$json_payload" "$api_url")
- 
+
 # Output the response from the API
 echo "API response for commit $commit_id: $response"
 echo "$response" | python -m json.tool
- 
+
 exit 0
- `;
- 
+        `;
+        console.log("Creating post-commit hook script.");
         fs.writeFileSync(path.join(normalizedHooksDir, "post-commit"), postCommitScript, { mode: 0o755 });
+        console.log("Post-commit hook installed.");
+
         vscode.window.showInformationMessage("Pre-commit & Post-commit hook installed.");
- 
     } catch (error) {
         console.error("Error setting up hooks:", error);
         vscode.window.showErrorMessage("Failed to set up Git hooks for commit review");
+        console.error("Error: ", error);
     }
 }
- 
+
 export function deactivate() {}
- 
- 
