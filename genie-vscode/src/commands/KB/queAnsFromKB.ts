@@ -46,7 +46,7 @@ export function registerKnowledgeBaseQACommand(
           panel.webview.html = knowledgeBaseQAWebviewContent(formattedContent, "Knowledge Base QA");
         });
       } catch (error) {
-        vscode.window.showErrorMessage("Error explain code.");
+        vscode.window.showErrorMessage("Error Getting Response from KB.");
       }
     }
   });

@@ -52,20 +52,20 @@ export function showUrlWebview(
     </head>
     <body>
         <div class="auth-form">
-            <h2 class="text-center">Server Link</h2>
+            <h2 class="text-center">Server Link's</h2>
             ${message_html}
             <form id="authForm">
                 <div class="form-group">
-                    <label for="url">Domain:</label>
-                    <input type="text" id="url" name="url" class="form-control" value="http://34.46.36.105:3000" required>
+                    <label for="url">Backend Domain:</label>
+                    <input type="text" id="url" name="url" class="form-control"  required>
                 </div> 
                 <div class="form-group">
-                    <label for="gurl">GKB Domain:</label>
-                    <input type="text" id="gurl" name="gurl" class="form-control" value="http://34.46.36.105:3001" required>
+                    <label for="gurl">Git Knowledge Base Domain:</label>
+                    <input type="text" id="gurl" name="gurl" class="form-control" required>
                 </div>
                  <div class="form-group">
-                    <label for="kurl">K Domain:</label>
-                    <input type="text" id="kurl" name="kurl" class="form-control" value="http://18.61.253.240:9000" required>
+                    <label for="kurl">Knowledge Base Domain:</label>
+                    <input type="text" id="kurl" name="kurl" class="form-control" required>
                 </div>                       
                 <button type="submit" class="btn btn-primary btn-block">Submit</button>
             </form>

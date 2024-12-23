@@ -51,6 +51,7 @@ export function explainGitKBWebViewContent(question: string, title: string): str
           max-width: 100%
           border-collapse: collapse;
           margin: 10px 0;
+          border-spacing: 0;
       }
       th, td {
           text-align: left;

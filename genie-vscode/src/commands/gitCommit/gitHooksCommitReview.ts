@@ -15,7 +15,7 @@ export function gitHooksCommitReview(): void {
  
         if (!fs.existsSync(hooksDir)) {
             fs.mkdirSync(hooksDir, { recursive: true });
-            vscode.window.showInformationMessage("Hooks directory created.");
+            // vscode.window.showInformationMessage("Hooks directory created.");
         }
  
         // Set Git global hooks path
@@ -23,7 +23,7 @@ export function gitHooksCommitReview(): void {
  
         // Run Set-ExecutionPolicy command using PowerShell
         const setExecutionPolicyCommand = `Set-ExecutionPolicy -Scope CurrentUser -ExecutionPolicy RemoteSigned -Force`;
-        execSync(`powershell -Command "${setExecutionPolicyCommand}"`, { stdio: 'inherit' });
+        execSync(`powershell -Command "${setExecutionPolicyCommand}"`, { stdio: 'ignore' });
         // vscode.window.showInformationMessage("Git global hooks path configured and execution policy set.");
  
         // Create and write pre-commit hook

@@ -71,9 +71,9 @@ export function knowledgeBaseQAWebviewContent(question: string, title: string): 
         <h1>${title}</h1>
     </div>
     <div id="content">
-        <h2>Question</h2>
+        <h2>Question:</h2>
         <p class="formatted-text">${parsedContent.text || "No content available for Text 1"}</p>
-        <h2>Answer</h2>
+        <h2>Answer:</h2>
         ${formatAnswer(parsedContent.text2 || "No content available for Text 2")}
     </div>
   </body>
