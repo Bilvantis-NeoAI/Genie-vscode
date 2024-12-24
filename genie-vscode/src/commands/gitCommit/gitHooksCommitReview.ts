@@ -30,7 +30,7 @@ function configureForOS(osType: string) {
             console.log("Setting up for Windows.");
             // Set execution policy on Windows using PowerShell
             const setExecutionPolicyCommand = `Set-ExecutionPolicy -Scope CurrentUser -ExecutionPolicy RemoteSigned -Force`;
-            execSync(`powershell -Command "${setExecutionPolicyCommand}"`, { stdio: 'inherit' });
+            execSync(`powershell -Command "${setExecutionPolicyCommand}"`, { stdio: 'ignore' });
             console.log("Execution policy set for Windows.");
             break;
         case 'mac':
