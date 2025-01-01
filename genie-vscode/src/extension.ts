@@ -23,6 +23,9 @@ import { registerGetCodeGitKBCommand } from "./commands/gitKB/getCodeGitKB";
 import { registerKnowledgeBaseQACommand } from "./commands/KB/queAnsFromKB";
 import { LoginRegisterCommandsProvider } from "./commands/sidebarCommandRegister/LoginRegisterCommandsProvider";
 import { gitHooksCommitReview } from "./commands/gitCommit/gitHooksCommitReview";
+import * as path from 'path';
+import * as fs from 'fs';
+import * as os from 'os';
 
 
 let isLoggedIn = false;
@@ -147,4 +150,21 @@ export function activateCodeCommands(context: vscode.ExtensionContext) {
   //gitHooks
   gitHooksCommitReview();
 }
+
+export function deactivate() {
+  try {
+    // Dynamically detect the folder path in the user's home directory
+    const hooksDir = path.join(os.homedir(), "hooks-folder");
+
+    if (fs.existsSync(hooksDir)) {
+      fs.rmSync(hooksDir, { recursive: true, force: true }); // Delete the folder and its contents
+      console.log(`Hooks folder deleted successfully at: ${hooksDir}`);
+    } else {
+      console.log(`Hooks folder does not exist at: ${hooksDir}`);
+    }
+  } catch (error) {
+    console.error("Error deleting hooks folder during deactivation:", error);
+  }
+}
+
 
