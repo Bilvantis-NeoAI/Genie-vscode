@@ -52,7 +52,7 @@ export function showUrlWebview(
     </head>
     <body>
         <div class="auth-form">
-            <h2 class="text-center">Server Link's</h2>
+            <h2 class="text-center">Server Links</h2>
             ${message_html}
             <form id="authForm">
                 <div class="form-group">

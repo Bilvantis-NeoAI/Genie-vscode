@@ -75,6 +75,8 @@ export function gitHooksCommitReview(): void {
 # Check for Python
 if command -v python3 > /dev/null 2>&1; then
     echo "Python3 is available. Commit review feature is enabled."
+elif command -v python > /dev/null 2>&1; then
+    echo "Python is available. Commit review feature is enabled."
 else
     echo "WARNING: Python3 is not installed. Commit review functionality will not work." >&2
 fi
@@ -118,8 +120,14 @@ encrypted_diff_content=$(encrypt_diff_content "$diff_content")
 encrypted_message=$(encrypt_diff_content "$commit_message")
 
 # Escape special characters in commit_message using Python
-escaped_commit_message=$(printf '%s' "$commit_message" | python3 -c "import json, sys; print(json.dumps(sys.stdin.read()))")
-escaped_diff_content=$(printf '%s' "$diff_content" | python3 -c "import json, sys; print(json.dumps(sys.stdin.read()))")
+if command -v python3 > /dev/null 2>&1; then
+    escaped_commit_message=$(printf '%s' "$commit_message" | python3 -c "import json, sys; print(json.dumps(sys.stdin.read()))")
+    escaped_diff_content=$(printf '%s' "$diff_content" | python3 -c "import json, sys; print(json.dumps(sys.stdin.read()))")
+elif command -v python > /dev/null 2>&1; then
+    escaped_commit_message=$(printf '%s' "$commit_message" | python -c "import json, sys; print(json.dumps(sys.stdin.read()))")
+    escaped_diff_content=$(printf '%s' "$diff_content" | python -c "import json, sys; print(json.dumps(sys.stdin.read()))")
+fi
+
 
 # Prepare the JSON payload
 json_payload=$(cat <<EOF
@@ -143,7 +151,11 @@ response=$(curl -s -X POST -H "Content-Type: application/json" -d "$json_payload
 
 # Output the response from the API
 echo "API response for commit $commit_id: $response"
-echo "$response" | python3 -m json.tool
+if command -v python3 > /dev/null 2>&1; then
+    echo "$response" | python3 -m json.tool
+elif command -v python > /dev/null 2>&1; then
+    echo "$response" | python -m json.tool
+fi
 
 exit 0
         `;
