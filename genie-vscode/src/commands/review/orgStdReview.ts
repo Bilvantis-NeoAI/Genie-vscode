@@ -2,6 +2,7 @@
 import * as vscode from "vscode";
 import { postOrgStdReview } from "../../utils/api/reviewAPI";
 import { reviewGetWebViewContent } from "../webview/review_Webview/reviewWebviewContent";
+import { getGitInfo } from "../gitInfo";
 
 export function registerOrgStdReviewCommand(context: vscode.ExtensionContext, authToken: string) {
   const reviewOrgStd = vscode.commands.registerCommand("extension.reviewOrgStd", async () => {
@@ -11,6 +12,11 @@ export function registerOrgStdReviewCommand(context: vscode.ExtensionContext, au
       const text = editor.document.getText(selection);
       const language = editor.document.languageId;
 
+      // Get workspace folder path
+      const workspacePath = vscode.workspace.workspaceFolders?.[0]?.uri.fsPath || "";
+      // Fetch Git information using the getGitInfo function
+      const { project_name, branch_name } = await getGitInfo(workspacePath);
+
       try {
         const progressOptions: vscode.ProgressOptions = {
           location: vscode.ProgressLocation.Notification,
@@ -19,7 +25,7 @@ export function registerOrgStdReviewCommand(context: vscode.ExtensionContext, au
         };
 
         await vscode.window.withProgress(progressOptions, async () => {
-          const reviewOrgStds = await postOrgStdReview(text, language, authToken);
+          const reviewOrgStds = await postOrgStdReview(text, language, authToken, project_name, branch_name);
           const formattedContent = JSON.stringify(reviewOrgStds, null, 2);
 
           const panel = vscode.window.createWebviewPanel("orgStdReview", "Org Std Review", vscode.ViewColumn.One, {});

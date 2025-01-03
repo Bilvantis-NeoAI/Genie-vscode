@@ -4,6 +4,14 @@ export function refactorCodeAssistantWebviewContent(content: string, title: stri
         innerMonologue: string;
         refactoredCode: string;
       }
+      // Utility to escape HTML special characters
+      function escapeHtml(html: string): string {
+        return html.replace(/&/g, "&amp;")
+                  .replace(/</g, "&lt;")
+                  .replace(/>/g, "&gt;")
+                  .replace(/"/g, "&quot;")
+                  .replace(/'/g, "&#039;");
+      }
    
       let parsedContent: ParsedContent;
       try {
@@ -95,7 +103,7 @@ export function refactorCodeAssistantWebviewContent(content: string, title: stri
             </div>
             <div class="section">
               <h3>Refactored Code:</h3>
-              <pre><code>${parsedContent.refactoredCode}</code></pre>
+              <pre><code>${escapeHtml(parsedContent.refactoredCode)}</code></pre>
             </div>
           </div>
           <div id="buttons">

@@ -1,6 +1,7 @@
 import * as vscode from "vscode";
 import { postUnittestCodeAssistant } from "../../utils/api/assistantAPI";
 import { unittestCodeAssistantWebViewContent } from "../webview/assistant_webview/unitestCodeAssistantWebviewContent";
+import { getGitInfo } from "../gitInfo";
 
 export function registerUnittestCodeAssistantCommand(context: vscode.ExtensionContext, authToken: string) {
   const unittestCode = vscode.commands.registerCommand("extension.unittestCode", async () => {
@@ -10,6 +11,10 @@ export function registerUnittestCodeAssistantCommand(context: vscode.ExtensionCo
       const text = editor.document.getText(selection);
       const language = editor.document.languageId;
       
+      // Get workspace folder path
+      const workspacePath = vscode.workspace.workspaceFolders?.[0]?.uri.fsPath || "";
+      // Fetch Git information using the getGitInfo function
+      const { project_name, branch_name } = await getGitInfo(workspacePath);
 
       try {
         const progressOptions: vscode.ProgressOptions = {
@@ -19,7 +24,7 @@ export function registerUnittestCodeAssistantCommand(context: vscode.ExtensionCo
         };
 
         await vscode.window.withProgress(progressOptions, async () => {
-          const unittestCodes = await postUnittestCodeAssistant(text, language, authToken);
+          const unittestCodes = await postUnittestCodeAssistant(text, language, authToken, project_name, branch_name);
           const formattedContent = JSON.stringify(unittestCodes, null, 2);
 
           const panel = vscode.window.createWebviewPanel("unittestCodeAssistant", "Unit Test Code Assistant", vscode.ViewColumn.One, {});

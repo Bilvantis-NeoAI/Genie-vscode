@@ -29,6 +29,7 @@ export function showUrlWebview(
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
         <title>URL Submit</title>
         <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
+        <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600&display=swap" rel="stylesheet">
         <style>
             body {
                 display: flex;
@@ -36,7 +37,7 @@ export function showUrlWebview(
                 justify-content: center;
                 height: 100vh;
                 margin: 0;
-                font-family: Arial, sans-serif;
+                font-family: 'Poppins', sans-serif;
                 background-color: #f0f2f5;
             }
             .auth-form {
@@ -51,15 +52,22 @@ export function showUrlWebview(
     </head>
     <body>
         <div class="auth-form">
-            <h2 class="text-center">Server Link</h2>
+            <h2 class="text-center">Server Links</h2>
             ${message_html}
             <form id="authForm">
                 <div class="form-group">
-                    <label for="url">Domain:</label>
-                    <input type="text" id="url" name="url" class="form-control" value="http://34.46.36.105:3000" required>
+                    <label for="url">Backend Domain:</label>
+                    <input type="text" id="url" name="url" class="form-control" value='http://34.46.36.105:3000' required>
+                </div> 
+                <div class="form-group">
+                    <label for="gurl">Git Knowledge Base Domain:</label>
+                    <input type="text" id="gurl" name="gurl" class="form-control" value='http://34.46.36.105:3001' required>
                 </div>
-                
-                <button type="submit" class="btn btn-primary btn-block">URL</button>
+                 <div class="form-group">
+                    <label for="kurl">Knowledge Base Domain:</label>
+                    <input type="text" id="kurl" name="kurl" class="form-control" value='http://34.100.243.119:9000' required>
+                </div>                       
+                <button type="submit" class="btn btn-primary btn-block">Submit</button>
             </form>
         </div>
         <script>
@@ -70,7 +78,8 @@ export function showUrlWebview(
                 authForm.addEventListener('submit', (event) => {
                     event.preventDefault();
                     const userUrl = document.getElementById('url').value;
-                    
+                    const GUrl = document.getElementById('gurl').value;
+                    const KUrl = document.getElementById('kurl').value;                    
 
                     fetch(\`\${userUrl}/touch\`, {
                         method: 'GET',
@@ -78,7 +87,7 @@ export function showUrlWebview(
                     .then(response => response.json())
                     .then(data => {
                         if (data.message === 'API is valid and operational') {
-                            vscode.postMessage({ command: 'urlRegisterSuccess', message: ' URL Submitted successfully.', userUrl  });
+                            vscode.postMessage({ command: 'urlRegisterSuccess', message: ' URL Submitted successfully.', userUrl, GUrl, KUrl });
                         
                             } else {
                             vscode.postMessage({ command: 'urlRegisterError', error: data.detail || 'URL SUbmiiton failed' });
@@ -104,9 +113,17 @@ export function showUrlWebview(
                     vscode.window.showInformationMessage(message.message);
                     
                     if (message.userUrl) {
-                        exchangeUrl(message.userUrl);
-                        
+                        exchangeUrl(message.userUrl); 
                     }
+                    if (message.GUrl) {
+                        updateGitKbBaseApi(message.GUrl);
+                       
+                    }
+                    if (message.KUrl) {
+                        updateKbBaseApi(message.KUrl);
+                       
+                    }
+
                     context.globalState.update('urlSubmitted', true);
                     panel.dispose();
                     break;
@@ -118,4 +135,13 @@ export function showUrlWebview(
         undefined,
         context.subscriptions
     );
+    // Function to update GITKB_BASE_API
+    function updateGitKbBaseApi(newUrl: string) {
+        require('../../../auth/config').GITKB_BASE_API = newUrl;
+    }
+    
+    // Function to update KB_BASE_API
+    function updateKbBaseApi(newUrl: string) {
+        require('../../../auth/config').KB_BASE_API = newUrl;
+    }
 }

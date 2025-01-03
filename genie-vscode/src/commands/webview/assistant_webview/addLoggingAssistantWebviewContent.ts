@@ -3,7 +3,14 @@ export function addLoggingAssistantWebviewContent(content: string, title: string
         details: string;
         loggedCode: string;
       }
-   
+      // Utility to escape HTML special characters
+      function escapeHtml(html: string): string {
+        return html.replace(/&/g, "&amp;")
+                  .replace(/</g, "&lt;")
+                  .replace(/>/g, "&gt;")
+                  .replace(/"/g, "&quot;")
+                  .replace(/'/g, "&#039;");
+      }
       let parsedContent: ParsedContent;
       try {
         parsedContent = JSON.parse(content);
@@ -94,7 +101,7 @@ export function addLoggingAssistantWebviewContent(content: string, title: string
             </div>
             <div class="section">
               <h3>Logged Code:</h3>
-              <pre><code>${parsedContent.loggedCode}</code></pre>
+              <pre><code>${escapeHtml(parsedContent.loggedCode)}</code></pre>
             </div>
           </div>
           <div id="buttons">

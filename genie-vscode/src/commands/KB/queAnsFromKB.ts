@@ -38,7 +38,7 @@ export function registerKnowledgeBaseQACommand(
             );
 
              // Log response to the console
-             console.log("Knowledge Base Response:", KBresponse);
+            //  console.log("Knowledge Base Response:", KBresponse);
 
             const formattedContent = JSON.stringify(KBresponse, null, 2);
 
@@ -46,7 +46,7 @@ export function registerKnowledgeBaseQACommand(
           panel.webview.html = knowledgeBaseQAWebviewContent(formattedContent, "Knowledge Base QA");
         });
       } catch (error) {
-        vscode.window.showErrorMessage("Error explain code.");
+        vscode.window.showErrorMessage("Error Getting Response from KB.");
       }
     }
   });

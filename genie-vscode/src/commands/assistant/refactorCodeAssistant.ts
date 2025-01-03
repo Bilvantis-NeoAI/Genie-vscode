@@ -1,6 +1,7 @@
 import * as vscode from "vscode";
 import { postRefactorCodeAssistant } from "../../utils/api/assistantAPI";
 import { refactorCodeAssistantWebviewContent } from "../webview/assistant_webview/refactorCodeAssistantWebviewContent";
+import { getGitInfo } from "../gitInfo";
 
 export function registerRefactorCodeAssistantCommand(context: vscode.ExtensionContext, authToken: string) {
   const refactorCode = vscode.commands.registerCommand("extension.refactorCode", async () => {
@@ -9,7 +10,12 @@ export function registerRefactorCodeAssistantCommand(context: vscode.ExtensionCo
       const selection = editor.selection;
       const text = editor.document.getText(selection);
       const language = editor.document.languageId;
- 
+
+      // Get workspace folder path
+      const workspacePath = vscode.workspace.workspaceFolders?.[0]?.uri.fsPath || "";
+      // Fetch Git information using the getGitInfo function
+      const { project_name, branch_name } = await getGitInfo(workspacePath);
+
       try {
         const progressOptions: vscode.ProgressOptions = {
           location: vscode.ProgressLocation.Notification,
@@ -18,7 +24,7 @@ export function registerRefactorCodeAssistantCommand(context: vscode.ExtensionCo
         };
  
         await vscode.window.withProgress(progressOptions, async () => {
-          const response = await postRefactorCodeAssistant(text, language, authToken);
+          const response = await postRefactorCodeAssistant(text, language, authToken, project_name, branch_name);
          
           const formattedContent = JSON.stringify(response, null, 2);
        

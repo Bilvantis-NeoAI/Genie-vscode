@@ -2,10 +2,10 @@ import axios from "axios";
 import { BASE_API } from "../../auth/config";
 import { getAuthHeaders } from "../../auth/apiHeaders";
 
-export async function postCodeGenerationAssistant(prompt: string, language: string, authToken: string): Promise<any> {
+export async function postCodeGenerationAssistant(prompt: string, language: string, authToken: string, project_name: any, branch_name: string): Promise<any> {
     const response = await axios.post(
       `${BASE_API}/assistant/code-generation`,
-      { prompt, language },
+      { prompt, language, project_name, branch_name },
       {
         headers: getAuthHeaders(authToken),
       }
@@ -13,10 +13,10 @@ export async function postCodeGenerationAssistant(prompt: string, language: stri
     return response.data;
   }
 
-export async function postAddCommentsAssistant(code: string, language: string, authToken: string): Promise<any> {
+export async function postAddCommentsAssistant(code: string, language: string, authToken: string, project_name: any, branch_name: string): Promise<any> {
   const response = await axios.post(
     `${BASE_API}/assistant/add-comments`,
-    { code, language },
+    { code, language, project_name, branch_name },
     {
       headers: getAuthHeaders(authToken),
     }
@@ -26,10 +26,10 @@ export async function postAddCommentsAssistant(code: string, language: string, a
 }
  
  
-export async function postAddDocStringsAssistant(code: string, language: string, authToken: string): Promise<any> {
+export async function postAddDocStringsAssistant(code: string, language: string, authToken: string, project_name: any, branch_name: string): Promise<any> {
   const response = await axios.post(
     `${BASE_API}/assistant/add-docstrings`,
-    { code, language },
+    { code, language, project_name, branch_name },
     {
       headers: getAuthHeaders(authToken),
     }
@@ -37,10 +37,10 @@ export async function postAddDocStringsAssistant(code: string, language: string,
   return response.data;
 }
  
-export async function postExplainCodeAssistant(code: string, language: string, authToken: string): Promise<any> {
+export async function postExplainCodeAssistant(code: string, language: string, authToken: string, project_name: any, branch_name: string): Promise<any> {
 const response = await axios.post(
     `${BASE_API}/assistant/explain-code`,
-    { code, language },
+    { code, language, project_name, branch_name },
     {
     headers: getAuthHeaders(authToken),
     }
@@ -48,10 +48,10 @@ const response = await axios.post(
 return response.data;
 }
 
-export async function postUnittestCodeAssistant(code: string, language: string, authToken: string): Promise<any> {
+export async function postUnittestCodeAssistant(code: string, language: string, authToken: string, project_name: any, branch_name: string): Promise<any> {
     const response = await axios.post(
         `${BASE_API}/assistant/unittest-code`,
-        { code, language },
+        { code, language, project_name, branch_name },
         {
         headers: getAuthHeaders(authToken),
         }
@@ -59,10 +59,10 @@ export async function postUnittestCodeAssistant(code: string, language: string, 
     return response.data;
     }
 
-export async function postAddLoggingAssistant(code: string, language: string, authToken: string): Promise<any> {
+export async function postAddLoggingAssistant(code: string, language: string, authToken: string, project_name: any, branch_name: string): Promise<any> {
     const response = await axios.post(
         `${BASE_API}/assistant/add-logging`,
-        { code, language },
+        { code, language, project_name, branch_name },
         {
         headers: getAuthHeaders(authToken),
         }
@@ -70,10 +70,10 @@ export async function postAddLoggingAssistant(code: string, language: string, au
     return response.data;
     }
 
-export async function postAddErrorHandlingAssistant(code: string, language: string, authToken: string): Promise<any> {
+export async function postAddErrorHandlingAssistant(code: string, language: string, authToken: string, project_name: any, branch_name: string): Promise<any> {
     const response = await axios.post(
         `${BASE_API}/assistant/add-error-handlng`,
-        { code, language },
+        { code, language, project_name, branch_name },
         {
         headers: getAuthHeaders(authToken),
         }
@@ -81,10 +81,10 @@ export async function postAddErrorHandlingAssistant(code: string, language: stri
     return response.data;
     }
 
-export async function postRefactorCodeAssistant(code: string, language: string, authToken: string): Promise<any> {
+export async function postRefactorCodeAssistant(code: string, language: string, authToken: string, project_name: any, branch_name: string): Promise<any> {
     const response = await axios.post(
         `${BASE_API}/assistant/refactor-code`,
-        { code, language },
+        { code, language, project_name, branch_name },
         {
         headers: getAuthHeaders(authToken),
         }

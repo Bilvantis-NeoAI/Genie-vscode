@@ -2,6 +2,14 @@ export function getCodeGitKBWebviewContent(question: string, title: string): str
     interface ParsedContent {
         code: string;
       }
+      // Utility to escape HTML special characters
+      function escapeHtml(html: string): string {
+        return html.replace(/&/g, "&amp;")
+                  .replace(/</g, "&lt;")
+                  .replace(/>/g, "&gt;")
+                  .replace(/"/g, "&quot;")
+                  .replace(/'/g, "&#039;");
+      }
    
       let parsedContent: ParsedContent;
       try {
@@ -90,7 +98,7 @@ export function getCodeGitKBWebviewContent(question: string, title: string): str
             
             <div class="section">
               <h3>Get Code:</h3>
-              <pre><code>${parsedContent.code}</code></pre>
+              <pre><code>${escapeHtml(parsedContent.code)}</code></pre>
             </div>
           </div>
           <div id="buttons">

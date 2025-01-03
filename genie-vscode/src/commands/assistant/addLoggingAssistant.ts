@@ -1,6 +1,8 @@
 import * as vscode from "vscode";
 import { postAddLoggingAssistant } from "../../utils/api/assistantAPI";
 import { addLoggingAssistantWebviewContent } from "../webview/assistant_webview/addLoggingAssistantWebviewContent";
+import { getGitInfo } from "../gitInfo";
+
 export function registerAddLoggingAssistantCommand(context: vscode.ExtensionContext, authToken: string) {
   const addLogging = vscode.commands.registerCommand("extension.addLogging", async () => {
     const editor = vscode.window.activeTextEditor;
@@ -8,7 +10,11 @@ export function registerAddLoggingAssistantCommand(context: vscode.ExtensionCont
       const selection = editor.selection;
       const text = editor.document.getText(selection);
       const language = editor.document.languageId;
- 
+      // Get workspace folder path
+      const workspacePath = vscode.workspace.workspaceFolders?.[0]?.uri.fsPath || "";
+      // Fetch Git information using the getGitInfo function
+      const { project_name, branch_name } = await getGitInfo(workspacePath);
+      
       try {
         const progressOptions: vscode.ProgressOptions = {
           location: vscode.ProgressLocation.Notification,
@@ -17,7 +23,7 @@ export function registerAddLoggingAssistantCommand(context: vscode.ExtensionCont
         };
  
         await vscode.window.withProgress(progressOptions, async () => {
-          const response = await postAddLoggingAssistant(text, language, authToken);
+          const response = await postAddLoggingAssistant(text, language, authToken, project_name, branch_name);
          
           const formattedContent = JSON.stringify(response, null, 2);
        

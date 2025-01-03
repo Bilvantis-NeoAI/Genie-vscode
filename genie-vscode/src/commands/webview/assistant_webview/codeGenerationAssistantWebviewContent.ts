@@ -4,6 +4,14 @@ export function codeGenerationAssistantWebviewContent(content: string, title: st
         innerMonologue: string;
         generatedCode: string;
       }
+      // Utility to escape HTML special characters
+      function escapeHtml(html: string): string {
+        return html.replace(/&/g, "&amp;")
+                  .replace(/</g, "&lt;")
+                  .replace(/>/g, "&gt;")
+                  .replace(/"/g, "&quot;")
+                  .replace(/'/g, "&#039;");
+      }
    
       let parsedContent: ParsedContent;
       try {
@@ -95,7 +103,7 @@ export function codeGenerationAssistantWebviewContent(content: string, title: st
             </div>
             <div class="section">
               <h3>Generated Code:</h3>
-              <pre><code>${parsedContent.generatedCode}</code></pre>
+              <pre><code>${escapeHtml(parsedContent.generatedCode)}</code></pre>
             </div>
           </div>
           <div id="buttons">

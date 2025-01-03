@@ -4,6 +4,14 @@ export function addDocstringsAssistantWebviewContent(content: string, title: str
         innerMonologue: string;
         documentationAdded: string;
       }
+      // Utility to escape HTML special characters
+      function escapeHtml(html: string): string {
+        return html.replace(/&/g, "&amp;")
+                  .replace(/</g, "&lt;")
+                  .replace(/>/g, "&gt;")
+                  .replace(/"/g, "&quot;")
+                  .replace(/'/g, "&#039;");
+      }
    
       let parsedContent: ParsedContent;
       try {
@@ -95,7 +103,7 @@ export function addDocstringsAssistantWebviewContent(content: string, title: str
             </div>
             <div class="section">
               <h3>Documentation Added:</h3>
-              <pre><code>${parsedContent.documentationAdded}</code></pre>
+              <pre><code>${escapeHtml(parsedContent.documentationAdded)}</code></pre>
             </div>
           </div>
           <div id="buttons">

@@ -1,13 +1,13 @@
 import * as vscode from "vscode";
 import { postQueAnsRepositoryGitKB } from "../../utils/api/gitKBAPI";
 import { explainGitKBWebViewContent } from "../webview/gitKB_webview/explainGitKBWebviewContent";
+
 export function registerExplainGitKBCommand(context: vscode.ExtensionContext, authToken: string) {
   const explainGitKB = vscode.commands.registerCommand("extension.explainGitKB", async () => {
     const editor = vscode.window.activeTextEditor;
     if (editor) {
       const selection = editor.selection;
       const text = editor.document.getText(selection);
-      
 
       try {
         const progressOptions: vscode.ProgressOptions = {

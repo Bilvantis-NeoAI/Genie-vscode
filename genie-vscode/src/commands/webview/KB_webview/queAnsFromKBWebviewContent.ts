@@ -26,22 +26,27 @@ export function knowledgeBaseQAWebviewContent(question: string, title: string): 
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>${title}</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600&display=swap" rel="stylesheet">
     <style>
         body {
-            font-family: Arial, sans-serif;
+            font-family: 'Poppins', sans-serif;
             background-color: #f2f0f0;
             color: #333;
             margin: 0;
             padding: 10px;
+            box-sizing: border-box;
         }
         h1, h2 {
-            color: #047ccc;
+            color: #07439C;
         }
         .header {
-            border-bottom: 1px solid #047ccc;
+            border-bottom: 1px solid #07439C;
             margin-bottom: 10px;
             padding-bottom: 5px;
         }
+            .table-container {
+        overflow-x: auto; /* Add horizontal scroll for small screens */
+      }
         pre, code {
             background-color: #f9f9f9;
             border-radius: 5px;
@@ -66,9 +71,9 @@ export function knowledgeBaseQAWebviewContent(question: string, title: string): 
         <h1>${title}</h1>
     </div>
     <div id="content">
-        <h2>Question</h2>
+        <h2>Question:</h2>
         <p class="formatted-text">${parsedContent.text || "No content available for Text 1"}</p>
-        <h2>Answer</h2>
+        <h2>Answer:</h2>
         ${formatAnswer(parsedContent.text2 || "No content available for Text 2")}
     </div>
   </body>

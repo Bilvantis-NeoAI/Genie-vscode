@@ -2,18 +2,16 @@
   "name": "genie-vscode",
   "displayName": "Genie_vscode",
   "description": "A VS extension to comment code, review code, generate docstrings, unit tests, analyze code metrics, generate logs, and handle errors",
-  "version": "0.0.1",
+  "version": "0.0.4",
   "publisher": "Bilvantis",
   "type": "commonjs",
   "engines": {
-    "vscode": "^1.60.0"
+    "vscode": "^1.95.0"
   },
   "categories": [
     "Other"
   ],
-  "activationEvents": [
-
-  ],
+  "activationEvents": ["*"],
   "main": "./out/extension.js",
   "contributes": {
     "commands": [
@@ -103,103 +101,6 @@
         "title": "Get Response From KB"
       }
     ],
-    "keybindings": [
-      {
-        "command": "extension.reviewCode",
-        "key": "ctrl+shift+r",
-        "when": "editorTextFocus"
-      },
-      {
-        "command": "extension.reviewPerformance",
-        "key": "ctrl+shift+p",
-        "when": "editorTextFocus"
-      },
-      {
-        "command": "extension.reviewSecurity",
-        "key": "ctrl+shift+s",
-        "when": "editorTextFocus"
-      },
-      {
-        "command": "extension.reviewSyntax",
-        "key": "ctrl+shift+y",
-        "when": "editorTextFocus"
-      },
-      {
-        "command": "extension.reviewOverall",
-        "key": "ctrl+shift+o",
-        "when": "editorTextFocus"
-      },
-      {
-        "command": "extension.reviewOwasp",
-        "key": "ctrl+shift+w",
-        "when": "editorTextFocus"
-      },
-      {
-        "command": "extension.reviewTechDepth",
-        "key": "ctrl+shift+c",
-        "when": "editorTextFocus"
-      },
-      {
-        "command": "extension.reviewOrgStd",
-        "key": "ctrl+shift+g",
-        "when": "editorTextFocus"
-      },
-      {
-        "command": "extension.addComments",
-        "key": "ctrl+alt+c",
-        "when": "editorTextFocus"
-      },
-      {
-        "command": "extension.codeGeneration",
-        "key": "ctrl+alt+g",
-        "when": "editorTextFocus"
-      },
-      {
-        "command": "extension.addDocstrings",
-        "key": "ctrl+alt+d",
-        "when": "editorTextFocus"
-      },
-      {
-        "command": "extension.explainCode",
-        "key": "ctrl+alt+x",
-        "when": "editorTextFocus"
-      },
-      {
-        "command": "extension.unittestCode",
-        "key": "ctrl+alt+u",
-        "when": "editorTextFocus"
-      },
-      {
-        "command": "extension.errorHandling",
-        "key": "ctrl+alt+e",
-        "when": "editorTextFocus"
-      },
-      {
-        "command": "extension.addLogging",
-        "key": "ctrl+alt+l",
-        "when": "editorTextFocus"
-      },
-      {
-        "command": "extension.refactorCode",
-        "key": "ctrl+alt+r",
-        "when": "editorTextFocus"
-      },
-      {
-        "command": "extension.explainGitKB",
-        "key": "ctrl+shift+a",
-        "when": "editorTextFocus"
-      },
-      {
-        "command": "extension.getCodeGitKB",
-        "key": "ctrl+shift+b",
-        "when": "editorTextFocus"
-      },
-      {
-        "command": "extension.knowledgeBaseQueAns",
-        "key": "ctrl+shift+k",
-        "when": "editorTextFocus"
-      }      
-    ],
     "viewsContainers": {
       "activitybar": [
         {
@@ -213,12 +114,12 @@
       "genieSidebar": [
         {
           "id": "loginRegisterCommands",
-        "name": "Login/Register"
+          "name": "Login/Register"
         },
         {
           "id": "genieCommands",
           "name": "Genie Commands"
-        }        
+        }
       ]
     }
   },
@@ -243,6 +144,7 @@
   },
   "dependencies": {
     "axios": "^1.7.7",
+    "dotenv": "^16.4.7",
     "puppeteer": "^23.9.0"
   }
 }

@@ -1,13 +1,14 @@
 import * as vscode from "vscode";
 import { getCodeGitKBWebviewContent } from "../webview/gitKB_webview/getCodeGitKBWebviewContent";
 import { postGetCodeGitKB } from "../../utils/api/gitKBAPI";
+
 export function registerGetCodeGitKBCommand(context: vscode.ExtensionContext, authToken: string) {
   const getCodeGitKB = vscode.commands.registerCommand("extension.getCodeGitKB", async () => {
     const editor = vscode.window.activeTextEditor;
     if (editor) {
       const selection = editor.selection;
       const text = editor.document.getText(selection);
- 
+
       try {
         const progressOptions: vscode.ProgressOptions = {
           location: vscode.ProgressLocation.Notification,

@@ -25,26 +25,33 @@ export function explainGitKBWebViewContent(question: string, title: string): str
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>${title}</title>
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600&display=swap" rel="stylesheet">  
   <style>
       body {
-          font-family: Arial, sans-serif;
+          font-family: 'Poppins', sans-serif;
           background-color: #f2f0f0;
           color: #333;
           margin: 0;
           padding: 10px;
+          box-sizing: border-box;
       }
       h1, h2 {
-          color: #047ccc;
+          color: #07439C;
       }
+          .table-container {
+        overflow-x: auto; /* Add horizontal scroll for small screens */
+    }
       .header {
-          border-bottom: 1px solid #047ccc;
+          border-bottom: 1px solid #07439C;
           margin-bottom: 10px;
           padding-bottom: 5px;
       }
       table {
           width: 100%;
+          max-width: 100%
           border-collapse: collapse;
           margin: 10px 0;
+          border-spacing: 0;
       }
       th, td {
           text-align: left;
@@ -52,7 +59,7 @@ export function explainGitKBWebViewContent(question: string, title: string): str
           border: 1px solid #ddd;
       }
       th {
-          background-color: #047ccc;
+          background-color: #07439C;
           color: white;
       }
       td.pre-formatted {
@@ -76,37 +83,6 @@ export function explainGitKBWebViewContent(question: string, title: string): str
       .severity-cosmetic {
           color: blue;
       }
-      button.download-btn {
-          padding: 5px 10px;
-          background-color: #047ccc;
-          color: white;
-          border: none;
-          border-radius: 5px;
-          cursor: pointer;
-      }
-      button.download-btn:hover {
-          background-color: #035f99;
-      }
-      .filter-options {
-          display: none;
-          position: absolute;
-          background-color: #f1f1f1;
-          box-shadow: 0px 8px 16px 0px rgba(0,0,0,0.2);
-          z-index: 1;
-          min-width: 150px;
-      }
-      .filter-options a {
-          color: black;
-          padding: 8px 12px;
-          text-decoration: none;
-          display: block;
-      }
-      .filter-options a:hover {
-          background-color: #ddd;
-      }
-      .filter-container:hover .filter-options {
-          display: block;
-      }
   </style>
 </head>
 <body>
@@ -114,7 +90,7 @@ export function explainGitKBWebViewContent(question: string, title: string): str
       <h1>${title}</h1>
   </div>
   <div id="content">
-      <h2>Summary</h2>
+      <h2>Summary:</h2>
       <table>
           <tr>
               <th>Quality</th>
@@ -125,7 +101,7 @@ export function explainGitKBWebViewContent(question: string, title: string): str
               <td>${parsedContent.remarks}</td>
           </tr>
       </table>
-      <h2>Explanation</h2>
+      <h2>Explanation:</h2>
       <table id="issuesTable">
           <thead>
               <tr>
