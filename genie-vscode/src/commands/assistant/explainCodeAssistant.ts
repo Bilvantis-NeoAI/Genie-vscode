@@ -3,12 +3,18 @@ import { postExplainCodeAssistant } from "../../utils/api/assistantAPI";
 import { explainCodeAssistantWebViewContent } from "../webview/assistant_webview/explainCodeAssistantWebviewContent";
 import { getGitInfo } from "../gitInfo";
 
+let panel: vscode.WebviewPanel | undefined;
+
 export function registerExplainCodeAssistantCommand(context: vscode.ExtensionContext, authToken: string) {
   const explainCode = vscode.commands.registerCommand("extension.explainCode", async () => {
     const editor = vscode.window.activeTextEditor;
     if (editor) {
       const selection = editor.selection;
       const text = editor.document.getText(selection);
+      if (!text) {
+        vscode.window.showWarningMessage("No code selected. Please select code to review.");
+        return;
+      }
       const language = editor.document.languageId;
       
       // Get workspace folder path
@@ -26,12 +32,28 @@ export function registerExplainCodeAssistantCommand(context: vscode.ExtensionCon
         await vscode.window.withProgress(progressOptions, async () => {
           const explainCodes = await postExplainCodeAssistant(text, language, authToken, project_name, branch_name);
           const formattedContent = JSON.stringify(explainCodes, null, 2);
-
-          const panel = vscode.window.createWebviewPanel("explainCodeAssistant", "Explain Code Assistant", vscode.ViewColumn.One, {});
+          
+          if (panel) {
+            panel.reveal(vscode.ViewColumn.One);
+          } else {
+            panel = vscode.window.createWebviewPanel(
+              "explainCodeAssistant", 
+              "Explain Code Assistant", 
+              vscode.ViewColumn.One, 
+              {
+                enableScripts: true,
+                retainContextWhenHidden: true,
+              });
+              panel.onDidDispose(() => {
+                panel = undefined;
+              });
+          }
           panel.webview.html = explainCodeAssistantWebViewContent(formattedContent, "Explain Code Assistant");
         });
-      } catch (error) {
-        vscode.window.showErrorMessage("Error explain code.");
+      } catch (error:any) {
+        const errorMessage = error.message || "An unknown error occurred.";
+        vscode.window.showErrorMessage(`Error Explain Code: ${errorMessage}`);
+
       }
     }
   });

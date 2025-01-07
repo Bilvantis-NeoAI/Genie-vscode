@@ -26,6 +26,8 @@ export function explainCodeAssistantWebViewContent(content: string, title: strin
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>${title}</title>
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600&display=swap" rel="stylesheet">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.2.4/pdfmake.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.2.4/vfs_fonts.js"></script>
     <style>
         body {
             font-family: 'Poppins', sans-serif;
@@ -84,7 +86,7 @@ export function explainCodeAssistantWebViewContent(content: string, title: strin
         }
         button.download-btn {
             padding: 5px 10px;
-            background-color: #047ccc;
+            background-color: #07439C;
             color: white;
             border: none;
             border-radius: 5px;
@@ -100,7 +102,10 @@ export function explainCodeAssistantWebViewContent(content: string, title: strin
         <h1>${title}</h1>
     </div>
     <div id="content">
-        <h2>Summary:</h2>
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
+            <h2>Summary:</h2>
+            <button id="downloadButton" class="download-btn">Download as pdf </button>
+        </div>
         <table>
             <tr>
                 <th>Quality</th>
@@ -111,13 +116,13 @@ export function explainCodeAssistantWebViewContent(content: string, title: strin
                 <td>${parsedContent.remarks}</td>
             </tr>
         </table>
-        <h2>Issues:</h2>
+        <h2>Explanaton:</h2>
         <table id="issuesTable">
             <thead>
                 <tr>
                     <th>S.No</th>
                     <th>Overview</th>
-                    <th>DetailedExplanation</th>
+                    <th>Detailed Explanation</th>
                     <th>Status</th>
                 </tr>
             </thead>
@@ -132,8 +137,16 @@ export function explainCodeAssistantWebViewContent(content: string, title: strin
                             
                             <td>
                                 <select class="status-dropdown" onchange="updateStatus(${index}, this.value)">
-                                    <option value="accept" ${explanation.status === 'accept' ? 'selected' : ''}>Accept</option>
-                                    <option value="reject" ${explanation.status === 'reject' ? 'selected' : ''}>Reject</option>
+                                    <option value="Accept" ${
+                                      explanation.status === "Accept"
+                                        ? "selected"
+                                        : ""
+                                    }>Accept</option>
+                                    <option value="Reject" ${
+                                      explanation.status === "Reject"
+                                        ? "selected"
+                                        : ""
+                                    }>Reject</option>
                                 </select>
                             </td>
                         </tr>
@@ -143,6 +156,98 @@ export function explainCodeAssistantWebViewContent(content: string, title: strin
             </tbody>
         </table>
     </div>
+    <script>
+        const json_data = ${JSON.stringify(parsedContent, null, 2)};
+        const explanation = ${JSON.stringify(parsedContent.explanation)};
+
+        function updateStatus(index, value) {
+            explanation[index].status = value;
+        }
+
+        document.getElementById("downloadButton").addEventListener("click", () => {
+    const docDefinition = {
+        pageOrientation: 'landscape',
+        content: [
+            { text: '${title}', style: 'header' },
+            { text: 'Summary:', style: 'subheader' },
+            {
+                table: {
+                    widths: [100, '*'],
+                    body: [
+                        [
+                            { text: 'Quality', bold: true, fillColor: '#E9E5E5', fontSize: 10, alignment: 'center' },
+                            { text: 'Remarks', bold: true, fillColor: '#E9E5E5', fontSize: 10, alignment: 'center' },
+                        ],
+                        [
+                            { text: json_data.quality || '', fontSize: 10, alignment: 'center' },
+                            { text: json_data.remarks || '', fontSize: 10 }
+                        ]
+                    ]
+                },
+                layout: {
+                    hLineWidth: () => 0.5,
+                    vLineWidth: () => 0.5,
+                    hLineColor: () => '#CCCCCC',
+                    vLineColor: () => '#CCCCCC',
+                    paddingLeft: () => 5,
+                    paddingRight: () => 5,
+                    paddingTop: () => 5,
+                    paddingBottom: () => 5
+                }
+            },
+            { text: 'Explanation:', style: 'subheader' },
+            {
+                table: {
+                    headerRows: 1,
+                    widths: [30, '*', '*', 40],
+                    body: [
+                        [
+                            { text: 'S.No', bold: true, fillColor: '#E9E5E5', fontSize: 10, alignment: 'center' },
+                            { text: 'Overview', bold: true, fillColor: '#E9E5E5', fontSize: 10, alignment: 'center' },
+                            { text: 'Detailed Explanation', bold: true, fillColor: '#E9E5E5', fontSize: 10, alignment: 'center' },
+                            { text: 'Status', bold: true, fillColor: '#E9E5E5', fontSize: 10, alignment: 'center' },
+                        ],
+                        ...explanation.map((explanation, index) => [
+                            { text: index + 1, fontSize: 10, alignment: 'center'},
+                            { text: explanation.overview, fontSize: 10 },
+                            { text: explanation.detailedExplanation, fontSize: 10 },
+                            { text: explanation.status || 'Accept', fontSize: 10, alignment: 'center' }
+                        ])
+                    ]
+                },
+                layout: {
+                    hLineWidth: () => 0.5,
+                    vLineWidth: () => 0.5,
+                    hLineColor: () => '#CCCCCC',
+                    vLineColor: () => '#CCCCCC',
+                    paddingLeft: () => 5,
+                    paddingRight: () => 5,
+                    paddingTop: () => 5,
+                    paddingBottom: () => 5
+                }
+            }
+        ],
+        styles: {
+            header: {
+                fontSize: 18,
+                bold: true,
+                alignment: 'center',
+                margin: [0, 0, 0, 10]
+            },
+            subheader: {
+                fontSize: 14,
+                bold: true,
+                margin: [0, 10, 0, 5]
+            },
+            jsonText: {
+                fontSize: 10,
+                margin: [0, 5, 0, 10]
+            }
+        }
+    };
+    pdfMake.createPdf(docDefinition).download('${title}_${new Date().toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' }).replace(/ /g, '_').toLowerCase()}.pdf'); 
+    });
+    </script>
   </body>
   </html>`;
 }

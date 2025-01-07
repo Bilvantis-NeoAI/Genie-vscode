@@ -37,9 +37,6 @@ export function registerKnowledgeBaseQACommand(
               authToken
             );
 
-             // Log response to the console
-            //  console.log("Knowledge Base Response:", KBresponse);
-
             const formattedContent = JSON.stringify(KBresponse, null, 2);
 
             const panel = vscode.window.createWebviewPanel("knowledgeBaseQA", "Knowledge Base QA", vscode.ViewColumn.One, {});
