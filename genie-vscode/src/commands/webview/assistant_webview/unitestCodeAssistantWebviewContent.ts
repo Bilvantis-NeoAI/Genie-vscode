@@ -226,7 +226,7 @@ export function unittestCodeAssistantWebViewContent(content: string, title: stri
                             { text: index + 1, fontSize: 10, alignment: 'center'},
                             { text: unitTests.testCase, fontSize: 10 },
                             { text: unitTests.explanation, fontSize: 10 },
-                            { text: unitTests.importance, fontSize: 10 },
+                            { text: unitTests.importance, fontSize: 10, alignment: 'center' },
                             { text: unitTests.severity, fontSize: 10, alignment: 'center' },
                             { text: unitTests.status || 'Accept', fontSize: 10, alignment: 'center' }
                         ])
