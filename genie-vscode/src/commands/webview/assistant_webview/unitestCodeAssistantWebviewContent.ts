@@ -26,8 +26,10 @@ export function unittestCodeAssistantWebViewContent(content: string, title: stri
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>${title}</title>
-     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600&display=swap" rel="stylesheet">
-    <style>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600&display=swap" rel="stylesheet">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.2.4/pdfmake.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.2.4/vfs_fonts.js"></script>
+     <style>
         body {
             font-family: 'Poppins', sans-serif;
             background-color: #f2f0f0;
@@ -91,7 +93,7 @@ export function unittestCodeAssistantWebViewContent(content: string, title: stri
         }
         button.download-btn {
             padding: 5px 10px;
-            background-color: #047ccc;
+            background-color: #07439C;
             color: white;
             border: none;
             border-radius: 5px;
@@ -107,7 +109,10 @@ export function unittestCodeAssistantWebViewContent(content: string, title: stri
         <h1>${title}</h1>
     </div>
     <div id="content">
-        <h2>Summary:</h2>
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
+            <h2>Summary:</h2>
+            <button id="downloadButton" class="download-btn">Download as pdf </button>
+        </div>
         <table>
             <tr>
                 <th>Details</th>
@@ -148,8 +153,16 @@ export function unittestCodeAssistantWebViewContent(content: string, title: stri
                             <td class="severity severity-${unitTests.severity.toLowerCase()}">${unitTests.severity}</td>
                             <td>
                                 <select class="status-dropdown" onchange="updateStatus(${index}, this.value)">
-                                    <option value="accept" ${unitTests.status === 'accept' ? 'selected' : ''}>Accept</option>
-                                    <option value="reject" ${unitTests.status === 'reject' ? 'selected' : ''}>Reject</option>
+                                    <option value="Accept" ${
+                                      unitTests.status === "Accept"
+                                        ? "selected"
+                                        : ""
+                                    }>Accept</option>
+                                    <option value="Reject" ${
+                                      unitTests.status === "Reject"
+                                        ? "selected"
+                                        : ""
+                                    }>Reject</option>
                                 </select>
                             </td>
                         </tr>
@@ -159,6 +172,99 @@ export function unittestCodeAssistantWebViewContent(content: string, title: stri
             </tbody>
         </table>
     </div>
+    <script>
+        const json_data = ${JSON.stringify(parsedContent, null, 2)};
+        const unitTests = ${JSON.stringify(parsedContent.unitTests)};
+
+        function updateStatus(index, value) {
+            unitTests[index].status = value;
+        }
+
+        document.getElementById("downloadButton").addEventListener("click", () => {
+    const docDefinition = {
+        pageOrientation: 'landscape',
+        content: [
+            { text: '${title}', style: 'header' },
+            { text: 'Summary:', style: 'subheader' },
+            {
+                table: {
+                    widths: ['*'],
+                    body: [
+                        [
+                            { text: 'Details', bold: true, fillColor: '#E9E5E5', fontSize: 10, alignment: 'center' }
+                        ],
+                        [{ text: json_data.details || '', fontSize: 10 }]
+                    ]
+                },
+                layout: {
+                    hLineWidth: () => 0.5,
+                    vLineWidth: () => 0.5,
+                    hLineColor: () => '#CCCCCC',
+                    vLineColor: () => '#CCCCCC',
+                    paddingLeft: () => 5,
+                    paddingRight: () => 5,
+                    paddingTop: () => 5,
+                    paddingBottom: () => 5
+                }
+            },
+            { text: 'Explanation:', style: 'subheader' },
+            {
+                table: {
+                    headerRows: 1,
+                    widths: [30, '*', '*', 55, 40, 40],
+                    body: [
+                        [
+                            { text: 'S.No', bold: true, fillColor: '#E9E5E5', fontSize: 10, alignment: 'center' },
+                            { text: 'TestCase', bold: true, fillColor: '#E9E5E5', fontSize: 10, alignment: 'center' },
+                            { text: 'Explanation', bold: true, fillColor: '#E9E5E5', fontSize: 10, alignment: 'center' },
+                            { text: 'Importance', bold: true, fillColor: '#E9E5E5', fontSize: 10, alignment: 'center' },
+                            { text: 'Severity', bold: true, fillColor: '#E9E5E5', fontSize: 10, alignment: 'center' },
+                            { text: 'Status', bold: true, fillColor: '#E9E5E5', fontSize: 10, alignment: 'center' },
+                        ],
+
+                        ...unitTests.map((unitTests, index) => [
+                            { text: index + 1, fontSize: 10, alignment: 'center'},
+                            { text: unitTests.testCase, fontSize: 10 },
+                            { text: unitTests.explanation, fontSize: 10 },
+                            { text: unitTests.importance, fontSize: 10, alignment: 'center' },
+                            { text: unitTests.severity, fontSize: 10, alignment: 'center' },
+                            { text: unitTests.status || 'Accept', fontSize: 10, alignment: 'center' }
+                        ])
+                    ]
+                },
+                layout: {
+                    hLineWidth: () => 0.5,
+                    vLineWidth: () => 0.5,
+                    hLineColor: () => '#CCCCCC',
+                    vLineColor: () => '#CCCCCC',
+                    paddingLeft: () => 5,
+                    paddingRight: () => 5,
+                    paddingTop: () => 5,
+                    paddingBottom: () => 5
+                }
+            }
+        ],
+        styles: {
+            header: {
+                fontSize: 18,
+                bold: true,
+                alignment: 'center',
+                margin: [0, 0, 0, 10]
+            },
+            subheader: {
+                fontSize: 14,
+                bold: true,
+                margin: [0, 10, 0, 5]
+            },
+            jsonText: {
+                fontSize: 10,
+                margin: [0, 5, 0, 10]
+            }
+        }
+    };
+    pdfMake.createPdf(docDefinition).download('${title}_${new Date().toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' }).replace(/ /g, '_').toLowerCase()}.pdf'); 
+    });
+    </script>
   </body>
   </html>`;
 }

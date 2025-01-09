@@ -4,12 +4,18 @@ import { postOwaspReview } from "../../utils/api/reviewAPI";
 import { reviewGetWebViewContent } from "../webview/review_Webview/reviewWebviewContent";
 import { getGitInfo } from "../gitInfo";
 
+let panel: vscode.WebviewPanel | undefined;
+
 export function registerOwaspReviewCommand(context: vscode.ExtensionContext, authToken: string) {
   const reviewOwasp = vscode.commands.registerCommand("extension.reviewOwasp", async () => {
     const editor = vscode.window.activeTextEditor;
     if (editor) {
       const selection = editor.selection;
       const text = editor.document.getText(selection);
+      if (!text) {
+        vscode.window.showWarningMessage("No code selected. Please select code to review.");
+        return;
+      }
       const language = editor.document.languageId;
 
       // Get workspace folder path
@@ -29,12 +35,26 @@ export function registerOwaspReviewCommand(context: vscode.ExtensionContext, aut
           const reviewOwasp = await postOwaspReview(text, language, authToken, project_name, branch_name);
           const formattedContent = JSON.stringify(reviewOwasp, null, 2);
 
-          const panel = vscode.window.createWebviewPanel("owaspReview", "Owasp Review", vscode.ViewColumn.One, {});
-          // panel.webview.html = reviewGetWebViewContent(reviewSyntax);
+          if (panel) {
+            panel.reveal(vscode.ViewColumn.One);
+          } else {
+            panel = vscode.window.createWebviewPanel(
+              "owaspReview", 
+              "Owasp Review", 
+              vscode.ViewColumn.One, 
+              {
+                enableScripts: true,
+                retainContextWhenHidden: true,
+              });
+              panel.onDidDispose(() => {
+                panel = undefined;
+              });
+          }
           panel.webview.html = reviewGetWebViewContent(formattedContent, "Owasp Review");
         });
-      } catch (error) {
-        vscode.window.showErrorMessage("Error reviewing code.");
+      } catch (error:any) {
+       const errorMessage = error.message || "An unknown error occurred.";
+             vscode.window.showErrorMessage(`Error reviewing code: ${errorMessage}`);
       }
     }
   });

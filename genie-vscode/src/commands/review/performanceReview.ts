@@ -2,15 +2,20 @@
 import * as vscode from "vscode";
 import { postPerformanceReview } from "../../utils/api/reviewAPI";
 import { reviewGetWebViewContent } from "../webview/review_Webview/reviewWebviewContent";
-import { getGitInfo
+import { getGitInfo } from "../gitInfo";
 
- } from "../gitInfo";
+let panel: vscode.WebviewPanel | undefined;
+
 export function registerPerformanceReviewCommand(context: vscode.ExtensionContext, authToken: string) {
   const reviewPerformance = vscode.commands.registerCommand("extension.reviewPerformance", async () => {
     const editor = vscode.window.activeTextEditor;
     if (editor) {
       const selection = editor.selection;
       const text = editor.document.getText(selection);
+      if (!text) {
+        vscode.window.showWarningMessage("No code selected. Please select code to review.");
+        return;
+      }
       const language = editor.document.languageId;
       // Get workspace folder path
       const workspacePath = vscode.workspace.workspaceFolders?.[0]?.uri.fsPath || "";
@@ -28,12 +33,27 @@ export function registerPerformanceReviewCommand(context: vscode.ExtensionContex
           const reviewPerformance = await postPerformanceReview(text, language, authToken, project_name, branch_name);
           const formattedContent = JSON.stringify(reviewPerformance, null, 2);
 
-          const panel = vscode.window.createWebviewPanel("performanceReview", "Performance Review", vscode.ViewColumn.One, {});
-          // panel.webview.html = reviewGetWebViewContent(reviewPerformance);
+          if (panel) {
+            panel.reveal(vscode.ViewColumn.One);
+          } else {
+            panel = vscode.window.createWebviewPanel(
+              "performanceReview", 
+              "Performance Review", 
+              vscode.ViewColumn.One, 
+              {
+                enableScripts: true,
+                retainContextWhenHidden: true,
+              });
+              panel.onDidDispose(() => {
+                panel = undefined;
+              });
+
+          }
           panel.webview.html = reviewGetWebViewContent(formattedContent, "Performance Review");
         });
-      } catch (error) {
-        vscode.window.showErrorMessage("Error reviewing code.");
+      } catch (error:any) {
+        const errorMessage = error.message || "An unknown error occurred.";
+        vscode.window.showErrorMessage(`Error reviewing code: ${errorMessage}`);
       }
     }
   });

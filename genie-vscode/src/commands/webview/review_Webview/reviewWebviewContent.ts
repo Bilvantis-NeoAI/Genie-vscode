@@ -1,47 +1,57 @@
-export function reviewGetWebViewContent(content: string, title: string): string {
-    interface Issue {
-        identification: string;
-        explanation: string;
-        fix: string;
-        score: number;
-        severity: string;
-        status?: string;
-    }
+export function reviewGetWebViewContent(
+  content: string,
+  title: string
+): string {
+  interface Issue {
+    identification: string;
+    explanation: string;
+    fix: string;
+    score: number;
+    severity: string;
+    status?: string;
+  }
 
-    interface ParsedContent {
-        quality?: string;
-        standardsAdherence?: string; 
-        remarks: string;
-        overallSeverity?: string;
-        issues: Issue[];
-    }
+  interface ParsedContent {
+    quality?: string;
+    standardsAdherence?: string;
+    remarks: string;
+    overallSeverity?: string;
+    issues: Issue[];
+  }
 
-    let parsedContent: ParsedContent;
-    try {
-        parsedContent = JSON.parse(content);
-    } catch (e) {
-        const errorMessage = e instanceof Error ? e.message : String(e);
-        return `<h1>Error parsing content</h1><p>${errorMessage}</p>`;
-    }
+  let parsedContent: ParsedContent;
+  try {
+    parsedContent = JSON.parse(content);
+  } catch (e) {
+    const errorMessage = e instanceof Error ? e.message : String(e);
+    return `<h1>Error parsing content</h1><p>${errorMessage}</p>`;
+  }
 
+  // Check if `overallSeverity` exists
+  const hasOverallSeverity = parsedContent.hasOwnProperty("overallSeverity");
 
-    // Check if `overallSeverity` exists
-    const hasOverallSeverity = parsedContent.hasOwnProperty('overallSeverity');
-    
-     // Determine which column to display
-     const showQuality = parsedContent.hasOwnProperty('quality');
-     const showStandardsAdherence = parsedContent.hasOwnProperty('standardsAdherence');
+  // Determine which column to display
+  const showQuality = parsedContent.hasOwnProperty("quality");
+  const showStandardsAdherence =
+    parsedContent.hasOwnProperty("standardsAdherence");
 
-    // Extract unique severities from the issues
-    const uniqueSeverities = [...new Set(parsedContent.issues.map(issue => issue.severity.toLowerCase()))];
+  // Extract unique severities from the issues
+  const uniqueSeverities = [
+    ...new Set(
+      parsedContent.issues.map((issue) => issue.severity.toLowerCase())
+    ),
+  ];
+  const reviewContentJSON = JSON.stringify(parsedContent, null, 2);
 
-    return `<!DOCTYPE html>
-  <html lang="en">
-  <head>
+  return `<!DOCTYPE html>
+<html lang="en">
+<head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>${title}</title>
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600&display=swap" rel="stylesheet">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.2.4/pdfmake.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.2.4/vfs_fonts.js"></script>
     <style>
         body {
             font-family: 'Poppins', sans-serif;
@@ -59,9 +69,9 @@ export function reviewGetWebViewContent(content: string, title: string): string 
             margin-bottom: 10px;
             padding-bottom: 5px;
         }
-            .table-container {
-        overflow-x: auto; /* Add horizontal scroll for small screens */
-    }
+        .table-container {
+            overflow-x: auto; /* Add horizontal scroll for small screens */
+        }
         table {
             width: 100%;
             max-width: 100%; /* Ensure table doesn't exceed container width */
@@ -77,7 +87,7 @@ export function reviewGetWebViewContent(content: string, title: string): string 
             background-color: #07439C;
             color: white;
         }
-            /* Add specific styling for the Remarks column */
+        /* Add specific styling for the Remarks column */
         th.remarks, td.remarks {
             width: 800px; /* Adjust the width as needed */
             white-space: nowrap; /* Prevent text wrapping */
@@ -85,13 +95,12 @@ export function reviewGetWebViewContent(content: string, title: string): string 
             text-overflow: ellipsis; /* Add ellipsis if text overflows */
         }
         td.identification {
-        max-width: 300px; /* Set a maximum width for the column */
-        overflow-x: auto; /* Enable horizontal scrolling */
-        white-space: nowrap; /* Prevent wrapping */
-        scrollbar-color: white lightgray; /* Thumb color and track color */
-        scrollbar-width: thin; /* Makes the scrollbar thinner */
+            max-width: 300px; /* Set a maximum width for the column */
+            overflow-x: auto; /* Enable horizontal scrolling */
+            white-space: nowrap; /* Prevent wrapping */
+            scrollbar-color: white lightgray; /* Thumb color and track color */
+            scrollbar-width: thin; /* Makes the scrollbar thinner */
         }
-
         td.pre-formatted {
             max-width: 100px;
             word-wrap: break-word;
@@ -122,29 +131,40 @@ export function reviewGetWebViewContent(content: string, title: string): string 
         }
         button.download-btn:hover {
             background-color: #035f99;
-        }  
+        }
     </style>
-  </head>
-  <body>
+</head>
+<body>
     <div class="header">
         <h1>${title}</h1>
+        
     </div>
     <div id="content">
-        <h2>Summary:</h2>
+    
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
+            <h2>Summary:</h2>
+            <button id="downloadButton" class="download-btn">Download as pdf </button>
+        </div>
         <table>
             <tr>
-                
-                 ${showQuality ? '<th>Quality</th>' : ''}
-                ${showStandardsAdherence ? '<th>Quality</th>' : ''}
-                
+                ${showQuality ? "<th>Quality</th>" : ""}
+                ${showStandardsAdherence ? "<th>Standards Adherence</th>" : ""}
                 <th class="remarks">Remarks</th>
-                ${hasOverallSeverity ? '<th>Overall Severity</th>' : ''}
+                ${hasOverallSeverity ? "<th>Overall Severity</th>" : ""}
             </tr>
             <tr>
-                ${showQuality ? `<td>${parsedContent.quality}</td>` : ''}
-                ${showStandardsAdherence ? `<td>${parsedContent.standardsAdherence}</td>` : ''}
+                ${showQuality ? `<td>${parsedContent.quality}</td>` : ""}
+                ${
+                  showStandardsAdherence
+                    ? `<td>${parsedContent.standardsAdherence}</td>`
+                    : ""
+                }
                 <td>${parsedContent.remarks}</td>
-                ${hasOverallSeverity ? `<td>${parsedContent.overallSeverity}</td>` : ''}
+                ${
+                  hasOverallSeverity
+                    ? `<td>${parsedContent.overallSeverity}</td>`
+                    : ""
+                }
             </tr>
         </table>
         <h2>Issues:</h2>
@@ -155,64 +175,158 @@ export function reviewGetWebViewContent(content: string, title: string): string 
                     <th>Identification</th>
                     <th>Fix</th>
                     <th>Explanation</th>
-                    <th>
-                        Severity
-                    </th>
+                    <th>Severity</th>
                     <th>Status</th>
                 </tr>
             </thead>
             <tbody id="issuesBody">
                 ${parsedContent.issues
-                    .sort((a: Issue, b: Issue) => {
-                        const severityOrder: { [key: string]: number } = { critical: 0, major: 1, minor: 2, cosmetic: 3 };
-                        const severityA = severityOrder[a.severity.toLowerCase()] ?? 4;
-                        const severityB = severityOrder[b.severity.toLowerCase()] ?? 4;
-                        return severityA - severityB;
-                    })
-                    .map(
-                        (issue: Issue, index: number) => `
+                  .sort((a, b) => {
+                    const severityOrder: { [key: string]: number } = {
+                      critical: 0,
+                      major: 1,
+                      minor: 2,
+                      cosmetic: 3,
+                    };
+                    const severityA =
+                      severityOrder[a.severity.toLowerCase()] ?? 4;
+                    const severityB =
+                      severityOrder[b.severity.toLowerCase()] ?? 4;
+                    return severityA - severityB;
+                  })
+                  .map(
+                    (issue, index) => `
                         <tr data-severity="${issue.severity.toLowerCase()}">
                             <td>${index + 1}</td>
-                            <td class="identification"><pre>${issue.identification}</pre></td>
-                            <td class="identification"><pre>${issue.fix}</pre></td>
+                            <td class="identification"><pre>${
+                              issue.identification
+                            }</pre></td>
+                            <td class="identification"><pre>${
+                              issue.fix
+                            }</pre></td>
                             <td>${issue.explanation}</td>
-                            <td class="severity severity-${issue.severity.toLowerCase()}">${issue.severity}</td>
+                            <td class="severity severity-${issue.severity.toLowerCase()}">${
+                      issue.severity
+                    }</td>
                             <td>
                                 <select class="status-dropdown" onchange="updateStatus(${index}, this.value)">
-                                    <option value="accept" ${issue.status === 'accept' ? 'selected' : ''}>Accept</option>
-                                    <option value="reject" ${issue.status === 'reject' ? 'selected' : ''}>Reject</option>
+                                    <option value="Accept" ${
+                                      issue.status === "Accept"
+                                        ? "selected"
+                                        : ""
+                                    }>Accept</option>
+                                    <option value="Reject" ${
+                                      issue.status === "Reject"
+                                        ? "selected"
+                                        : ""
+                                    }>Reject</option>
                                 </select>
                             </td>
                         </tr>
                     `
-                    )
-                    .join('')}
+                  )
+                  .join("")}
             </tbody>
         </table>
     </div>
     <script>
-    // Function to filter table rows by severity
-    function filterSeverity(severity) {
-        const rows = document.querySelectorAll('#issuesBody tr'); // Select all rows in the table body
-        rows.forEach(row => {
-            const rowSeverity = row.getAttribute('data-severity'); // Get the severity level from the row
-            if (severity === 'all' || rowSeverity === severity) {
-                row.style.display = ''; // Show the row if severity matches or 'all' is selected
-            } else {
-                row.style.display = 'none'; // Hide the row otherwise
-            }
-        });
-    }
+        const json_data = ${JSON.stringify(parsedContent, null, 2)};
+        const issues = ${JSON.stringify(parsedContent.issues)};
 
-    // Event Listener for Filter Options
-    document.querySelectorAll('.filter-options a').forEach(option => {
-        option.addEventListener('click', event => {
-            event.preventDefault(); // Prevent default link behavior
-            const severity = option.getAttribute('onclick').match(/filterSeverity\\('(.*?)'\\)/)[1]; // Extract severity value
-            filterSeverity(severity); // Call the filter function
-        });
+        function updateStatus(index, value) {
+            issues[index].status = value;
+        }
+
+        document.getElementById("downloadButton").addEventListener("click", () => {
+    const docDefinition = {
+        pageOrientation: 'landscape',
+        content: [
+            { text: '${title}', style: 'header' },
+            { text: 'Summary:', style: 'subheader' },
+            {
+                table: {
+                    widths: [100, '*', 150],
+                    body: [
+                        [
+                            { text: 'Quality', bold: true, fillColor: '#E9E5E5', fontSize: 10, alignment: 'center' },
+                            { text: 'Remarks', bold: true, fillColor: '#E9E5E5', fontSize: 10, alignment: 'center' },
+                            { text: 'Overall Severity', bold: true, fillColor: '#E9E5E5', fontSize: 10, alignment: 'center' }
+                        ],
+                        [
+                        { text: json_data.quality || '', fontSize: 10, alignment: 'center'},
+                        {text: json_data.remarks, fontSize:10},
+                        {text: json_data.overallSeverity || '', fontSize: 10, alignment: 'center'}
+                         ]
+                    ]
+                },
+                layout: {
+                    hLineWidth: () => 0.5,
+                    vLineWidth: () => 0.5,
+                    hLineColor: () => '#CCCCCC',
+                    vLineColor: () => '#CCCCCC',
+                    paddingLeft: () => 5,
+                    paddingRight: () => 5,
+                    paddingTop: () => 5,
+                    paddingBottom: () => 5
+                }
+            },
+            { text: 'Issues:', style: 'subheader' },
+            {
+                table: {
+                    headerRows: 1,
+                    widths: [30, '*', '*', '*', 50, 40],
+                    body: [
+                        [
+                            { text: 'S.No', bold: true, fillColor: '#E9E5E5', fontSize: 10, alignment: 'center' },
+                            { text: 'Identification', bold: true, fillColor: '#E9E5E5', fontSize: 10, alignment: 'center' },
+                            { text: 'Fix', bold: true, fillColor: '#E9E5E5', fontSize: 10, alignment: 'center' },
+                            { text: 'Explanation', bold: true, fillColor: '#E9E5E5', fontSize: 10, alignment: 'center' },
+                            { text: 'Severity', bold: true, fillColor: '#E9E5E5', fontSize: 10, alignment: 'center' },
+                            { text: 'Status', bold: true, fillColor: '#E9E5E5', fontSize: 10, alignment: 'center' }
+                        ],
+                        ...issues.map((issue, index) => [
+                            {text: index + 1, fontSize: 10, alignment: 'center'},
+                            { text: issue.identification, fontSize: 10 },
+                            { text: issue.fix, fontSize: 10 },
+                            { text: issue.explanation, fontSize: 10 },
+                            { text: issue.severity, fontSize: 10, alignment: 'center' },
+                            { text: issue.status || 'Accept', fontSize: 10, alignment: 'center' }
+                        ])
+                    ]
+                },
+                layout: {
+                    hLineWidth: () => 0.5,
+                    vLineWidth: () => 0.5,
+                    hLineColor: () => '#CCCCCC',
+                    vLineColor: () => '#CCCCCC',
+                    paddingLeft: () => 5,
+                    paddingRight: () => 5,
+                    paddingTop: () => 5,
+                    paddingBottom: () => 5
+                }
+            }
+        ],
+        styles: {
+            header: {
+                fontSize: 18,
+                bold: true,
+                alignment: 'center',
+                margin: [0, 0, 0, 10]
+            },
+            subheader: {
+                fontSize: 14,
+                bold: true,
+                margin: [0, 10, 0, 5]
+            },
+            jsonText: {
+                fontSize: 10,
+                margin: [0, 5, 0, 10]
+            }
+        }
+    };
+    pdfMake.createPdf(docDefinition).download('${title}_${new Date().toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' }).replace(/ /g, '_').toLowerCase()}.pdf'); 
     });
     </script>
-  </body>
-  </html>`;
+</body>
+</html>`;
 }

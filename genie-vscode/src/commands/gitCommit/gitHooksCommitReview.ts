@@ -8,7 +8,6 @@ import { BASE_API } from "../../auth/config";
 // Function to detect the current OS
 function detectOS() {
     const platform = os.platform();
-    console.log(`Detected platform: ${platform}`);
 
     // Return OS type as a string
     switch (platform) {
@@ -27,15 +26,12 @@ function detectOS() {
 function configureForOS(osType: string) {
     switch (osType) {
         case 'windows':
-            console.log("Setting up for Windows.");
             // Set execution policy on Windows using PowerShell
             const setExecutionPolicyCommand = `Set-ExecutionPolicy -Scope CurrentUser -ExecutionPolicy RemoteSigned -Force`;
             execSync(`powershell -Command "${setExecutionPolicyCommand}"`, { stdio: 'ignore' });
-            console.log("Execution policy set for Windows.");
             break;
         case 'mac':
         case 'linux':
-            console.log(`Setting up for ${osType}. No PowerShell needed.`);
             // No additional configuration needed for macOS/Linux
             break;
         default:
@@ -51,19 +47,15 @@ export function gitHooksCommitReview(): void {
         const hooksDir = path.join(os.homedir(), "hooks-folder");
         const normalizedHooksDir = hooksDir.replace(/\//g, path.sep); // Correct path separator for current OS
 
-        console.log(`Creating hooks directory at: ${normalizedHooksDir}`);
         if (!fs.existsSync(hooksDir)) {
             fs.mkdirSync(hooksDir, { recursive: true });
             vscode.window.showInformationMessage("Hooks directory created.");
-            console.log("Hooks directory created.");
         } else {
             console.log("Hooks directory already exists.");
         }
 
         // Set Git global hooks path
-        console.log(`Setting Git global hooks path to: ${normalizedHooksDir}`);
         execSync(`git config --global core.hooksPath ${normalizedHooksDir}`);
-        console.log("Git global hooks path configured.");
 
         // Detect OS and apply platform-specific configurations
         const osType = detectOS();
@@ -83,9 +75,7 @@ fi
 # Allow the commit to proceed
 exit 0
         `;
-        console.log("Creating pre-commit hook script.");
         fs.writeFileSync(path.join(normalizedHooksDir, "pre-commit"), preCommitScript, { mode: 0o755 });
-        console.log("Pre-commit hook installed.");
 
         // Create and write post-commit hook
         const postCommitScript = `#!/bin/bash
@@ -159,10 +149,7 @@ fi
 
 exit 0
         `;
-        console.log("Creating post-commit hook script.");
         fs.writeFileSync(path.join(normalizedHooksDir, "post-commit"), postCommitScript, { mode: 0o755 });
-        console.log("Post-commit hook installed.");
-
         vscode.window.showInformationMessage("Pre-commit & Post-commit hook installed.");
     } catch (error) {
         console.error("Error setting up hooks:", error);
