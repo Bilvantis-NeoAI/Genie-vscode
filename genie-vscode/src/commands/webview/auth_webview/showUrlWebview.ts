@@ -124,7 +124,7 @@ export function showUrlWebview(
                        
                     }
 
-                    context.globalState.update('urlSubmitted', true);
+                    context.secrets.store('urlSubmitted', 'true')
                     panel.dispose();
                     break;
                 case 'urlRegisterError':

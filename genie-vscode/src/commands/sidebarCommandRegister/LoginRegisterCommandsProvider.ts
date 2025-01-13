@@ -24,7 +24,8 @@ export class LoginRegisterCommandsProvider implements vscode.TreeDataProvider<Lo
       return Promise.resolve([
         new LoginRegisterCommand("Url", "extension.url", "debug-disconnect"), // Codicon for URL - link-external
         new LoginRegisterCommand("Login", "extension.login", "account"), // Codicon for Login
-        new LoginRegisterCommand("Register", "extension.register", "new-file") // Codicon for Register
+        new LoginRegisterCommand("Register", "extension.register", "new-file"), // Codicon for Register
+        new LoginRegisterCommand("Logout", "extension.logout", "sign-out") // Codicon for Logout
       ]);
     }
     return Promise.resolve([]);

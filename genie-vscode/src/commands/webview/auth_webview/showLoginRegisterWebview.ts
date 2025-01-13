@@ -265,7 +265,7 @@ export function showLoginRegisterWebview(
                     break;
                 case 'loginRegisterSuccess':
                     if (message.token) {
-                        context.globalState.update('authToken', message.token).then(() => {
+                        context.secrets.store('authToken', message.token).then(() => {
                             vscode.window.showInformationMessage('Login Successful!');
                             const genieProvider = new GenieCommandsProvider();
                             vscode.window.registerTreeDataProvider("genieCommands", genieProvider);

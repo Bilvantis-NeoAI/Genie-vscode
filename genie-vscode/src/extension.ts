@@ -23,148 +23,167 @@ import { registerGetCodeGitKBCommand } from "./commands/gitKB/getCodeGitKB";
 import { registerKnowledgeBaseQACommand } from "./commands/KB/queAnsFromKB";
 import { LoginRegisterCommandsProvider } from "./commands/sidebarCommandRegister/LoginRegisterCommandsProvider";
 import { gitHooksCommitReview } from "./commands/gitCommit/gitHooksCommitReview";
-import * as path from 'path';
-import * as fs from 'fs';
-import * as os from 'os';
+import * as path from "path";
+import * as fs from "fs";
+import * as os from "os";
+import { GenieCommandsProvider } from "./commands/sidebarCommandRegister/GenieCommandsProvider";
+import { showLogoutWebview } from "./commands/webview/auth_webview/showLogOutWebview";
 
-
+let globalContext: vscode.ExtensionContext;
 let isLoggedIn = false;
-let authToken: string | undefined;
+
+
+
+
+
+
 
 export async function activate(context: vscode.ExtensionContext) {
-  // Reset auth token on activation
-  context.globalState.update("authToken", undefined);
-  context.globalState.update("urlSubmitted", false);
+
+
+
+  
+ // Reset auth token on activation
+// context.secrets.delete("authToken");
+// context.secrets.delete("urlSubmitted");
+  globalContext = context;
+  console.log("globalcontext at activate",globalContext)
+
   
 
+  const urlSubmitted = await context.secrets.get("urlSubmitted");
+  const authToken = await context.secrets.get("authToken");
+
+  console.log("AuthToken at activation:", authToken);
+  console.log("URL Submitted at activation:", urlSubmitted);
+
   const loginRegisterProvider = new LoginRegisterCommandsProvider();
-  // Replace the openLoginPage command registration
   vscode.window.registerTreeDataProvider("loginRegisterCommands", loginRegisterProvider);
 
-  // Register sidebar commands
   context.subscriptions.push(
     vscode.commands.registerCommand("extension.url", () => {
-      // Directly show the login webview
       showUrlWebview(context);
     })
   );
   context.subscriptions.push(
     vscode.commands.registerCommand("extension.login", () => {
-      // Directly show the login webview
       showLoginRegisterWebview(context, "login");
     })
   );
-
   context.subscriptions.push(
     vscode.commands.registerCommand("extension.register", () => {
       showLoginRegisterWebview(context, "register");
     })
   );
+  context.subscriptions.push(
+    vscode.commands.registerCommand("extension.logout", () => {
+      showLogoutWebview(context); // Opens the logout webview
+      
+      // Perform additional tasks like clearing tokens or states here
+    isLoggedIn = false; // Mark user as logged out
 
-  
-  let urlSubmitted = context.globalState.get("urlSubmitted", false);
+    // Delete the saved secrets
+    context.secrets.delete("authToken");
+    context.secrets.delete("urlSubmitted");
+
+    })
+  );
+
   if (!urlSubmitted) {
     showUrlWebview(context);
-
-
-
-	// Wait for the URL submission to complete
-    const waitForSubmission = async () => {
-		while (!context.globalState.get("urlSubmitted", false)) {
-		  await new Promise((resolve) => setTimeout(resolve, 100)); // Small delay for polling
-		}
-	  };
-	  await waitForSubmission();
-   }
-
-   // Proceed after the URL is submitted
-  urlSubmitted = context.globalState.get("urlSubmitted", false);
-  if (urlSubmitted) {
-    showLoginPrompt(context);
+    await waitForUrlSubmission();
   }
-  
 
-  // Load previously stored auth token if available
-  const storedToken = context.globalState.get<string>("authToken");
+  const updatedUrlSubmitted = await context.secrets.get("urlSubmitted");
+  console.log("Updated urlSubmitted", updatedUrlSubmitted)
+  const updatedAuthToken = await context.secrets.get("authToken");
+  console.log("Updated authToken", updatedAuthToken);
 
-  if (storedToken) {
-    authToken = storedToken;
-    isLoggedIn = true;
-    activateCodeCommands(context);
-  } 
-
-  // Register the sidebar provider for Genie commands
-  // const genieProvider = new GenieCommandsProvider();
-  // vscode.window.registerTreeDataProvider("genieCommands", genieProvider);
+  if (updatedUrlSubmitted) {
+    if (updatedAuthToken) {
+      isLoggedIn = true;
+      activateCodeCommands(context);
+      const genieProvider = new GenieCommandsProvider();
+      vscode.window.registerTreeDataProvider("genieCommands", genieProvider);
+    } else {
+      showLoginPrompt(context);
+    }
+  } else {
+    showUrlWebview(context);
+  }
 }
 
 export function openLoginPage(context: vscode.ExtensionContext) {
   showLoginRegisterWebview(context, "login");
 }
-
+ 
 export function openSignUpPage(context: vscode.ExtensionContext) {
   showLoginRegisterWebview(context, "register");
 }
 
-/**
- * Activates all code-related commands using the stored auth token.
- * If the auth token is not available, an error message is shown.
- */
-export function activateCodeCommands(context: vscode.ExtensionContext) {
-  const authToken = context.globalState.get<string>("authToken");
-
-  if (!authToken) {
-    vscode.window.showErrorMessage("Authentication is required to activate code commands.");
-    return;
+async function waitForUrlSubmission() {
+  while ((await globalContext.secrets.get("urlSubmitted")) !== "true") {
+    await new Promise((resolve) => setTimeout(resolve, 100));
   }
-
-
-    
-  // Register all review commands
-  registerCodeReviewCommand(context, authToken);
-  registerPerformanceReviewCommand(context, authToken);
-  registerSecurityReviewCommand(context, authToken);
-  registerSyntaxReviewCommand(context, authToken);
-  registerOverallReviewCommand(context, authToken);
-  registerOwaspReviewCommand(context, authToken);
-  registerTechDepthReviewCommand(context, authToken);
-  registerOrgStdReviewCommand(context, authToken);
-  
-  //Register all Assistant Commands
-  registerAddCommentsAssistantCommand(context, authToken);
-  registerAddDocstringsAssistantCommand(context, authToken);
-  registerCodeGenerationAssistantCommand(context, authToken);
-  registerErrorHandlingAssistantCommand(context, authToken);
-  registerAddLoggingAssistantCommand(context, authToken);
-  registerRefactorCodeAssistantCommand(context, authToken);
-  registerExplainCodeAssistantCommand(context, authToken);
-  registerUnittestCodeAssistantCommand(context, authToken);
-
-  //Register Git KB Commands
-  registerExplainGitKBCommand(context, authToken);
-  registerGetCodeGitKBCommand(context, authToken);
-
-  //Register KB Commands
-  registerKnowledgeBaseQACommand(context, authToken);
-
-  //gitHooks
-  gitHooksCommitReview();
 }
 
-export function deactivate() {
+export function activateCodeCommands(context: vscode.ExtensionContext) {
+  context.secrets.get("authToken").then((authToken) => {
+    if (!authToken) {
+      vscode.window.showErrorMessage("Authentication is required to activate code commands.");
+      return;
+    }
+
+    registerCodeReviewCommand(context, authToken);
+    registerPerformanceReviewCommand(context, authToken);
+    registerSecurityReviewCommand(context, authToken);
+    registerSyntaxReviewCommand(context, authToken);
+    registerOverallReviewCommand(context, authToken);
+    registerOwaspReviewCommand(context, authToken);
+    registerTechDepthReviewCommand(context, authToken);
+    registerOrgStdReviewCommand(context, authToken);
+
+    registerAddCommentsAssistantCommand(context, authToken);
+    registerAddDocstringsAssistantCommand(context, authToken);
+    registerCodeGenerationAssistantCommand(context, authToken);
+    registerErrorHandlingAssistantCommand(context, authToken);
+    registerAddLoggingAssistantCommand(context, authToken);
+    registerRefactorCodeAssistantCommand(context, authToken);
+    registerExplainCodeAssistantCommand(context, authToken);
+    registerUnittestCodeAssistantCommand(context, authToken);
+
+    registerExplainGitKBCommand(context, authToken);
+    registerGetCodeGitKBCommand(context, authToken);
+
+    registerKnowledgeBaseQACommand(context, authToken);
+
+    gitHooksCommitReview();
+  });
+}
+
+
+
+
+
+export async function deactivate() {
   try {
-    // Dynamically detect the folder path in the user's home directory
+    console.log("Deactivation started.");
+
+    try {
+     
+    } catch (error) {
+      console.error("Error during secret deletion:", error);
+
+
     const hooksDir = path.join(os.homedir(), "hooks-folder");
 
     if (fs.existsSync(hooksDir)) {
-      fs.rmSync(hooksDir, { recursive: true, force: true }); // Delete the folder and its contents
-      console.log(`Hooks folder deleted successfully at: ${hooksDir}`);
+      fs.rmSync(hooksDir, { recursive: true, force: true });
     } else {
       console.log(`Hooks folder does not exist at: ${hooksDir}`);
     }
+  }
   } catch (error) {
-    console.error("Error deleting hooks folder during deactivation:", error);
+    console.error("Error during deactivation:", error);
   }
 }
-
-
