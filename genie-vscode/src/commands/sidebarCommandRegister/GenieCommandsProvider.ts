@@ -32,6 +32,7 @@ export class GenieCommandsProvider implements vscode.TreeDataProvider<GenieComma
       ]);
     } else if (element.label === "Review") {
       return Promise.resolve([
+        new GenieCommand("CK Review", "extension.reviewCK", 'graph-line', 'Perform a CK metrics review for your code.'),
         new GenieCommand("Code Overall Review", "extension.reviewOverall", 'file-code', 'Perform an overall review of your code.'),
         new GenieCommand("Code Review", "extension.reviewCode", 'file-text', 'Review specific sections of your code.'),
         new GenieCommand("Tech Dept Review", "extension.reviewTechDept", 'flame', 'Identify and analyze technical debt.'),

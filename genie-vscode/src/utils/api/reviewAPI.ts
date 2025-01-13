@@ -91,3 +91,15 @@ export async function postOrgStdReview(code: string, language: string, authToken
   );
   return response.data;
 }
+
+export async function postCkReview(code: string, language: string, authToken: string, project_name: any, branch_name: string): Promise<any> {
+  const response = await axios.post(
+    `${BASE_API}/review/CK-review`,
+    { code, language, project_name, branch_name },
+    {
+      headers: getAuthHeaders(authToken),
+    }
+  );
+  return response.data;
+}
+ 
