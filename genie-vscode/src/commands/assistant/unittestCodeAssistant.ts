@@ -13,7 +13,7 @@ export function registerUnittestCodeAssistantCommand(context: vscode.ExtensionCo
       const selection = editor.selection;
       const text = editor.document.getText(selection);
       if (!text) {
-        vscode.window.showWarningMessage("No code selected. Please select code to review.");
+        vscode.window.showWarningMessage("No code selected. Please select code to assistant.");
         return;
       }
       
@@ -23,7 +23,6 @@ export function registerUnittestCodeAssistantCommand(context: vscode.ExtensionCo
       const workspacePath = vscode.workspace.workspaceFolders?.[0]?.uri.fsPath || "";
       // Fetch Git information using the getGitInfo function
       const { project_name, branch_name } = await getGitInfo(workspacePath);
-      console.log("*****", project_name, branch_name);
       
 
       try {

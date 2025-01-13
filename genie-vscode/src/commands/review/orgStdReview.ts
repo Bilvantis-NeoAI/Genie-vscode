@@ -51,7 +51,7 @@ export function registerOrgStdReviewCommand(context: vscode.ExtensionContext, au
         });
       } catch (error:any) {
         const errorMessage = error.message || "An unknown error occurred.";
-        vscode.window.showErrorMessage(`Error reviewing code: ${errorMessage}`);
+        vscode.window.showErrorMessage(`Error Org Std Review: ${errorMessage}`);
       }
     }
   });

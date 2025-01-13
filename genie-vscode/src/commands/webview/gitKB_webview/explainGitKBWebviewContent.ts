@@ -28,6 +28,7 @@ export function explainGitKBWebViewContent(question: string, title: string): str
   <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600&display=swap" rel="stylesheet">  
   <script src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.2.4/pdfmake.min.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.2.4/vfs_fonts.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.17.0/xlsx.full.min.js"></script>
   <style>
 
       body {
@@ -104,9 +105,15 @@ export function explainGitKBWebViewContent(question: string, title: string): str
       <h1>${title}</h1>
   </div>
   <div id="content">
-      <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
-            <h2>Summary:</h2>
-            <button id="downloadButton" class="download-btn">Download as pdf </button>
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
+            <div>
+                <h2>Summary:</h2>
+            </div>
+            <div>
+                <button id="downloadButton" class="download-btn">Download as PDF</button>
+                <button id="downloadButtonExcel" class="download-btn">Download as Excel</button>
+            </div>
+            
         </div>
       <table>
           <tr>
@@ -213,7 +220,7 @@ export function explainGitKBWebViewContent(question: string, title: string): str
                             { text: index + 1, fontSize: 10, alignment: 'center'},
                             { text: explanation.overview, fontSize: 10 },
                             { text: explanation.detailedExplanation, fontSize: 10 },
-                            { test: explanation.status || 'Accept', fontSize: 10, alignment: 'center' }
+                            { text: explanation.status || 'Accept', fontSize: 10, alignment: 'center' }
                         ])
                     ]
                 },
@@ -249,6 +256,35 @@ export function explainGitKBWebViewContent(question: string, title: string): str
     };
     pdfMake.createPdf(docDefinition).download('${title}_${new Date().toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' }).replace(/ /g, '_').toLowerCase()}.pdf'); 
     });
+
+    document.getElementById("downloadButtonExcel").addEventListener("click", () => {
+      const workbook = XLSX.utils.book_new();
+        const summarySheetData = [
+            ['Quality', 'Remarks'],
+            [json_data.quality || '', json_data.remarks || '']
+        ];
+        const explanationData = [
+            ['S.No', 'Overview', 'DetailedExplanation', 'Status'],
+            ...explanation.map((explanation, index) => [
+                index + 1,
+                explanation.overview,
+                explanation.detailedExplanation,
+                explanation.status || 'Accept'
+            ])
+        ];
+ 
+        const summarySheet = XLSX.utils.aoa_to_sheet(summarySheetData);
+        const explanationSheet = XLSX.utils.aoa_to_sheet(explanationData);
+        
+
+        XLSX.utils.book_append_sheet(workbook, summarySheet, 'Summary');
+        XLSX.utils.book_append_sheet(workbook, explanationSheet, 'Explanation');
+ 
+        XLSX.writeFile(workbook, '${title}_${new Date().toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' }).replace(/ /g, '_').toLowerCase()}.xlsx');
+
+                });
+
+
     </script>
 </body>
 </html>`;

@@ -8,6 +8,11 @@ export function registerGetCodeGitKBCommand(context: vscode.ExtensionContext, au
     if (editor) {
       const selection = editor.selection;
       const text = editor.document.getText(selection);
+      if (!text) {
+        vscode.window.showWarningMessage("No code selected. Please select code to getcode from GitKB.");
+        return;
+      }
+  
 
       try {
         const progressOptions: vscode.ProgressOptions = {
@@ -45,8 +50,9 @@ export function registerGetCodeGitKBCommand(context: vscode.ExtensionContext, au
           });
         });
  
-      } catch (error) {
-        vscode.window.showErrorMessage("Error Code Generation code.");
+      } catch (error:any) {
+        const errorMessage = error.message || "An unknown error occurred.";
+        vscode.window.showErrorMessage(`Error Get Code: ${errorMessage}`);
       }
     }
   });

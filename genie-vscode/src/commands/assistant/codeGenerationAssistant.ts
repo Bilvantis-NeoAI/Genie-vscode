@@ -9,6 +9,11 @@ export function registerCodeGenerationAssistantCommand(context: vscode.Extension
     if (editor) {
       const selection = editor.selection;
       const text = editor.document.getText(selection);
+      if (!text) {
+            vscode.window.showWarningMessage("No code selected. Please select code to assistant.");
+            return;
+          }
+      
       const language = editor.document.languageId;
       // Get workspace folder path
       const workspacePath = vscode.workspace.workspaceFolders?.[0]?.uri.fsPath || "";
@@ -51,8 +56,9 @@ export function registerCodeGenerationAssistantCommand(context: vscode.Extension
           });
         });
  
-      } catch (error) {
-        vscode.window.showErrorMessage("Error Code Generation code.");
+      } catch (error: any) {        
+        const errorMessage = error.message || "An unknown error occurred.";
+        vscode.window.showErrorMessage(`Error Code Generation: ${errorMessage}`);
       }
     }
   });

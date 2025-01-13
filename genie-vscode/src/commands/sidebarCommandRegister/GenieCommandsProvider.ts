@@ -34,7 +34,7 @@ export class GenieCommandsProvider implements vscode.TreeDataProvider<GenieComma
       return Promise.resolve([
         new GenieCommand("Code Overall Review", "extension.reviewOverall", 'file-code', 'Perform an overall review of your code.'),
         new GenieCommand("Code Review", "extension.reviewCode", 'file-text', 'Review specific sections of your code.'),
-        new GenieCommand("Tech Depth Review", "extension.reviewTechDepth", 'flame', 'Identify and analyze technical debt.'),
+        new GenieCommand("Tech Dept Review", "extension.reviewTechDept", 'flame', 'Identify and analyze technical debt.'),
         new GenieCommand("Org Std Review", "extension.reviewOrgStd", 'organization', 'Ensure adherence to organizational coding standards.'),
         new GenieCommand("Owasp Review", "extension.reviewOwasp", 'shield', 'Perform a security review based on OWASP guidelines.'),
         new GenieCommand("Performance Review", "extension.reviewPerformance", 'pulse', 'Analyze and improve code performance.'),
