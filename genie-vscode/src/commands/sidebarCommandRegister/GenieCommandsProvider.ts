@@ -15,9 +15,7 @@ export class GenieCommandsProvider implements vscode.TreeDataProvider<GenieComma
     if (!element) {
       return Promise.resolve([
         new GenieCategory("Assistant", "extensions"),
-        new GenieCategory("Review", "list-unordered"),
-        new GenieCategory("Git - Knowledge Base", "git-merge"),
-        new GenieCategory("Knowledge Base", "book")
+        new GenieCategory("Review", "list-unordered")
       ]);
     } else if (element.label === "Assistant") {
       return Promise.resolve([
@@ -35,7 +33,7 @@ export class GenieCommandsProvider implements vscode.TreeDataProvider<GenieComma
         new GenieCommand("CK Review", "extension.reviewCK", 'graph-line', 'Perform a CK metrics review for your code.'),
         new GenieCommand("Code Overall Review", "extension.reviewOverall", 'file-code', 'Perform an overall review of your code.'),
         new GenieCommand("Code Review", "extension.reviewCode", 'file-text', 'Review specific sections of your code.'),
-        new GenieCommand("Tech Dept Review", "extension.reviewTechDept", 'flame', 'Identify and analyze technical debt.'),
+        new GenieCommand("Tech Debt Review", "extension.reviewTechDebt", 'flame', 'Identify and analyze technical debt.'),
         new GenieCommand("Org Std Review", "extension.reviewOrgStd", 'organization', 'Ensure adherence to organizational coding standards.'),
         new GenieCommand("Owasp Review", "extension.reviewOwasp", 'shield', 'Perform a security review based on OWASP guidelines.'),
         new GenieCommand("Performance Review", "extension.reviewPerformance", 'pulse', 'Analyze and improve code performance.'),
@@ -43,18 +41,7 @@ export class GenieCommandsProvider implements vscode.TreeDataProvider<GenieComma
         new GenieCommand("Syntax Review", "extension.reviewSyntax", 'checklist', 'Check for syntax errors and inconsistencies.'),
         
       ]);
-    } else if (element.label === "Git - Knowledge Base") {
-      return Promise.resolve([
-        new GenieCommand("Explain", "extension.explainGitKB", 'comment', 'Get explanations form Git concepts.'),
-        new GenieCommand("Get Code", "extension.getCodeGitKB", 'git-branch', 'Retrieve code snippets from the Git knowledge base.'),
-        
-      ]);
-    } else if (element.label === "Knowledge Base") {
-      return Promise.resolve([
-        new GenieCommand("Get Response From KB", "extension.knowledgeBaseQueAns", 'search', 'Fetch answers from the Knowledge Base for your queries.'),
-
-      ]);
-    }
+    } 
 
     return Promise.resolve([]);
   }

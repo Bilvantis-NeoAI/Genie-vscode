@@ -8,7 +8,7 @@ import { showLoginRegisterWebview } from "./commands/webview/auth_webview/showLo
 import { showUrlWebview } from "./commands/webview/auth_webview/showUrlWebview";
 import { showLoginPrompt } from "./auth/authDialog";
 import { registerOwaspReviewCommand } from "./commands/review/owaspReview";
-import { registerTechDeptReviewCommand } from "./commands/review/techDeptReview";
+import { registerTechDebtReviewCommand } from "./commands/review/techDebtReview";
 import { registerAddDocstringsAssistantCommand } from "./commands/assistant/addDocstringAssistant";
 import { registerCodeGenerationAssistantCommand } from "./commands/assistant/codeGenerationAssistant";
 import { registerAddCommentsAssistantCommand } from "./commands/assistant/addCommentsCodeAssistant";
@@ -18,9 +18,6 @@ import { registerErrorHandlingAssistantCommand } from "./commands/assistant/addE
 import { registerRefactorCodeAssistantCommand } from "./commands/assistant/refactorCodeAssistant";
 import { registerExplainCodeAssistantCommand } from "./commands/assistant/explainCodeAssistant";
 import { registerUnittestCodeAssistantCommand } from "./commands/assistant/unittestCodeAssistant";
-import { registerExplainGitKBCommand } from "./commands/gitKB/explainGitKB";
-import { registerGetCodeGitKBCommand } from "./commands/gitKB/getCodeGitKB";
-import { registerKnowledgeBaseQACommand } from "./commands/KB/queAnsFromKB";
 import { LoginRegisterCommandsProvider } from "./commands/sidebarCommandRegister/LoginRegisterCommandsProvider";
 import { gitHooksCommitReview } from "./commands/gitCommit/gitHooksCommitReview";
 import * as path from 'path';
@@ -31,7 +28,7 @@ import { registerCkReviewCommand } from "./commands/review/ckReview";
 
  
  
-let isLoggedIn = false;
+
 // let authToken: string | undefined;
 const jwt = require('jsonwebtoken');
  
@@ -59,7 +56,10 @@ export async function activate(context: vscode.ExtensionContext) {
       showLoginRegisterWebview(context, "register");
     })
   );
- 
+
+//   context.globalState.update("authToken", undefined);
+// context.globalState.update("urlSubmitted", false);
+
   let urlSubmitted = context.globalState.get<boolean>("urlSubmitted") || false;
   let authToken = context.globalState.get<string>("authToken");  
  
@@ -104,7 +104,6 @@ export async function activate(context: vscode.ExtensionContext) {
         }
 
       // authToken = storedToken;
-      isLoggedIn = true;
       activateCodeCommands(context);
       // Register the sidebar provider for Genie commands
       const genieProvider = new GenieCommandsProvider();
@@ -150,7 +149,7 @@ export function activateCodeCommands(context: vscode.ExtensionContext) {
   registerSyntaxReviewCommand(context, authToken);
   registerOverallReviewCommand(context, authToken);
   registerOwaspReviewCommand(context, authToken);
-  registerTechDeptReviewCommand(context, authToken);
+  registerTechDebtReviewCommand(context, authToken);
   registerOrgStdReviewCommand(context, authToken);
   registerCkReviewCommand(context, authToken);
  
@@ -163,14 +162,7 @@ export function activateCodeCommands(context: vscode.ExtensionContext) {
   registerRefactorCodeAssistantCommand(context, authToken);
   registerExplainCodeAssistantCommand(context, authToken);
   registerUnittestCodeAssistantCommand(context, authToken);
- 
-  //Register Git KB Commands
-  registerExplainGitKBCommand(context, authToken);
-  registerGetCodeGitKBCommand(context, authToken);
- 
-  //Register KB Commands
-  registerKnowledgeBaseQACommand(context, authToken);
- 
+  
   //gitHooks
   gitHooksCommitReview();
 }

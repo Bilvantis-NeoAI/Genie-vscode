@@ -1,13 +1,13 @@
 
 import * as vscode from "vscode";
-import { postTechDeptReview } from "../../utils/api/reviewAPI";
+import { postTechDebtReview } from "../../utils/api/reviewAPI";
 import { reviewGetWebViewContent } from "../webview/review_Webview/reviewWebviewContent";
 import { getGitInfo } from "../gitInfo";
 
 let panel: vscode.WebviewPanel | undefined;
 
-export function registerTechDeptReviewCommand(context: vscode.ExtensionContext, authToken: string) {
-  const reviewTechDept = vscode.commands.registerCommand("extension.reviewTechDept", async () => {
+export function registerTechDebtReviewCommand(context: vscode.ExtensionContext, authToken: string) {
+  const reviewTechDebt = vscode.commands.registerCommand("extension.reviewTechDebt", async () => {
     const editor = vscode.window.activeTextEditor;
     if (editor) {
       const selection = editor.selection;
@@ -26,20 +26,20 @@ export function registerTechDeptReviewCommand(context: vscode.ExtensionContext, 
       try {
         const progressOptions: vscode.ProgressOptions = {
           location: vscode.ProgressLocation.Notification,
-          title: "TechDept Reviewing",
+          title: "TechDebt Reviewing",
           cancellable: false,
         };
 
         await vscode.window.withProgress(progressOptions, async () => {
-          const reviewTechDept = await postTechDeptReview(text, language, authToken, project_name, branch_name);
-          const formattedContent = JSON.stringify(reviewTechDept, null, 2);
+          const reviewTechDebt = await postTechDebtReview(text, language, authToken, project_name, branch_name);
+          const formattedContent = JSON.stringify(reviewTechDebt, null, 2);
 
           if (panel) {
             panel.reveal(vscode.ViewColumn.One);
           } else {
             panel = vscode.window.createWebviewPanel(
-              "techDeptReview", 
-              "TechDept Review", 
+              "techDebtReview", 
+              "TechDebt Review", 
               vscode.ViewColumn.One, 
               {
                 enableScripts: true,
@@ -49,7 +49,7 @@ export function registerTechDeptReviewCommand(context: vscode.ExtensionContext, 
                 panel = undefined;
               });
           }
-          panel.webview.html = reviewGetWebViewContent(formattedContent, "TechDept Review");
+          panel.webview.html = reviewGetWebViewContent(formattedContent, "TechDebt Review");
         });
       } catch (error: any) {
         const errorMessage = error.message || "An unknown error occurred.";
@@ -58,6 +58,6 @@ export function registerTechDeptReviewCommand(context: vscode.ExtensionContext, 
     }
   });
 
-  context.subscriptions.push(reviewTechDept);
+  context.subscriptions.push(reviewTechDebt);
 }
 

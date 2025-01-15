@@ -58,15 +58,7 @@ export function showUrlWebview(
                 <div class="form-group">
                     <label for="url">Backend Domain:</label>
                     <input type="text" id="url" name="url" class="form-control" value='http://34.46.36.105:3000' required>
-                </div> 
-                <div class="form-group">
-                    <label for="gurl">Git Knowledge Base Domain:</label>
-                    <input type="text" id="gurl" name="gurl" class="form-control" value='http://34.46.36.105:3001' required>
-                </div>
-                 <div class="form-group">
-                    <label for="kurl">Knowledge Base Domain:</label>
-                    <input type="text" id="kurl" name="kurl" class="form-control" value='http://34.100.243.119:9000' required>
-                </div>                       
+                </div>          
                 <button type="submit" class="btn btn-primary btn-block">Submit</button>
             </form>
         </div>
@@ -77,9 +69,7 @@ export function showUrlWebview(
             if (authForm) {
                 authForm.addEventListener('submit', (event) => {
                     event.preventDefault();
-                    const userUrl = document.getElementById('url').value;
-                    const GUrl = document.getElementById('gurl').value;
-                    const KUrl = document.getElementById('kurl').value;                    
+                    const userUrl = document.getElementById('url').value;                  
 
                     fetch(\`\${userUrl}/touch\`, {
                         method: 'GET',
@@ -87,10 +77,10 @@ export function showUrlWebview(
                     .then(response => response.json())
                     .then(data => {
                         if (data.message === 'API is valid and operational') {
-                            vscode.postMessage({ command: 'urlRegisterSuccess', message: ' URL Submitted successfully.', userUrl, GUrl, KUrl });
+                            vscode.postMessage({ command: 'urlRegisterSuccess', message: ' URL Submitted successfully.', userUrl });
                         
                             } else {
-                            vscode.postMessage({ command: 'urlRegisterError', error: data.detail || 'URL SUbmiiton failed' });
+                            vscode.postMessage({ command: 'urlRegisterError', error: data.detail || 'URL Submission failed' });
                         }
                     })
                     .catch(error => {
@@ -115,15 +105,6 @@ export function showUrlWebview(
                     if (message.userUrl) {
                         exchangeUrl(message.userUrl); 
                     }
-                    if (message.GUrl) {
-                        updateGitKbBaseApi(message.GUrl);
-                       
-                    }
-                    if (message.KUrl) {
-                        updateKbBaseApi(message.KUrl);
-                       
-                    }
-
                     context.globalState.update('urlSubmitted', true);
                     panel.dispose();
                     break;
@@ -135,13 +116,4 @@ export function showUrlWebview(
         undefined,
         context.subscriptions
     );
-    // Function to update GITKB_BASE_API
-    function updateGitKbBaseApi(newUrl: string) {
-        require('../../../auth/config').GITKB_BASE_API = newUrl;
-    }
-    
-    // Function to update KB_BASE_API
-    function updateKbBaseApi(newUrl: string) {
-        require('../../../auth/config').KB_BASE_API = newUrl;
-    }
 }

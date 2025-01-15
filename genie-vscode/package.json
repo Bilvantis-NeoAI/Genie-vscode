@@ -49,8 +49,8 @@
         "title": "Owasp Review Selected"
       },
       {
-        "command": "extension.reviewTechDept",
-        "title": "Tech Dept Review Selected"
+        "command": "extension.reviewTechDebt",
+        "title": "Tech Debt Review Selected"
       },
       {
         "command": "extension.reviewOrgStd",
@@ -91,18 +91,6 @@
       {
         "command": "extension.refactorCode",
         "title": "Refactor Code"
-      },
-      {
-        "command": "extension.explainGitKB",
-        "title": "Get Response From Git KB"
-      },
-      {
-        "command": "extension.getCodeGitKB",
-        "title": "Get Code From Git KB"
-      },
-      {
-        "command": "extension.knowledgeBaseQueAns",
-        "title": "Get Response From KB"
       }
     ],
     "viewsContainers": {
