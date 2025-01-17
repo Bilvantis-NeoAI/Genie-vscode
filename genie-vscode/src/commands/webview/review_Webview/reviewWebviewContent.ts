@@ -316,7 +316,7 @@ export function reviewGetWebViewContent(
             {
                 table: {
                     headerRows: 1,
-                    widths: [30, '*', '*', '*', 50, 40],
+                    widths: ['5%', '27%', '27%', '27%', '8%', '6%'],
                     body: issuesTableBody
                 },
                 layout: {
