@@ -1,5 +1,6 @@
 import * as vscode from 'vscode';
 import { exchangeUrl } from '../../../auth/config';
+import { showLoginPrompt } from '../../../auth/authDialog';
 export function showUrlWebview(
     context: vscode.ExtensionContext,
     error_message?: string,
@@ -106,6 +107,14 @@ export function showUrlWebview(
                         exchangeUrl(message.userUrl); 
                     }
                     context.globalState.update('urlSubmitted', true);
+                    let urlSubmitted = context.globalState.get<boolean>("urlSubmitted") || false;
+                    let authToken = context.globalState.get<string>("authToken");
+                    if (urlSubmitted) {
+                        if(authToken) {
+                            showLoginPrompt(context);
+                        }
+                        
+                    }
                     panel.dispose();
                     break;
                 case 'urlRegisterError':
