@@ -49,7 +49,7 @@ export function registerTechDebtReviewCommand(context: vscode.ExtensionContext, 
                 panel = undefined;
               });
           }
-          panel.webview.html = reviewGetWebViewContent(formattedContent, "TechDebt Review");
+          panel.webview.html = reviewGetWebViewContent(formattedContent, "Tech Debt Review");
         });
       } catch (error: any) {
         const errorMessage = error.message || "An unknown error occurred.";
