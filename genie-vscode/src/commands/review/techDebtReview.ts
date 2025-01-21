@@ -39,7 +39,7 @@ export function registerTechDebtReviewCommand(context: vscode.ExtensionContext, 
           } else {
             panel = vscode.window.createWebviewPanel(
               "techDebtReview", 
-              "TechDebt Review", 
+              "Tech Debt Review", 
               vscode.ViewColumn.One, 
               {
                 enableScripts: true,
