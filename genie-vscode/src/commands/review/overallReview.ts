@@ -39,7 +39,7 @@ export function registerOverallReviewCommand(context: vscode.ExtensionContext, a
           } else {
             panel = vscode.window.createWebviewPanel(
               "codeOverallReview", 
-              "Overall Review", 
+              "Code Overall Review", 
               vscode.ViewColumn.One, 
               {
               enableScripts: true,
