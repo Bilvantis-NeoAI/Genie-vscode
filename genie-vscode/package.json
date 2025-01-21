@@ -3,7 +3,7 @@
   "displayName": "Genie_vscode",
   "description": "A VS extension to comment code, review code, generate docstrings, unit tests, analyze code metrics, generate logs, and handle errors",
   "version": "0.0.1",
-  "publisher": "Bilvantis",
+  "publisher": "HSBC",
   "type": "commonjs",
   "engines": {
     "vscode": "^1.95.0"
