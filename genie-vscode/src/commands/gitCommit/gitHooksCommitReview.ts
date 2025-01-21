@@ -260,6 +260,7 @@ username=$(git config user.name)
 repo_name=$(git config --get remote.origin.url | sed 's#.*/##;s/.git//')
 num_files_lines_changed=$(git diff --shortstat "$default_branch_commit" "$commit_id")
 files_changed=$(git diff --name-only "$default_branch_commit" "$commit_id")
+user_id=
 # Validate diff content
 if [[ -z "$diff_content" ]]; then
     diff_content="No changes detected compared to the default branch ($default_branch)"

@@ -127,12 +127,12 @@ export function unittestCodeAssistantWebViewContent(content: string, title: stri
                 <td>${parsedContent.details}</td>
             </tr>
         </table>
-        <h2>Issues:</h2>
+        <h2>Unit Test Cases:</h2>
         <table id="issuesTable">
             <thead>
                 <tr>
                     <th>S.No</th>
-                    <th>TestCase</th>
+                    <th>Test Case</th>
                     <th>Explanation</th>
                     <th>Importance</th>
                     <th>
@@ -213,7 +213,7 @@ export function unittestCodeAssistantWebViewContent(content: string, title: stri
                     paddingBottom: () => 5
                 }
             },
-            { text: 'Explanation:', style: 'subheader' },
+            { text: 'Unit Test Cases:', style: 'subheader' },
             {
                 table: {
                     headerRows: 1,
@@ -221,7 +221,7 @@ export function unittestCodeAssistantWebViewContent(content: string, title: stri
                     body: [
                         [
                             { text: 'S.No', bold: true, fillColor: '#E9E5E5', fontSize: 10, alignment: 'center' },
-                            { text: 'TestCase', bold: true, fillColor: '#E9E5E5', fontSize: 10, alignment: 'center' },
+                            { text: 'Test Case', bold: true, fillColor: '#E9E5E5', fontSize: 10, alignment: 'center' },
                             { text: 'Explanation', bold: true, fillColor: '#E9E5E5', fontSize: 10, alignment: 'center' },
                             { text: 'Importance', bold: true, fillColor: '#E9E5E5', fontSize: 10, alignment: 'center' },
                             { text: 'Severity', bold: true, fillColor: '#E9E5E5', fontSize: 10, alignment: 'center' },
@@ -278,7 +278,7 @@ export function unittestCodeAssistantWebViewContent(content: string, title: stri
             [json_data.details || '']
         ];
         const explanationData = [
-            ['S.No', 'TestCase', 'Explanation', 'Importance', 'Severity', 'Status'],
+            ['S.No', 'Test Case', 'Explanation', 'Importance', 'Severity', 'Status'],
             ...unitTests.map((unitTests, index) => [
                 index + 1,
                 unitTests.testCase,
@@ -294,7 +294,7 @@ export function unittestCodeAssistantWebViewContent(content: string, title: stri
         
 
         XLSX.utils.book_append_sheet(workbook, summarySheet, 'Summary');
-        XLSX.utils.book_append_sheet(workbook, explanationSheet, 'Explanation');
+        XLSX.utils.book_append_sheet(workbook, explanationSheet, 'Unit Test Cases');
  
         XLSX.writeFile(workbook, '${title}_${new Date().toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' }).replace(/ /g, '_').toLowerCase()}.xlsx');
 

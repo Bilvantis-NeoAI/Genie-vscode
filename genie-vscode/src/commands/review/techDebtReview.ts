@@ -26,7 +26,7 @@ export function registerTechDebtReviewCommand(context: vscode.ExtensionContext, 
       try {
         const progressOptions: vscode.ProgressOptions = {
           location: vscode.ProgressLocation.Notification,
-          title: "TechDebt Reviewing",
+          title: "Tech Debt Reviewing",
           cancellable: false,
         };
 
@@ -39,7 +39,7 @@ export function registerTechDebtReviewCommand(context: vscode.ExtensionContext, 
           } else {
             panel = vscode.window.createWebviewPanel(
               "techDebtReview", 
-              "TechDebt Review", 
+              "Tech Debt Review", 
               vscode.ViewColumn.One, 
               {
                 enableScripts: true,
