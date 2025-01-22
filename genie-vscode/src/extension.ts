@@ -31,6 +31,7 @@ import { registerCkReviewCommand } from "./commands/review/ckReview";
 
 // let authToken: string | undefined;
 const jwt = require('jsonwebtoken');
+export let userId: string | undefined;
  
 export async function activate(context: vscode.ExtensionContext) {
   const loginRegisterProvider = new LoginRegisterCommandsProvider();
@@ -88,6 +89,8 @@ export async function activate(context: vscode.ExtensionContext) {
         const decodedToken = jwt.decode(authToken);
         const tokenExpiration = decodedToken.exp;
         console.log("***", tokenExpiration);
+        userId = decodedToken.userId;
+        console.log("*** userId", userId);
         const currentTime = Math.floor(Date.now() / 1000);
         console.log("*** current time", currentTime);
           
