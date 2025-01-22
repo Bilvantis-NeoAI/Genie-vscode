@@ -70,9 +70,9 @@ export async function postOwaspReview(code: string, language: string, authToken:
   return response.data;
 }
 
-export async function postTechDepthReview(code: string, language: string, authToken: string, project_name: any, branch_name: string): Promise<any> {
+export async function postTechDebtReview(code: string, language: string, authToken: string, project_name: any, branch_name: string): Promise<any> {
   const response = await axios.post(
-    `${BASE_API}/review/tech-depth`,
+    `${BASE_API}/review/tech-debt`,
     { code, language, project_name, branch_name },
     {
       headers: getAuthHeaders(authToken),
@@ -91,3 +91,15 @@ export async function postOrgStdReview(code: string, language: string, authToken
   );
   return response.data;
 }
+
+export async function postCkReview(code: string, language: string, authToken: string, project_name: any, branch_name: string): Promise<any> {
+  const response = await axios.post(
+    `${BASE_API}/review/CK-review`,
+    { code, language, project_name, branch_name },
+    {
+      headers: getAuthHeaders(authToken),
+    }
+  );
+  return response.data;
+}
+ 

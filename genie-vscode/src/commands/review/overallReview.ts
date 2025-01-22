@@ -55,7 +55,7 @@ export function registerOverallReviewCommand(context: vscode.ExtensionContext, a
         });
       } catch (error:any) {
         const errorMessage = error.message || "An unknown error occurred.";
-              vscode.window.showErrorMessage(`Error reviewing code: ${errorMessage}`);
+              vscode.window.showErrorMessage(`Error Overall Review: ${errorMessage}`);
       }
     }
   });

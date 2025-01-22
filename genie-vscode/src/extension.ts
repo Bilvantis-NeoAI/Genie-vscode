@@ -8,7 +8,7 @@ import { showLoginRegisterWebview } from "./commands/webview/auth_webview/showLo
 import { showUrlWebview } from "./commands/webview/auth_webview/showUrlWebview";
 import { showLoginPrompt } from "./auth/authDialog";
 import { registerOwaspReviewCommand } from "./commands/review/owaspReview";
-import { registerTechDepthReviewCommand } from "./commands/review/techDepthReview";
+import { registerTechDebtReviewCommand } from "./commands/review/techDebtReview";
 import { registerAddDocstringsAssistantCommand } from "./commands/assistant/addDocstringAssistant";
 import { registerCodeGenerationAssistantCommand } from "./commands/assistant/codeGenerationAssistant";
 import { registerAddCommentsAssistantCommand } from "./commands/assistant/addCommentsCodeAssistant";
@@ -27,10 +27,14 @@ import * as path from 'path';
 import * as fs from 'fs';
 import * as os from 'os';
 import { GenieCommandsProvider } from "./commands/sidebarCommandRegister/GenieCommandsProvider";
+import { registerCkReviewCommand } from "./commands/review/ckReview";
+
  
  
 let isLoggedIn = false;
 // let authToken: string | undefined;
+export let userId: string | undefined;
+const jwt = require('jsonwebtoken');
  
 export async function activate(context: vscode.ExtensionContext) {
   const loginRegisterProvider = new LoginRegisterCommandsProvider();
@@ -74,12 +78,33 @@ export async function activate(context: vscode.ExtensionContext) {
  
    urlSubmitted = context.globalState.get<boolean>("urlSubmitted") || false;
    authToken = context.globalState.get<string>("authToken");
- 
+
    // Proceed after the URL is submitted
-  // urlSubmitted = context.globalState.get("urlSubmitted", false);
   if (urlSubmitted) {
  
     if (authToken) {      
+
+      try {
+        console.log("*** authtoken if condition");
+        const decodedToken = jwt.decode(authToken);
+        const tokenExpiration = decodedToken.exp;
+        console.log("***", tokenExpiration);
+        userId = decodedToken.userId;
+        const currentTime = Math.floor(Date.now() / 1000);
+        console.log("*** current time", currentTime);
+          
+          // Token is expired, clear it
+          if (currentTime > tokenExpiration) {
+          context.globalState.update('authToken', undefined);
+          context.globalState.update('urlSubmitted', false);
+          console.log("The token is expired and has been cleared.", context.globalState.get<string>("authToken"));
+        } else {
+            console.log("The token is still valid.");
+        }
+        } catch (error) {
+          console.error("Failed to decode the token:", error);
+        }
+
       // authToken = storedToken;
       isLoggedIn = true;
       activateCodeCommands(context);
@@ -89,7 +114,8 @@ export async function activate(context: vscode.ExtensionContext) {
        
       } else {
         // Show login/register if authToken is missing
-        showLoginRegisterWebview(context, "login");
+        // showLoginRegisterWebview(context, "login");
+        showLoginPrompt(context);
       }
  
   } else {
@@ -126,8 +152,9 @@ export function activateCodeCommands(context: vscode.ExtensionContext) {
   registerSyntaxReviewCommand(context, authToken);
   registerOverallReviewCommand(context, authToken);
   registerOwaspReviewCommand(context, authToken);
-  registerTechDepthReviewCommand(context, authToken);
+  registerTechDebtReviewCommand(context, authToken);
   registerOrgStdReviewCommand(context, authToken);
+  registerCkReviewCommand(context, authToken);
  
   //Register all Assistant Commands
   registerAddCommentsAssistantCommand(context, authToken);

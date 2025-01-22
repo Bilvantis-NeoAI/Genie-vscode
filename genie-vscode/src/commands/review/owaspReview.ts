@@ -54,7 +54,7 @@ export function registerOwaspReviewCommand(context: vscode.ExtensionContext, aut
         });
       } catch (error:any) {
        const errorMessage = error.message || "An unknown error occurred.";
-             vscode.window.showErrorMessage(`Error reviewing code: ${errorMessage}`);
+             vscode.window.showErrorMessage(`Error Owasp Review: ${errorMessage}`);
       }
     }
   });

@@ -1,3 +1,5 @@
+import * as XLSX from 'xlsx';
+
 export function reviewGetWebViewContent(
   content: string,
   title: string
@@ -52,6 +54,7 @@ export function reviewGetWebViewContent(
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600&display=swap" rel="stylesheet">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.2.4/pdfmake.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.2.4/vfs_fonts.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.17.0/xlsx.full.min.js"></script>
     <style>
         body {
             font-family: 'Poppins', sans-serif;
@@ -142,9 +145,16 @@ export function reviewGetWebViewContent(
     <div id="content">
     
         <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
-            <h2>Summary:</h2>
-            <button id="downloadButton" class="download-btn">Download as pdf </button>
+            <div>
+                <h2>Summary:</h2>
+            </div>
+            <div>
+                <button id="downloadButton" class="download-btn">Download as PDF</button>
+                <button id="downloadButtonExcel" class="download-btn">Download as Excel</button>
+            </div>
+            
         </div>
+
         <table>
             <tr>
                 ${showQuality ? "<th>Quality</th>" : ""}
@@ -236,8 +246,46 @@ export function reviewGetWebViewContent(
         function updateStatus(index, value) {
             issues[index].status = value;
         }
-
+        
         document.getElementById("downloadButton").addEventListener("click", () => {
+    const hasQuality = json_data.hasOwnProperty('quality') && json_data.quality;
+    const hasOverallSeverity = json_data.hasOwnProperty('overallSeverity') && json_data.overallSeverity;
+    const hasStandardsAdherence = json_data.hasOwnProperty('standardsAdherence') && json_data.standardsAdherence;
+
+    const summaryTableBody = [
+        [
+            ...(hasQuality ? [{ text: 'Quality', bold: true, fillColor: '#E9E5E5', fontSize: 10, alignment: 'center' }] : []),
+            ...(hasStandardsAdherence ? [{ text: 'Standards Adherence', bold: true, fillColor: '#E9E5E5', fontSize: 10, alignment: 'center' }] : []),
+            { text: 'Remarks', bold: true, fillColor: '#E9E5E5', fontSize: 10, alignment: 'center' },
+            ...(hasOverallSeverity ? [{ text: 'Overall Severity', bold: true, fillColor: '#E9E5E5', fontSize: 10, alignment: 'center' }] : [])
+        ],
+        [
+            ...(hasQuality ? [{ text: json_data.quality || '', fontSize: 10, alignment: 'center' }] : []),
+            ...(hasStandardsAdherence ? [{ text: json_data.standardsAdherence || '', fontSize: 10, alignment: 'center' }] : []),
+            { text: json_data.remarks, fontSize: 10 },
+            ...(hasOverallSeverity ? [{ text: json_data.overallSeverity || '', fontSize: 10, alignment: 'center' }] : [])
+        ]
+    ];
+
+    const issuesTableBody = [
+        [
+            { text: 'S.No', bold: true, fillColor: '#E9E5E5', fontSize: 10, alignment: 'center' },
+            { text: 'Identification', bold: true, fillColor: '#E9E5E5', fontSize: 10, alignment: 'center' },
+            { text: 'Fix', bold: true, fillColor: '#E9E5E5', fontSize: 10, alignment: 'center' },
+            { text: 'Explanation', bold: true, fillColor: '#E9E5E5', fontSize: 10, alignment: 'center' },
+            { text: 'Severity', bold: true, fillColor: '#E9E5E5', fontSize: 10, alignment: 'center' },
+            { text: 'Status', bold: true, fillColor: '#E9E5E5', fontSize: 10, alignment: 'center' }
+        ],
+        ...issues.map((issue, index) => [
+            { text: index + 1, fontSize: 10, alignment: 'center' },
+            { text: issue.identification, fontSize: 10 },
+            { text: issue.fix, fontSize: 10 },
+            { text: issue.explanation, fontSize: 10 },
+            { text: issue.severity, fontSize: 10, alignment: 'center' },
+            { text: issue.status || 'Accept', fontSize: 10, alignment: 'center' }
+        ])
+    ];
+
     const docDefinition = {
         pageOrientation: 'landscape',
         content: [
@@ -245,19 +293,13 @@ export function reviewGetWebViewContent(
             { text: 'Summary:', style: 'subheader' },
             {
                 table: {
-                    widths: [100, '*', 150],
-                    body: [
-                        [
-                            { text: 'Quality', bold: true, fillColor: '#E9E5E5', fontSize: 10, alignment: 'center' },
-                            { text: 'Remarks', bold: true, fillColor: '#E9E5E5', fontSize: 10, alignment: 'center' },
-                            { text: 'Overall Severity', bold: true, fillColor: '#E9E5E5', fontSize: 10, alignment: 'center' }
-                        ],
-                        [
-                        { text: json_data.quality || '', fontSize: 10, alignment: 'center'},
-                        {text: json_data.remarks, fontSize:10},
-                        {text: json_data.overallSeverity || '', fontSize: 10, alignment: 'center'}
-                         ]
-                    ]
+                    widths: [
+                        ...(hasQuality ? [100] : []),
+                        ...(hasStandardsAdherence ? [150] : []),
+                        '*',
+                        ...(hasOverallSeverity ? [150] : [])
+                    ],
+                    body: summaryTableBody
                 },
                 layout: {
                     hLineWidth: () => 0.5,
@@ -274,25 +316,8 @@ export function reviewGetWebViewContent(
             {
                 table: {
                     headerRows: 1,
-                    widths: [30, '*', '*', '*', 50, 40],
-                    body: [
-                        [
-                            { text: 'S.No', bold: true, fillColor: '#E9E5E5', fontSize: 10, alignment: 'center' },
-                            { text: 'Identification', bold: true, fillColor: '#E9E5E5', fontSize: 10, alignment: 'center' },
-                            { text: 'Fix', bold: true, fillColor: '#E9E5E5', fontSize: 10, alignment: 'center' },
-                            { text: 'Explanation', bold: true, fillColor: '#E9E5E5', fontSize: 10, alignment: 'center' },
-                            { text: 'Severity', bold: true, fillColor: '#E9E5E5', fontSize: 10, alignment: 'center' },
-                            { text: 'Status', bold: true, fillColor: '#E9E5E5', fontSize: 10, alignment: 'center' }
-                        ],
-                        ...issues.map((issue, index) => [
-                            {text: index + 1, fontSize: 10, alignment: 'center'},
-                            { text: issue.identification, fontSize: 10 },
-                            { text: issue.fix, fontSize: 10 },
-                            { text: issue.explanation, fontSize: 10 },
-                            { text: issue.severity, fontSize: 10, alignment: 'center' },
-                            { text: issue.status || 'Accept', fontSize: 10, alignment: 'center' }
-                        ])
-                    ]
+                    widths: ['5%', '27%', '27%', '27%', '8%', '6%'],
+                    body: issuesTableBody
                 },
                 layout: {
                     hLineWidth: () => 0.5,
@@ -324,8 +349,53 @@ export function reviewGetWebViewContent(
             }
         }
     };
+
     pdfMake.createPdf(docDefinition).download('${title}_${new Date().toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' }).replace(/ /g, '_').toLowerCase()}.pdf'); 
-    });
+   });
+        
+    document.getElementById("downloadButtonExcel").addEventListener("click", () => {
+    const workbook = XLSX.utils.book_new();
+
+    const hasQuality = json_data.hasOwnProperty('quality') && json_data.quality;
+    const hasOverallSeverity = json_data.hasOwnProperty('overallSeverity') && json_data.overallSeverity;
+     const hasStandardsAdherence = json_data.hasOwnProperty('standardsAdherence') && json_data.standardsAdherence;
+
+    const summaryHeaders = [
+        ...(hasQuality ? ['Quality'] : []),
+        ...(hasStandardsAdherence ? ['Standards Adherence'] : []),
+        'Remarks',
+        ...(hasOverallSeverity ? ['Overall Severity'] : [])
+    ];
+
+    const summaryData = [
+        ...(hasQuality ? [json_data.quality || ''] : []),
+        ...(hasStandardsAdherence ? [json_data.standardsAdherence || ''] : []),
+        json_data.remarks,
+        ...(hasOverallSeverity ? [json_data.overallSeverity || ''] : [])
+    ];
+
+    const summarySheetData = [summaryHeaders, summaryData];
+    const summarySheet = XLSX.utils.aoa_to_sheet(summarySheetData);
+
+    const issuesSheetData = [
+        ['S.No', 'Identification', 'Fix', 'Explanation', 'Severity', 'Status'],
+        ...issues.map((issue, index) => [
+            index + 1,
+            issue.identification,
+            issue.fix,
+            issue.explanation,
+            issue.severity,
+            issue.status || 'Accept'
+        ])
+    ];
+    const issuesSheet = XLSX.utils.aoa_to_sheet(issuesSheetData);
+
+    XLSX.utils.book_append_sheet(workbook, summarySheet, 'Summary');
+    XLSX.utils.book_append_sheet(workbook, issuesSheet, 'Issues');
+
+    XLSX.writeFile(workbook, '${title}_${new Date().toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' }).replace(/ /g, '_').toLowerCase()}.xlsx');
+});
+    
     </script>
 </body>
 </html>`;

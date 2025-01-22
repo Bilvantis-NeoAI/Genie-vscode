@@ -42,8 +42,9 @@ export function registerKnowledgeBaseQACommand(
             const panel = vscode.window.createWebviewPanel("knowledgeBaseQA", "Knowledge Base QA", vscode.ViewColumn.One, {});
           panel.webview.html = knowledgeBaseQAWebviewContent(formattedContent, "Knowledge Base QA");
         });
-      } catch (error) {
-        vscode.window.showErrorMessage("Error Getting Response from KB.");
+      } catch (error:any) {
+        const errorMessage = error.message || "An unknown error occurred.";
+        vscode.window.showErrorMessage(`Error Get Response From KB: ${errorMessage}`);
       }
     }
   });

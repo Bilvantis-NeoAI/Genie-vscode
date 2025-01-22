@@ -9,6 +9,11 @@ export function registerRefactorCodeAssistantCommand(context: vscode.ExtensionCo
     if (editor) {
       const selection = editor.selection;
       const text = editor.document.getText(selection);
+      if (!text) {
+            vscode.window.showWarningMessage("No code selected. Please select code to assistant.");
+            return;
+          }
+      
       const language = editor.document.languageId;
 
       // Get workspace folder path
@@ -52,8 +57,9 @@ export function registerRefactorCodeAssistantCommand(context: vscode.ExtensionCo
           });
         });
  
-      } catch (error) {
-        vscode.window.showErrorMessage("Error Refactoring code.");
+      } catch (error:any) {
+        const errorMessage = error.message || "An unknown error occurred.";
+        vscode.window.showErrorMessage(`Error Refactoring Code: ${errorMessage}`);
       }
     }
   });
