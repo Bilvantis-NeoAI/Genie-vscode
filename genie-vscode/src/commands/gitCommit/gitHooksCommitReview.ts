@@ -235,14 +235,24 @@ json_payload=$(cat <<EOF
    "branch": "$branch",
    "commit_message": $escaped_commit_message,
    "files_changed": $escaped_files_changed,
-   "user_id": "${userId}"
+   "user_id": "67498e2eb96484d566d74a46"
 }
 EOF
 )
+
+# Save the JSON payload to a temporary file
+json_file=$(mktemp)
+echo "$json_payload" > "$json_file"
+
+
  
 # Use the BASE_API environment variable
 api_url="${BASE_API}/review/commit-review"
-response=$(curl -s -X POST -H "Content-Type: application/json" -d "$json_payload" "$api_url")
+# Use the JSON file in the curl request
+response=$(curl -s -X POST -H "Content-Type: application/json" -d @"$json_file" "$api_url")
+
+# Clean up the temporary file
+rm "$json_file"
  
 # Check if the response is received
 if [[ -z "$response" ]]; then
@@ -280,8 +290,7 @@ for issue in data['review']['issues']:
     print('Severity: ' + issue['severity'])
     print('Suggested Fix: ' + issue['fix'])
     print('-' * 20)
-"
-   
+"   
         `;
         fs.writeFileSync(path.join(normalizedHooksDir, "post-commit"), postCommitScript, { mode: 0o755 });
         vscode.window.showInformationMessage("Pre-commit & Post-commit hook installed.");
