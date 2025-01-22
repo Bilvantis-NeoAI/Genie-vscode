@@ -33,6 +33,7 @@ import { registerCkReviewCommand } from "./commands/review/ckReview";
  
 let isLoggedIn = false;
 // let authToken: string | undefined;
+export let userId: string | undefined;
 const jwt = require('jsonwebtoken');
  
 export async function activate(context: vscode.ExtensionContext) {
@@ -88,6 +89,7 @@ export async function activate(context: vscode.ExtensionContext) {
         const decodedToken = jwt.decode(authToken);
         const tokenExpiration = decodedToken.exp;
         console.log("***", tokenExpiration);
+        userId = decodedToken.userId;
         const currentTime = Math.floor(Date.now() / 1000);
         console.log("*** current time", currentTime);
           
