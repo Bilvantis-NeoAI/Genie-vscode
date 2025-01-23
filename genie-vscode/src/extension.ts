@@ -85,14 +85,12 @@ export async function activate(context: vscode.ExtensionContext) {
     if (authToken) {      
 
       try {
-        console.log("*** authtoken if condition");
+        
         const decodedToken = jwt.decode(authToken);
         const tokenExpiration = decodedToken.exp;
-        console.log("***", tokenExpiration);
         userId = decodedToken.userId;
-        console.log("*** userId", userId);
         const currentTime = Math.floor(Date.now() / 1000);
-        console.log("*** current time", currentTime);
+        
           
           // Token is expired, clear it
           if (currentTime > tokenExpiration) {

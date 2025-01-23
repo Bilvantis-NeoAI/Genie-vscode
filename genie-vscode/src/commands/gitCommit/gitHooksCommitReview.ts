@@ -47,7 +47,7 @@ export function gitHooksCommitReview(): void {
         // Create the hooks folder path
        
  
-        console.log("user id exported",userId);
+        
         const hooksDir = path.join(os.homedir(), "hooks-folder");
         const normalizedHooksDir = hooksDir.replace(/\//g, path.sep); // Correct path separator for current OS
  
