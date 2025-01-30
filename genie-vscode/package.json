@@ -6,12 +6,14 @@
   "publisher": "HSBC",
   "type": "commonjs",
   "engines": {
-    "vscode": "^1.95.0"
+    "vscode": "^1.94.2"
   },
   "categories": [
     "Other"
   ],
-  "activationEvents": ["*"],
+  "activationEvents": [
+    "*"
+  ],
   "main": "./out/extension.js",
   "contributes": {
     "commands": [
@@ -126,14 +128,16 @@
   "devDependencies": {
     "@types/mocha": "^10.0.9",
     "@types/node": "20.x",
-    "@types/vscode": "^1.95.0",
+    "@types/react-dom": "^19.0.3",
+    "@types/vscode": "^1.94.2",
+    "@types/web": "^0.0.200",
     "@types/xlsx": "^0.0.36",
     "@typescript-eslint/eslint-plugin": "^8.10.0",
     "@typescript-eslint/parser": "^8.7.0",
     "@vscode/test-cli": "^0.0.10",
     "@vscode/test-electron": "^2.4.1",
     "eslint": "^9.13.0",
-    "typescript": "^5.6.3"
+    "typescript": "^5.7.3"
   },
   "dependencies": {
     "axios": "^1.7.7",
