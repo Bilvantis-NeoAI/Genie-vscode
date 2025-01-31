@@ -113,10 +113,17 @@ json_payload=$(cat <<EOF
 EOF
 )
  
-api_url="${BASE_API}/review/commit-scan"
+# Save the JSON payload to a temporary file
+json_file=$(mktemp)
+echo "$json_payload" > "$json_file"
  
-# Send the JSON payload to the API
-response=$(curl -s -X POST -H "Content-Type: application/json" -d "$json_payload" "$api_url" )
+# Use the BASE_API environment variable
+api_url="${BASE_API}/review/commit-scan"
+# Use the JSON file in the curl request
+response=$(curl -s -X POST -H "Content-Type: application/json" -d @"$json_file" "$api_url")
+ 
+# Clean up the temporary file
+rm "$json_file"
  
 # Check if the response is received
 if [[ -z "$response" ]]; then
