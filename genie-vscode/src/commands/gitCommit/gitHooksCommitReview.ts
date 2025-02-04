@@ -45,19 +45,19 @@ function configureForOS(osType: string) {
 export function gitHooksCommitReview(): void {
     try {
         // Create the hooks folder path
-       
- 
-        
         const hooksDir = path.join(os.homedir(), "hooks-folder");
         const normalizedHooksDir = hooksDir.replace(/\//g, path.sep); // Correct path separator for current OS
- 
-       
- 
         if (!fs.existsSync(hooksDir)) {
             fs.mkdirSync(hooksDir, { recursive: true });
             vscode.window.showInformationMessage("Hooks directory created.");
         } else {
-            console.log("Hooks directory already exists.");
+            // Delete the folder if it exists
+            fs.rmSync(hooksDir, { recursive: true, force: true });
+            // vscode.window.showInformationMessage("Hooks directory deleted.");
+            // Recreate the hooks folder
+            fs.mkdirSync(hooksDir, { recursive: true });
+            // console.log(`Created new hooks folder at: ${hooksDir}`);
+            vscode.window.showInformationMessage("Hooks directory created");
         }
  
         // Set Git global hooks path
@@ -235,7 +235,7 @@ json_payload=$(cat <<EOF
    "branch": "$branch",
    "commit_message": $escaped_commit_message,
    "files_changed": $escaped_files_changed,
-   "user_id": "67498e2eb96484d566d74a46"
+   "user_id": "${userId}"
 }
 EOF
 )
