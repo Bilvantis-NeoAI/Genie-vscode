@@ -239,7 +239,6 @@ json_payload=$(cat <<EOF
 }
 EOF
 )
- 
 # Save the JSON payload to a temporary file
 json_file=$(mktemp)
 echo "$json_payload" > "$json_file"
@@ -259,11 +258,10 @@ if [[ -z "$response" ]]; then
     echo "ERROR: An unexpected error occurred while communicating with the server. Please verify your internet connection or consider the possibility of an internal server issue." >&2
     exit 1
 fi
- 
 # Extract commit details using Python and string concatenation
-commit_quality=$(echo "$response" | $python_cmd -c "import json, sys; data = json.loads(sys.stdin.read()); print(data['review'].get('quality', ''))")
-commit_remarks=$(echo "$response" | $python_cmd -c "import json, sys; data = json.loads(sys.stdin.read()); print(data['review'].get('remarks', ''))")
-commit_severity=$(echo "$response" | $python_cmd -c "import json, sys; data = json.loads(sys.stdin.read()); print(data['review'].get('overallSeverity', ''))")
+commit_quality=$(echo "$response" | $python_cmd -c "import json, sys; data = json.loads(sys.stdin.read()); print(data.get('quality', ''))")
+commit_remarks=$(echo "$response" | $python_cmd -c "import json, sys; data = json.loads(sys.stdin.read()); print(data.get('remarks', ''))")
+commit_severity=$(echo "$response" | $python_cmd -c "import json, sys; data = json.loads(sys.stdin.read()); print(data.get('overallSeverity', ''))")
  
 # Print the results
 echo " "
@@ -284,7 +282,7 @@ echo "-------------------"
 echo "$response" | $python_cmd -c "
 import json, sys
 data = json.loads(sys.stdin.read())
-for issue in data['review']['issues']:
+for issue in data['issues']:
     print('Identification: ' + issue['identification'])
     print('Explanation: ' + issue['explanation'])
     print('Severity: ' + issue['severity'])

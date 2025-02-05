@@ -6,7 +6,7 @@
   "publisher": "HSBC",
   "type": "commonjs",
   "engines": {
-    "vscode": "^1.95.0"
+    "vscode": "^1.94.0"
   },
   "categories": [
     "Other"
@@ -126,7 +126,7 @@
   "devDependencies": {
     "@types/mocha": "^10.0.9",
     "@types/node": "20.x",
-    "@types/vscode": "^1.95.0",
+    "@types/vscode": "^1.94.0",
     "@types/xlsx": "^0.0.36",
     "@typescript-eslint/eslint-plugin": "^8.10.0",
     "@typescript-eslint/parser": "^8.7.0",
@@ -139,7 +139,6 @@
     "axios": "^1.7.7",
     "dotenv": "^16.4.7",
     "jsonwebtoken": "^9.0.2",
-    "puppeteer": "^23.9.0",
     "xlsx-style": "^0.8.13"
   }
 }
