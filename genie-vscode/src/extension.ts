@@ -165,7 +165,7 @@ export function activateCodeCommands(context: vscode.ExtensionContext) {
   registerUnittestCodeAssistantCommand(context, authToken);
   
   //gitHooks
-  // gitHooksCommitReview();
+  gitHooksCommitReview();
 }
  
  

@@ -115,8 +115,16 @@ EOF
  
 api_url="${BASE_API}/review/commit-scan"
  
-# Send the JSON payload to the API
-response=$(curl -s -X POST -H "Content-Type: application/json" -d "$json_payload" "$api_url" )
+# Save the JSON payload to a temporary file
+json_file=$(mktemp)
+echo "$json_payload" > "$json_file"
+ 
+ 
+# Send the JSON payload to the API from the temporary file
+response=$(curl -s -X POST -H "Content-Type: application/json" -d @"$json_file" "$api_url")
+ 
+# Clean up the temporary file
+rm "$json_file"
  
 # Check if the response is received
 if [[ -z "$response" ]]; then
