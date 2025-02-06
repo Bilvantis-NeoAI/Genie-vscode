@@ -25,6 +25,7 @@ import * as fs from 'fs';
 import * as os from 'os';
 import { GenieCommandsProvider } from "./commands/sidebarCommandRegister/GenieCommandsProvider";
 import { registerCkReviewCommand } from "./commands/review/ckReview";
+import { registerTestCasesReviewCommand } from "./commands/review/testCasesReview";
 
  
  
@@ -153,6 +154,7 @@ export function activateCodeCommands(context: vscode.ExtensionContext) {
   registerTechDebtReviewCommand(context, authToken);
   registerOrgStdReviewCommand(context, authToken);
   registerCkReviewCommand(context, authToken);
+  registerTestCasesReviewCommand(context, authToken);
  
   //Register all Assistant Commands
   registerAddCommentsAssistantCommand(context, authToken);

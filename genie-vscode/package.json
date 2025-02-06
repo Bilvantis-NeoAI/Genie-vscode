@@ -61,6 +61,10 @@
         "title": "CK Review Selected"
       },
       {
+        "command": "extension.reviewTestCases",
+        "title": "Test Cases"
+      },
+      {
         "command": "extension.addComments",
         "title": "Add Comments To Selected Code"
       },

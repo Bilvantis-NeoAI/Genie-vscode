@@ -39,9 +39,10 @@ export class GenieCommandsProvider implements vscode.TreeDataProvider<GenieComma
         new GenieCommand("Performance Review", "extension.reviewPerformance", 'pulse', 'Analyze and improve code performance.'),
         new GenieCommand("Security Review", "extension.reviewSecurity", 'lock', 'Identify security vulnerabilities in your code.'),
         new GenieCommand("Syntax Review", "extension.reviewSyntax", 'checklist', 'Check for syntax errors and inconsistencies.'),
+        new GenieCommand("TestCases Review", "extension.reviewTestCases", 'checklist', 'Generate the TestCasese for entire file.'),
         
       ]);
-    } 
+    }
 
     return Promise.resolve([]);
   }
