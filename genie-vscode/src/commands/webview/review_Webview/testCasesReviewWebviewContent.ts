@@ -1,131 +1,367 @@
+// export function testCasesReviewWebviewContent(content: string, title: string): string {
+//   interface TestCase {
+//       description: string;
+//       testcase: string;
+//       data: string[][];
+//   }
+
+//   interface ParsedContent {
+//       testcases: TestCase[];
+//   }
+
+//   function escapeHtml(html: string): string {
+//       return html.replace(/&/g, "&amp;")
+//                  .replace(/</g, "&lt;")
+//                  .replace(/>/g, "&gt;")
+//                  .replace(/"/g, "&quot;")
+//                  .replace(/'/g, "&#039;");
+//   }
+
+//   let parsedContent: ParsedContent;
+//   try {
+//       parsedContent = JSON.parse(content);
+//   } catch (e) {
+//       const errorMessage = e instanceof Error ? e.message : String(e);
+//       return `<h1>Error parsing content</h1><p>${errorMessage}</p>`;
+//   }
+
+//   const testCasesHtml = parsedContent.testcases.map(testCase => {
+//     // const dataHtml = testCase.data.map((dataArray, index) => `
+//     //   <p><strong>Data ${index + 1}:</strong> ${dataArray.join(", ")}</p>
+//     // `).join("\n"); // Iterate through each sub-array in 'data'
+//     const dataHtml = testCase.data.length === 0
+//   ? `<p><strong>Data:</strong> No data available</p>`
+//   : testCase.data.map((dataArray, index) => `
+//       <p><strong>Data ${index + 1}:</strong> ${dataArray.join(", ")}</p>
+//     `).join("\n");
+
+//     return `
+//       <div class="testcase-section">
+//           <h3>${escapeHtml(testCase.description)}</h3>
+//           <pre><code>${escapeHtml(testCase.testcase)}</code></pre>
+//           ${dataHtml}
+//       </div>
+//     `;
+//   }).join("\n");
+
+//   return `
+//     <!DOCTYPE html>
+//     <html lang="en">
+//     <head>
+//       <meta charset="UTF-8">
+//       <meta name="viewport" content="width=device-width, initial-scale=1.0">
+//       <title>${title}</title>
+//       <link href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.24.1/themes/prism-tomorrow.min.css" rel="stylesheet" />
+//       <style>
+//         body {
+//           margin: 0;
+//           padding: 0;
+//           font-family: Arial, sans-serif;
+//           background-color: #2d2d2d;
+//           color: #f8f8f2;
+//         }
+//         #floating-window {
+//           position: absolute;
+//           top: 50px;
+//           left: 50px;
+//           width: 800px;
+//           height: auto;
+//           border: 1px solid #ccc;
+//           background-color: #1e1e1e;
+//           resize: both;
+//           overflow: auto;
+//           z-index: 1000;
+//           padding: 15px;
+//         }
+//         #header {
+//           padding: 10px;
+//           cursor: move;
+//           background-color: #444;
+//           color: #fff;
+//           border-bottom: 1px solid #ccc;
+//           font-size: 18px;
+//         }
+//         .testcase-section {
+//           margin-bottom: 20px;
+//           padding: 10px;
+//           border: 1px solid #444;
+//           border-radius: 5px;
+//           background-color: #292929;
+//         }
+//         pre {
+//           max-width: 100%;
+//           word-wrap: break-word;
+//           white-space: pre-wrap;
+//           background-color: #1e1e1e;
+//           padding: 10px;
+//           border: 1px solid #444;
+//           border-radius: 5px;
+//         }
+//         #buttons {
+//           margin-top: 10px;
+//           text-align: center;
+//         }
+//         button {
+//           background-color: #444;
+//           color: #fff;
+//           border: none;
+//           padding: 10px 20px;
+//           cursor: pointer;
+//           margin: 5px;
+//         }
+//         button:hover {
+//           background-color: #555;
+//         }
+//       </style>
+//     </head>
+//     <body>
+//       <div id="floating-window">
+//         <div id="header">${title}</div>
+//         <div id="content">
+//           ${testCasesHtml}
+//         </div>
+//         <div id="buttons">
+//           <button id="accept">Accept</button>
+//           <button id="reject">Reject</button>
+//         </div>
+//       </div>
+//       <script>
+//         const vscode = acquireVsCodeApi();
+        
+//         document.getElementById('accept').addEventListener('click', () => {
+//           vscode.postMessage({ command: 'accept' });
+//         });
+        
+//         document.getElementById('reject').addEventListener('click', () => {
+//           vscode.postMessage({ command: 'reject' });
+//         });
+//       </script>
+//     </body>
+//     </html>
+//   `;
+// }
+
 export function testCasesReviewWebviewContent(content: string, title: string): string {
-    interface ParsedContent {
-        details: string;
-        innerMonologue: string;
-        documentationAdded: string;
-      }
-      // Utility to escape HTML special characters
-      function escapeHtml(html: string): string {
-        return html.replace(/&/g, "&amp;")
-                  .replace(/</g, "&lt;")
-                  .replace(/>/g, "&gt;")
-                  .replace(/"/g, "&quot;")
-                  .replace(/'/g, "&#039;");
-      }
-   
-      let parsedContent: ParsedContent;
-      try {
-        parsedContent = JSON.parse(content);
-    } catch (e) {
-        const errorMessage = e instanceof Error ? e.message : String(e);
-        return `<h1>Error parsing content</h1><p>${errorMessage}</p>`;
-    }
- 
- 
-    return `
-      <!DOCTYPE html>
-      <html lang="en">
-      <head>
-        <meta charset="UTF-8">
-        <meta name="viewport" content="width=device-width, initial-scale=1.0">
-        <title>${title}</title>
-        <link href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.24.1/themes/prism-tomorrow.min.css" rel="stylesheet" />
-        <style>
-          body {
-            margin: 0;
-            padding: 0;
-            font-family: Arial, sans-serif;
-            background-color: #2d2d2d;
-            color: #f8f8f2;
-          }
-          #floating-window {
-            position: absolute;
-            top: 50px;
-            left: 50px;
-            width: 600px;
-            height: 500px;
-            border: 1px solid #ccc;
-            background-color: #1e1e1e;
-            resize: both;
-            overflow: auto;
-            z-index: 1000;
-          }
-          #header {
-            padding: 10px;
-            cursor: move;
-            background-color: #444;
-            color: #fff;
-            border-bottom: 1px solid #ccc;
-          }
-          #content {
-            padding: 10px;
-          }
-          h3 {
-            color: #f8f8f2;
-            margin-bottom: 5px;
-          }
-          .section {
-            margin-bottom: 15px;
-          }
-          pre {
-            max-width: 100%;
-            word-wrap: break-word;
-            white-space: pre-wrap;
-            background-color: #1e1e1e;
-            padding: 10px;
-            border: 1px solid #444;
-            border-radius: 5px;
-          }
-          #buttons {
-            margin-top: 10px;
-            text-align: center;
-          }
-          button {
-            background-color: #444;
-            color: #fff;
-            border: none;
-            padding: 10px 20px;
-            cursor: pointer;
-            margin: 5px;
-          }
-          button:hover {
-            background-color: #555;
-          }
-        </style>
-      </head>
-      <body>
-        <div id="floating-window">
-          <div id="header">${title}</div>
-          <div id="content">
-            <div class="section">
-              <h3>Details:</h3>
-              <p>${parsedContent.details}</p>
-            </div>
-            <div class="section">
-              <h3>Documentation Added:</h3>
-              <pre><code>${escapeHtml(parsedContent.documentationAdded)}</code></pre>
-            </div>
-          </div>
-          <div id="buttons">
-            <button id="accept">Accept</button>
-            <button id="reject">Reject</button>
-          </div>
-        </div>
-        <script>
-          const vscode = acquireVsCodeApi();
-         
-          document.getElementById('accept').addEventListener('click', () => {
-            vscode.postMessage({ command: 'accept' });
-          });
-         
-          document.getElementById('reject').addEventListener('click', () => {
-            vscode.postMessage({ command: 'reject' });
-          });
-        </script>
-      </body>
-      </html>
-    `;
+  interface TestCase {
+      description: string;
+      testcase: string;
+      data: string[][];
   }
- 
- 
- 
+
+  interface ParsedContent {
+      testcases: TestCase[];
+  }
+
+  function escapeHtml(html: string): string {
+      return html.replace(/&/g, "&amp;")
+                 .replace(/</g, "&lt;")
+                 .replace(/>/g, "&gt;")
+                 .replace(/"/g, "&quot;")
+                 .replace(/'/g, "&#039;");
+  }
+
+  let parsedContent: ParsedContent;
+  try {
+      parsedContent = JSON.parse(content);
+  } catch (e) {
+      const errorMessage = e instanceof Error ? e.message : String(e);
+      return `<h1>Error parsing content</h1><p>${errorMessage}</p>`;
+  }
+
+  const testCasesHtml = parsedContent.testcases.map(testCase => {
+    const dataHtml = testCase.data.length === 0
+      ? `<p><strong>Data:</strong> No data available</p>`
+      : testCase.data.map((dataArray, index) => `
+          <p><strong>Data ${index + 1}:</strong> ${dataArray.join(", ")}</p>
+        `).join("\n");
+
+    return `
+      <div class="testcase-section">
+          <h3>${escapeHtml(testCase.description)}</h3>
+          <pre><code>${escapeHtml(testCase.testcase)}</code></pre>
+          ${dataHtml}
+      </div>
+    `;
+  }).join("\n");
+
+  return `
+    <!DOCTYPE html>
+    <html lang="en">
+    <head>
+      <meta charset="UTF-8">
+      <meta name="viewport" content="width=device-width, initial-scale=1.0">
+      <title>${escapeHtml(title)}</title>
+      <link href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.24.1/themes/prism-tomorrow.min.css" rel="stylesheet" />
+      <script src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.1.70/pdfmake.min.js"></script>
+      <script src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.1.70/vfs_fonts.js"></script>
+      <style>
+        body {
+          margin: 0;
+          padding: 0;
+          font-family: Arial, sans-serif;
+          background-color: #2d2d2d;
+          color: #f8f8f2;
+        }
+        #floating-window {
+          position: absolute;
+          top: 50px;
+          left: 50px;
+          width: 800px;
+          height: auto;
+          border: 1px solid #ccc;
+          background-color: #1e1e1e;
+          resize: both;
+          overflow: auto;
+          z-index: 1000;
+          padding: 15px;
+        }
+        #header {
+          padding: 10px;
+          cursor: move;
+          background-color: #444;
+          color: #fff;
+          border-bottom: 1px solid #ccc;
+          font-size: 18px;
+        }
+        .testcase-section {
+          margin-bottom: 20px;
+          padding: 10px;
+          border: 1px solid #444;
+          border-radius: 5px;
+          background-color: #292929;
+        }
+        pre {
+          max-width: 100%;
+          word-wrap: break-word;
+          white-space: pre-wrap;
+          background-color: #1e1e1e;
+          padding: 10px;
+          border: 1px solid #444;
+          border-radius: 5px;
+        }
+        #buttons {
+          margin-top: 10px;
+          text-align: center;
+        }
+        button {
+          background-color: #444;
+          color: #fff;
+          border: none;
+          padding: 10px 20px;
+          cursor: pointer;
+          margin: 5px;
+        }
+        button:hover {
+          background-color: #555;
+        }
+      </style>
+    </head>
+    <body>
+      <div id="floating-window">
+        <div id="header">${escapeHtml(title)}</div>
+        <div id="content">
+          ${testCasesHtml}
+        </div>
+        <div id="buttons">
+          <button id="download">Download</button>
+          <button id="reject">Reject</button>
+        </div>
+      </div>
+      <script>
+        const vscode = acquireVsCodeApi();
+
+        function createPdf(content, title) {
+    const docDefinition = {
+        pageOrientation: 'landscape',
+        content: [
+            { text: title, style: 'header' },
+            { text: 'Summary:', style: 'subheader' },
+            {
+                table: {
+                    widths: ['*'],
+                    body: [
+                        [
+                            { text: 'Details', bold: true, fillColor: '#E9E5E5', fontSize: 10, alignment: 'center' }
+                        ],
+                        [{ text: content || '', fontSize: 10 }]
+                    ]
+                },
+                layout: {
+                    hLineWidth: () => 0.5,
+                    vLineWidth: () => 0.5,
+                    hLineColor: () => '#CCCCCC',
+                    vLineColor: () => '#CCCCCC',
+                    paddingLeft: () => 5,
+                    paddingRight: () => 5,
+                    paddingTop: () => 5,
+                    paddingBottom: () => 5
+                }
+            },
+            { text: 'Test Cases:', style: 'subheader' },
+            {
+                table: {
+                    headerRows: 1,
+                    widths: [30, '*', '*', 55, 40, 40],
+                    body: [
+                        [
+                            { text: 'S.No', bold: true, fillColor: '#E9E5E5', fontSize: 10, alignment: 'center' },
+                            { text: 'Description', bold: true, fillColor: '#E9E5E5', fontSize: 10, alignment: 'center' },
+                            { text: 'Test Case', bold: true, fillColor: '#E9E5E5', fontSize: 10, alignment: 'center' },
+                            { text: 'Data', bold: true, fillColor: '#E9E5E5', fontSize: 10, alignment: 'center' }
+                        ],
+                        ...parsedContent.testcases.map((testCase, index) => [
+                            { text: String(index + 1), fontSize: 10, alignment: 'center' },
+                            { text: testCase.description, fontSize: 10 },
+                            { text: testCase.testcase, fontSize: 10 },
+                            { text: testCase.data.map((dataArray, i) => "Data " + (i + 1) + ": " + dataArray.join(", ")).join("\n"), fontSize: 10 }
+                        ])
+                    ]
+                },
+                layout: {
+                    hLineWidth: () => 0.5,
+                    vLineWidth: () => 0.5,
+                    hLineColor: () => '#CCCCCC',
+                    vLineColor: () => '#CCCCCC',
+                    paddingLeft: () => 5,
+                    paddingRight: () => 5,
+                    paddingTop: () => 5,
+                    paddingBottom: () => 5
+                }
+            }
+        ],
+        styles: {
+            header: {
+                fontSize: 18,
+                bold: true,
+                alignment: 'center',
+                margin: [0, 0, 0, 10]
+            },
+            subheader: {
+                fontSize: 14,
+                bold: true,
+                margin: [0, 10, 0, 5]
+            },
+            jsonText: {
+                fontSize: 10,
+                margin: [0, 5, 0, 10]
+            }
+        }
+    };
+
+    pdfMake.createPdf(docDefinition).download(title + ".pdf");
+}
+
+
+        document.getElementById('download').addEventListener('click', () => {
+          const content = document.getElementById('content').innerHTML;
+          createPdf(content, "${escapeHtml(title)}");
+        });
+
+        document.getElementById('reject').addEventListener('click', () => {
+          vscode.postMessage({ command: 'reject' });
+        });
+      </script>
+    </body>
+    </html>
+  `;
+}
