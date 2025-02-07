@@ -26,14 +26,11 @@
 //   }
 
 //   const testCasesHtml = parsedContent.testcases.map(testCase => {
-//     // const dataHtml = testCase.data.map((dataArray, index) => `
-//     //   <p><strong>Data ${index + 1}:</strong> ${dataArray.join(", ")}</p>
-//     // `).join("\n"); // Iterate through each sub-array in 'data'
 //     const dataHtml = testCase.data.length === 0
-//   ? `<p><strong>Data:</strong> No data available</p>`
-//   : testCase.data.map((dataArray, index) => `
-//       <p><strong>Data ${index + 1}:</strong> ${dataArray.join(", ")}</p>
-//     `).join("\n");
+//       ? `<p><strong>Data:</strong> No data available</p>`
+//       : testCase.data.map((dataArray, index) => `
+//           <p><strong>Data ${index + 1}:</strong> ${dataArray.join(", ")}</p>
+//         `).join("\n");
 
 //     return `
 //       <div class="testcase-section">
@@ -44,14 +41,19 @@
 //     `;
 //   }).join("\n");
 
+//   const jsonData = JSON.stringify(parsedContent, null, 2);
+//   const unitTests = JSON.stringify(parsedContent.testcases);
+
 //   return `
 //     <!DOCTYPE html>
 //     <html lang="en">
 //     <head>
 //       <meta charset="UTF-8">
 //       <meta name="viewport" content="width=device-width, initial-scale=1.0">
-//       <title>${title}</title>
+//       <title>${escapeHtml(title)}</title>
 //       <link href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.24.1/themes/prism-tomorrow.min.css" rel="stylesheet" />
+//       <script src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.1.70/pdfmake.min.js"></script>
+//       <script src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.1.70/vfs_fonts.js"></script>
 //       <style>
 //         body {
 //           margin: 0;
@@ -116,22 +118,101 @@
 //     </head>
 //     <body>
 //       <div id="floating-window">
-//         <div id="header">${title}</div>
+//         <div id="header">${escapeHtml(title)}</div>
 //         <div id="content">
 //           ${testCasesHtml}
 //         </div>
 //         <div id="buttons">
-//           <button id="accept">Accept</button>
+//           <button id="download">Download</button>
 //           <button id="reject">Reject</button>
 //         </div>
 //       </div>
 //       <script>
 //         const vscode = acquireVsCodeApi();
-        
-//         document.getElementById('accept').addEventListener('click', () => {
-//           vscode.postMessage({ command: 'accept' });
+//         const parsedContent = ${jsonData};
+//         const unitTests = ${unitTests};
+
+//         document.getElementById("download").addEventListener("click", () => {
+//           const docDefinition = {
+//             pageOrientation: 'landscape',
+//             content: [
+//               { text: '${escapeHtml(title)}', style: 'header' },
+//               { text: 'Summary:', style: 'subheader' },
+//               {
+//                 table: {
+//                   widths: ['*'],
+//                   body: [
+//                     [
+//                       { text: 'Details', bold: true, fillColor: '#E9E5E5', fontSize: 10, alignment: 'center' }
+//                     ],
+//                     [{ text: parsedContent.details || '', fontSize: 10 }]
+//                   ]
+//                 },
+//                 layout: {
+//                   hLineWidth: () => 0.5,
+//                   vLineWidth: () => 0.5,
+//                   hLineColor: () => '#CCCCCC',
+//                   vLineColor: () => '#CCCCCC',
+//                   paddingLeft: () => 5,
+//                   paddingRight: () => 5,
+//                   paddingTop: () => 5,
+//                   paddingBottom: () => 5
+//                 }
+//               },
+//               { text: 'Test Cases:', style: 'subheader' },
+//               {
+//                 table: {
+//                   headerRows: 1,
+//                   widths: [30, '*', '*', 55],
+//                   body: [
+//                     [
+//                       { text: 'S.No', bold: true, fillColor: '#E9E5E5', fontSize: 10, alignment: 'center' },
+//                       { text: 'Description', bold: true, fillColor: '#E9E5E5', fontSize: 10, alignment: 'center' },
+//                       { text: 'Test Case', bold: true, fillColor: '#E9E5E5', fontSize: 10, alignment: 'center' },
+//                       { text: 'Data', bold: true, fillColor: '#E9E5E5', fontSize: 10, alignment: 'center' }
+//                     ],
+//                     ...unitTests.map((testCase, index) => [
+//                       { text: String(index + 1), fontSize: 10, alignment: 'center' },
+//                       { text: testCase.description, fontSize: 10 },
+//                       { text: testCase.testcase, fontSize: 10 },
+//                       { text: testCase.data.map((dataArray, i) => "Data " + (i + 1) + ": " + dataArray.join(", ")).join("\\n"), fontSize: 10 }
+//                     ])
+//                   ]
+//                 },
+//                 layout: {
+//                   hLineWidth: () => 0.5,
+//                   vLineWidth: () => 0.5,
+//                   hLineColor: () => '#CCCCCC',
+//                   vLineColor: () => '#CCCCCC',
+//                   paddingLeft: () => 5,
+//                   paddingRight: () => 5,
+//                   paddingTop: () => 5,
+//                   paddingBottom: () => 5
+//                 }
+//               }
+//             ],
+//             styles: {
+//               header: {
+//                 fontSize: 18,
+//                 bold: true,
+//                 alignment: 'center',
+//                 margin: [0, 0, 0, 10]
+//               },
+//               subheader: {
+//                 fontSize: 14,
+//                 bold: true,
+//                 margin: [0, 10, 0, 5]
+//               },
+//               jsonText: {
+//                 fontSize: 10,
+//                 margin: [0, 5, 0, 10]
+//               }
+//             }
+//           };
+
+//           pdfMake.createPdf(docDefinition).download('${escapeHtml(title)}_' + new Date().toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' }).replace(/ /g, '_').toLowerCase() + '.pdf'); 
 //         });
-        
+
 //         document.getElementById('reject').addEventListener('click', () => {
 //           vscode.postMessage({ command: 'reject' });
 //         });
@@ -140,6 +221,7 @@
 //     </html>
 //   `;
 // }
+
 
 export function testCasesReviewWebviewContent(content: string, title: string): string {
   interface TestCase {
@@ -183,6 +265,9 @@ export function testCasesReviewWebviewContent(content: string, title: string): s
       </div>
     `;
   }).join("\n");
+
+  const jsonData = JSON.stringify(parsedContent, null, 2);
+  const unitTests = JSON.stringify(parsedContent.testcases);
 
   return `
     <!DOCTYPE html>
@@ -269,92 +354,66 @@ export function testCasesReviewWebviewContent(content: string, title: string): s
       </div>
       <script>
         const vscode = acquireVsCodeApi();
+        const parsedContent = ${jsonData};
+        const unitTests = ${unitTests};
 
-        function createPdf(content, title) {
-    const docDefinition = {
-        pageOrientation: 'landscape',
-        content: [
-            { text: title, style: 'header' },
-            { text: 'Summary:', style: 'subheader' },
-            {
+        document.getElementById("download").addEventListener("click", () => {
+          const docDefinition = {
+            pageOrientation: 'landscape',
+            content: [
+              { text: '${escapeHtml(title)}', style: 'header' },
+              { text: 'Test Cases:', style: 'subheader' },
+              {
                 table: {
-                    widths: ['*'],
-                    body: [
-                        [
-                            { text: 'Details', bold: true, fillColor: '#E9E5E5', fontSize: 10, alignment: 'center' }
-                        ],
-                        [{ text: content || '', fontSize: 10 }]
-                    ]
+                  headerRows: 1,
+                  widths: [30, '*', '*', '*'],
+                  body: [
+                    [
+                      { text: 'S.No', bold: true, fillColor: '#E9E5E5', fontSize: 10, alignment: 'center' },
+                      { text: 'Description', bold: true, fillColor: '#E9E5E5', fontSize: 10, alignment: 'center' },
+                      { text: 'Test Case', bold: true, fillColor: '#E9E5E5', fontSize: 10, alignment: 'center' },
+                      { text: 'Data', bold: true, fillColor: '#E9E5E5', fontSize: 10, alignment: 'center' }
+                    ],
+                    ...unitTests.map((testCase, index) => [
+                      { text: String(index + 1), fontSize: 10, alignment: 'center' },
+                      { text: testCase.description, fontSize: 10 },
+                      { text: testCase.testcase, fontSize: 10 },
+                      { text: testCase.data.map((dataArray, i) => "Data " + (i + 1) + ": " + dataArray.join(", ")).join("\\n"), fontSize: 10 }
+                    ])
+                  ]
                 },
                 layout: {
-                    hLineWidth: () => 0.5,
-                    vLineWidth: () => 0.5,
-                    hLineColor: () => '#CCCCCC',
-                    vLineColor: () => '#CCCCCC',
-                    paddingLeft: () => 5,
-                    paddingRight: () => 5,
-                    paddingTop: () => 5,
-                    paddingBottom: () => 5
+                  hLineWidth: () => 0.5,
+                  vLineWidth: () => 0.5,
+                  hLineColor: () => '#CCCCCC',
+                  vLineColor: () => '#CCCCCC',
+                  paddingLeft: () => 5,
+                  paddingRight: () => 5,
+                  paddingTop: () => 5,
+                  paddingBottom: () => 5
                 }
-            },
-            { text: 'Test Cases:', style: 'subheader' },
-            {
-                table: {
-                    headerRows: 1,
-                    widths: [30, '*', '*', 55, 40, 40],
-                    body: [
-                        [
-                            { text: 'S.No', bold: true, fillColor: '#E9E5E5', fontSize: 10, alignment: 'center' },
-                            { text: 'Description', bold: true, fillColor: '#E9E5E5', fontSize: 10, alignment: 'center' },
-                            { text: 'Test Case', bold: true, fillColor: '#E9E5E5', fontSize: 10, alignment: 'center' },
-                            { text: 'Data', bold: true, fillColor: '#E9E5E5', fontSize: 10, alignment: 'center' }
-                        ],
-                        ...parsedContent.testcases.map((testCase, index) => [
-                            { text: String(index + 1), fontSize: 10, alignment: 'center' },
-                            { text: testCase.description, fontSize: 10 },
-                            { text: testCase.testcase, fontSize: 10 },
-                            { text: testCase.data.map((dataArray, i) => "Data " + (i + 1) + ": " + dataArray.join(", ")).join("\n"), fontSize: 10 }
-                        ])
-                    ]
-                },
-                layout: {
-                    hLineWidth: () => 0.5,
-                    vLineWidth: () => 0.5,
-                    hLineColor: () => '#CCCCCC',
-                    vLineColor: () => '#CCCCCC',
-                    paddingLeft: () => 5,
-                    paddingRight: () => 5,
-                    paddingTop: () => 5,
-                    paddingBottom: () => 5
-                }
-            }
-        ],
-        styles: {
-            header: {
+              }
+            ],
+            styles: {
+              header: {
                 fontSize: 18,
                 bold: true,
                 alignment: 'center',
                 margin: [0, 0, 0, 10]
-            },
-            subheader: {
+              },
+              subheader: {
                 fontSize: 14,
                 bold: true,
                 margin: [0, 10, 0, 5]
-            },
-            jsonText: {
+              },
+              jsonText: {
                 fontSize: 10,
                 margin: [0, 5, 0, 10]
+              }
             }
-        }
-    };
+          };
 
-    pdfMake.createPdf(docDefinition).download(title + ".pdf");
-}
-
-
-        document.getElementById('download').addEventListener('click', () => {
-          const content = document.getElementById('content').innerHTML;
-          createPdf(content, "${escapeHtml(title)}");
+          pdfMake.createPdf(docDefinition).download('${escapeHtml(title)}_' + new Date().toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' }).replace(/ /g, '_').toLowerCase() + '.pdf'); 
         });
 
         document.getElementById('reject').addEventListener('click', () => {

@@ -7,8 +7,10 @@ export function registerTestCasesReviewCommand(context: vscode.ExtensionContext,
   const testCases = vscode.commands.registerCommand("extension.reviewTestCases", async () => {
     const editor = vscode.window.activeTextEditor;
     if (editor) {
-      const selection = editor.selection;
-      const text = editor.document.getText(selection);
+      // const selection = editor.selection;
+      const text = editor.document.getText();
+      console.log("text:", text);
+      
       if (!text) {
             vscode.window.showWarningMessage("No code selected. Please select code to assistant.");
             return;
@@ -265,19 +267,20 @@ export function registerTestCasesReviewCommand(context: vscode.ExtensionContext,
           // Listen for messages from the webview
           panel.webview.onDidReceiveMessage((message) => {
             switch (message.command) {
-              case 'accept':
-                // Replace the code in the editor with the commented code
-                editor.edit(editBuilder => {
-                  editBuilder.replace(selection, response.documentationAdded);
-                });
-                panel.dispose(); // Close the webview after accepting
-                break;
+        //       case 'accept':
+        //         // Replace the code in the editor with the commented code
+        //         editor.edit(editBuilder => {
+        //           editBuilder.replace(selection, response.documentationAdded);
+        //         });
+        //         panel.dispose(); // Close the webview after accepting
+        //         break;
               case 'reject':
                 // Just close the webview without making any changes
                 panel.dispose();
                 break;
             }
-          });
+          }
+        );
         });
  
       } catch (error:any) {
