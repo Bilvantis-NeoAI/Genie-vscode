@@ -19,17 +19,9 @@ import { registerRefactorCodeAssistantCommand } from "./commands/assistant/refac
 import { registerExplainCodeAssistantCommand } from "./commands/assistant/explainCodeAssistant";
 import { registerUnittestCodeAssistantCommand } from "./commands/assistant/unittestCodeAssistant";
 import { LoginRegisterCommandsProvider } from "./commands/sidebarCommandRegister/LoginRegisterCommandsProvider";
-import { gitHooksCommitReview } from "./commands/gitCommit/gitHooksCommitReview";
-import * as path from 'path';
-import * as fs from 'fs';
-import * as os from 'os';
 import { GenieCommandsProvider } from "./commands/sidebarCommandRegister/GenieCommandsProvider";
 import { registerCkReviewCommand } from "./commands/review/ckReview";
 
- 
- 
-
-// let authToken: string | undefined;
 const jwt = require('jsonwebtoken');
 export let userId: string | undefined;
  
@@ -37,7 +29,6 @@ export async function activate(context: vscode.ExtensionContext) {
   const loginRegisterProvider = new LoginRegisterCommandsProvider();
   // Replace the openLoginPage command registration
   vscode.window.registerTreeDataProvider("loginRegisterCommands", loginRegisterProvider);
- 
   // Register sidebar commands
   context.subscriptions.push(
     vscode.commands.registerCommand("extension.url", () => {
@@ -60,13 +51,10 @@ export async function activate(context: vscode.ExtensionContext) {
 
 //   context.globalState.update("authToken", undefined);
 // context.globalState.update("urlSubmitted", false);
-
   let urlSubmitted = context.globalState.get<boolean>("urlSubmitted") || false;
   let authToken = context.globalState.get<string>("authToken");  
- 
   if (!urlSubmitted) {
     showUrlWebview(context);
- 
   // Wait for the URL submission to complete
     const waitForSubmission = async () => {
     while (!context.globalState.get("urlSubmitted", false)) {
@@ -81,17 +69,12 @@ export async function activate(context: vscode.ExtensionContext) {
 
    // Proceed after the URL is submitted
   if (urlSubmitted) {
- 
-    if (authToken) {      
-
+    if (authToken) {     
       try {
-        
         const decodedToken = jwt.decode(authToken);
         const tokenExpiration = decodedToken.exp;
         userId = decodedToken.userId;
         const currentTime = Math.floor(Date.now() / 1000);
-        
-          
           // Token is expired, clear it
           if (currentTime > tokenExpiration) {
           context.globalState.update('authToken', undefined);
@@ -103,19 +86,15 @@ export async function activate(context: vscode.ExtensionContext) {
         } catch (error) {
           console.error("Failed to decode the token:", error);
         }
-
-      // authToken = storedToken;
       activateCodeCommands(context);
       // Register the sidebar provider for Genie commands
       const genieProvider = new GenieCommandsProvider();
       vscode.window.registerTreeDataProvider("genieCommands", genieProvider);
-       
       } else {
         // Show login/register if authToken is missing
         // showLoginRegisterWebview(context, "login");
         showLoginPrompt(context);
       }
- 
   } else {
     // If URL submission hasn't occurred, show URL webview
     showUrlWebview(context);
@@ -136,13 +115,10 @@ export function openSignUpPage(context: vscode.ExtensionContext) {
  */
 export function activateCodeCommands(context: vscode.ExtensionContext) {
   const authToken = context.globalState.get<string>("authToken");
- 
- 
   if (!authToken) {
     vscode.window.showErrorMessage("Authentication is required to activate code commands.");
     return;
   }
- 
   // Register all review commands
   registerCodeReviewCommand(context, authToken);
   registerPerformanceReviewCommand(context, authToken);
@@ -163,26 +139,10 @@ export function activateCodeCommands(context: vscode.ExtensionContext) {
   registerRefactorCodeAssistantCommand(context, authToken);
   registerExplainCodeAssistantCommand(context, authToken);
   registerUnittestCodeAssistantCommand(context, authToken);
-  
-  //gitHooks
-  gitHooksCommitReview();
 }
  
  
-export function deactivate() {
-  try {
-    // Dynamically detect the folder path in the user's home directory
-    const hooksDir = path.join(os.homedir(), "hooks-folder");
- 
-    if (fs.existsSync(hooksDir)) {
-      fs.rmSync(hooksDir, { recursive: true, force: true }); // Delete the folder and its contents
-    } else {
-      console.log(`Hooks folder does not exist at: ${hooksDir}`);
-    }
-  } catch (error) {
-    console.error("Error deleting hooks folder during deactivation:", error);
-  }
-}
+export function deactivate() {}
  
  
  

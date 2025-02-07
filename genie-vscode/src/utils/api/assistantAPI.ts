@@ -25,7 +25,6 @@ export async function postAddCommentsAssistant(code: string, language: string, a
   return response.data;
 }
  
- 
 export async function postAddDocStringsAssistant(code: string, language: string, authToken: string, project_name: any, branch_name: string): Promise<any> {
   const response = await axios.post(
     `${BASE_API}/assistant/add-docstrings`,

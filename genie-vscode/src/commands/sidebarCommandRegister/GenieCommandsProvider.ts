@@ -67,7 +67,7 @@ class GenieCommand extends vscode.TreeItem {
       title: label,
     };
     // this.tooltip = `${label}`; // Show shortcut in the tooltip
-    this.tooltip = tooltipDescription
+    this.tooltip = tooltipDescription;
     this.description = ''; // Show shortcut as the description
     this.iconPath = new vscode.ThemeIcon(iconName);
   }

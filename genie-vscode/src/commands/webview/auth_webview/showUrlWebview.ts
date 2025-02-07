@@ -20,8 +20,6 @@ export function showUrlWebview(
         ${error_message ? `<div class="alert alert-danger" role="alert">${error_message}</div>` : ''}
         ${success_message ? `<div class="alert alert-success" role="alert">${success_message}</div>` : ''}
     `;
-    // let updatedUrl = ''
-
     const webviewContent = `
     <!DOCTYPE html>
     <html lang="en">
