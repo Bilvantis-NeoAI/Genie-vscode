@@ -1,4 +1,3 @@
-
 export function filewiseUnitTestCodeAssistantWebviewContent(content: string, title: string): string {
     interface TestCase {
         description: string;
@@ -26,21 +25,6 @@ export function filewiseUnitTestCodeAssistantWebviewContent(content: string, tit
         return `<h1>Error parsing content</h1><p>${errorMessage}</p>`;
     }
   
-    // const testCasesHtml = parsedContent.testcases.map(testCase => {
-    //   const dataHtml = testCase.data.length === 0
-    //     ? `<p><strong>Data:</strong> No data available</p>`
-    //     : testCase.data.map((dataArray, index) => `
-    //         <p><strong>Data ${index + 1}:</strong> ${dataArray.join(", ")}</p>
-    //       `).join("\n");
-  
-    //   return `
-    //     <div class="testcase-section">
-    //         <h3>${escapeHtml(testCase.description)}</h3>
-    //         <pre><code>${escapeHtml(testCase.testcase)}</code></pre>
-    //         ${dataHtml}
-    //     </div>
-    //   `;
-    // }).join("\n");
     const testCasesHtml = parsedContent.testcases.map(testCase => {
         const dataHtml = testCase.data.length === 0
             ? `<p><strong>Data:</strong> No data available</p>`
@@ -68,10 +52,10 @@ export function filewiseUnitTestCodeAssistantWebviewContent(content: string, tit
             </div>
         `;
     }).join("\n");
-    
+
     const jsonData = JSON.stringify(parsedContent, null, 2);
     const unitTests = JSON.stringify(parsedContent.testcases);
-  
+
     return `
       <!DOCTYPE html>
       <html lang="en">
@@ -162,58 +146,73 @@ export function filewiseUnitTestCodeAssistantWebviewContent(content: string, tit
 
             document.getElementById("download").addEventListener("click", () => {
                 const docDefinition = {
-                pageOrientation: 'landscape',
-                content: [
-                    { text: '${escapeHtml(title)}', style: 'header' },
-                    { text: 'Test Cases:', style: 'subheader' },
-                    {
-                    table: {
-                        headerRows: 1,
-                        widths: [30, '*', '*', '*'],
-                        body: [
-                        [
-                            { text: 'S.No', bold: true, fillColor: '#E9E5E5', fontSize: 10, alignment: 'center' },
-                            { text: 'Description', bold: true, fillColor: '#E9E5E5', fontSize: 10, alignment: 'center' },
-                            { text: 'Test Case', bold: true, fillColor: '#E9E5E5', fontSize: 10, alignment: 'center' },
-                            { text: 'Data', bold: true, fillColor: '#E9E5E5', fontSize: 10, alignment: 'center' }
-                        ],
-                        ...unitTests.map((testCase, index) => [
-                        { text: String(index + 1), fontSize: 10, alignment: 'center' },
-                        { text: testCase.description, fontSize: 10 },
-                        { text: testCase.testcase, fontSize: 10 },
-                        { text: testCase.data.map((dataArray, i) => "Data " + (i + 1) + ": " + dataArray.join(", ")).join("\\n"), fontSize: 10 }
-                      ])
-                        ]
-                    },
-                    layout: {
-                        hLineWidth: () => 0.5,
-                        vLineWidth: () => 0.5,
-                        hLineColor: () => '#CCCCCC',
-                        vLineColor: () => '#CCCCCC',
-                        paddingLeft: () => 5,
-                        paddingRight: () => 5,
-                        paddingTop: () => 5,
-                        paddingBottom: () => 5
+                    pageOrientation: 'landscape',
+                    content: [
+                        { text: '${escapeHtml(title)}', style: 'header' },
+                        { text: 'Test Cases:', style: 'subheader' },
+                        {
+                            table: {
+                                headerRows: 1,
+                                widths: [30, '*', '*', '*'],
+                                body: [
+                                    [
+                                        { text: 'S.No', bold: true, fillColor: '#E9E5E5', fontSize: 10, alignment: 'center' },
+                                        { text: 'Description', bold: true, fillColor: '#E9E5E5', fontSize: 10, alignment: 'center' },
+                                        { text: 'Test Case', bold: true, fillColor: '#E9E5E5', fontSize: 10, alignment: 'center' },
+                                        { text: 'Data', bold: true, fillColor: '#E9E5E5', fontSize: 10, alignment: 'center' }
+                                    ],
+                                    ...unitTests.map((testCase, index) => [
+                                        { text: String(index + 1), fontSize: 10, alignment: 'center' },
+                                        { text: testCase.description, fontSize: 10 },
+                                        { text: testCase.testcase, fontSize: 10 },
+                                        { 
+                                            text: testCase.data.map((dataArray, i) => {
+                                                let formattedData = '';
+                                                if (Array.isArray(dataArray)) {
+                                                    formattedData = dataArray.map(item => 
+                                                        typeof item === 'object' ? JSON.stringify(item) : String(item)
+                                                    ).join(", ");
+                                                } else if (typeof dataArray === 'object') {
+                                                    formattedData = JSON.stringify(dataArray);
+                                                } else {
+                                                    formattedData = String(dataArray);
+                                                }
+                                                return "Data " + (i + 1) + ": " + formattedData;
+                                            }).join("\\n"),
+                                            fontSize: 10
+                                        }
+                                    ])
+                                ]
+                            },
+                            layout: {
+                                hLineWidth: () => 0.5,
+                                vLineWidth: () => 0.5,
+                                hLineColor: () => '#CCCCCC',
+                                vLineColor: () => '#CCCCCC',
+                                paddingLeft: () => 5,
+                                paddingRight: () => 5,
+                                paddingTop: () => 5,
+                                paddingBottom: () => 5
+                            }
+                        }
+                    ],
+                    styles: {
+                        header: {
+                            fontSize: 18,
+                            bold: true,
+                            alignment: 'center',
+                            margin: [0, 0, 0, 10]
+                        },
+                        subheader: {
+                            fontSize: 14,
+                            bold: true,
+                            margin: [0, 10, 0, 5]
+                        },
+                        jsonText: {
+                            fontSize: 10,
+                            margin: [0, 5, 0, 10]
+                        }
                     }
-                    }
-                ],
-                styles: {
-                    header: {
-                    fontSize: 18,
-                    bold: true,
-                    alignment: 'center',
-                    margin: [0, 0, 0, 10]
-                    },
-                    subheader: {
-                    fontSize: 14,
-                    bold: true,
-                    margin: [0, 10, 0, 5]
-                    },
-                    jsonText: {
-                    fontSize: 10,
-                    margin: [0, 5, 0, 10]
-                    }
-                }
                 };
 
                 pdfMake.createPdf(docDefinition).download('${escapeHtml(title)}_' + new Date().toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' }).replace(/ /g, '_').toLowerCase() + '.pdf'); 
@@ -222,10 +221,8 @@ export function filewiseUnitTestCodeAssistantWebviewContent(content: string, tit
             document.getElementById('reject').addEventListener('click', () => {
                 vscode.postMessage({ command: 'reject' });
             });
-            </script>
-
+        </script>
       </body>
       </html>
     `;
-  }
-  
+}
