@@ -103,15 +103,15 @@ export async function postCkReview(code: string, language: string, authToken: st
   return response.data;
 }
 
-export async function postTestCasesReview(code: string, language: string, authToken: string, project_name: any, branch_name: string): Promise<any> {
-  console.log("BASEAPI:", BASE_API);
+// export async function postTestCasesReview(code: string, language: string, authToken: string, project_name: any, branch_name: string): Promise<any> {
+//   console.log("BASEAPI:", BASE_API);
   
-  const response = await axios.post(
-    `${BASE_API}/assistant/add-docstrings`,
-    { code, language, project_name, branch_name },
-    {
-      headers: getAuthHeaders(authToken),
-    }
-  );
-  return response.data;
-}
+//   const response = await axios.post(
+//     `${BASE_API}/assistant/add-docstrings`,
+//     { code, language, project_name, branch_name },
+//     {
+//       headers: getAuthHeaders(authToken),
+//     }
+//   );
+//   return response.data;
+// }

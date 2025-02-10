@@ -26,7 +26,8 @@ export class GenieCommandsProvider implements vscode.TreeDataProvider<GenieComma
         new GenieCommand("Comment Code", "extension.addComments", 'comment', 'Add meaningful comments to your code.'),
         new GenieCommand("Explain Code", "extension.explainCode", 'info', 'Get explanations for your code.'),
         new GenieCommand("Refactor Code", "extension.refactorCode", 'gear', 'Refactor and optimize your code.'),
-        new GenieCommand("Unit Test Code", "extension.unittestCode", 'check', 'Generate unit tests for your code.')
+        new GenieCommand("Unit Test Code", "extension.unittestCode", 'check', 'Generate unit tests for your code.'),
+        new GenieCommand("Filewise Unit Test Code", "extension.assistantFilewiseUnitTestCode", 'checklist', 'Generate the TestCasese for entire file.'),
       ]);
     } else if (element.label === "Review") {
       return Promise.resolve([
@@ -38,8 +39,7 @@ export class GenieCommandsProvider implements vscode.TreeDataProvider<GenieComma
         new GenieCommand("Owasp Review", "extension.reviewOwasp", 'shield', 'Perform a security review based on OWASP guidelines.'),
         new GenieCommand("Performance Review", "extension.reviewPerformance", 'pulse', 'Analyze and improve code performance.'),
         new GenieCommand("Security Review", "extension.reviewSecurity", 'lock', 'Identify security vulnerabilities in your code.'),
-        new GenieCommand("Syntax Review", "extension.reviewSyntax", 'checklist', 'Check for syntax errors and inconsistencies.'),
-        new GenieCommand("TestCases Review", "extension.reviewTestCases", 'checklist', 'Generate the TestCasese for entire file.'),
+        new GenieCommand("Syntax Review", "extension.reviewSyntax", 'checklist', 'Check for syntax errors and inconsistencies.')
         
       ]);
     }

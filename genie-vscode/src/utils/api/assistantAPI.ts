@@ -91,3 +91,16 @@ export async function postRefactorCodeAssistant(code: string, language: string, 
     );
     return response.data;
     }
+
+    export async function postFilewiseUnitTestCodeAssistant(code: string, language: string, authToken: string, project_name: any, branch_name: string): Promise<any> {
+      console.log("BASEAPI:", BASE_API);
+      
+      const response = await axios.post(
+        `${BASE_API}/assistant/file-testCases`,
+        { code, language, project_name, branch_name },
+        {
+          headers: getAuthHeaders(authToken),
+        }
+      );
+      return response.data;
+    }

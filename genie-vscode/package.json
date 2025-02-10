@@ -61,8 +61,8 @@
         "title": "CK Review Selected"
       },
       {
-        "command": "extension.reviewTestCases",
-        "title": "Test Cases"
+        "command": "extension.assistantFilewiseUnitTestCode",
+        "title": "Filewise Unit Test Code"
       },
       {
         "command": "extension.addComments",

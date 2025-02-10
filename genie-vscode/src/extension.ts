@@ -19,13 +19,14 @@ import { registerRefactorCodeAssistantCommand } from "./commands/assistant/refac
 import { registerExplainCodeAssistantCommand } from "./commands/assistant/explainCodeAssistant";
 import { registerUnittestCodeAssistantCommand } from "./commands/assistant/unittestCodeAssistant";
 import { LoginRegisterCommandsProvider } from "./commands/sidebarCommandRegister/LoginRegisterCommandsProvider";
-import { gitHooksCommitReview } from "./commands/gitCommit/gitHooksCommitReview";
+// import { gitHooksCommitReview } from "./commands/gitCommit/gitHooksCommitReview";
 import * as path from 'path';
 import * as fs from 'fs';
 import * as os from 'os';
 import { GenieCommandsProvider } from "./commands/sidebarCommandRegister/GenieCommandsProvider";
 import { registerCkReviewCommand } from "./commands/review/ckReview";
-import { registerTestCasesReviewCommand } from "./commands/review/testCasesReview";
+// import { registerTestCasesReviewCommand } from "./commands/review/testCasesReview";
+import { registerFilewiseUnitTestCodeAssistantCommand } from "./commands/assistant/filewiseUnitTestCodeAssistant";
 
  
  
@@ -154,7 +155,6 @@ export function activateCodeCommands(context: vscode.ExtensionContext) {
   registerTechDebtReviewCommand(context, authToken);
   registerOrgStdReviewCommand(context, authToken);
   registerCkReviewCommand(context, authToken);
-  registerTestCasesReviewCommand(context, authToken);
  
   //Register all Assistant Commands
   registerAddCommentsAssistantCommand(context, authToken);
@@ -165,9 +165,10 @@ export function activateCodeCommands(context: vscode.ExtensionContext) {
   registerRefactorCodeAssistantCommand(context, authToken);
   registerExplainCodeAssistantCommand(context, authToken);
   registerUnittestCodeAssistantCommand(context, authToken);
+  registerFilewiseUnitTestCodeAssistantCommand(context, authToken);
   
   //gitHooks
-  gitHooksCommitReview();
+  // gitHooksCommitReview();
 }
  
  
