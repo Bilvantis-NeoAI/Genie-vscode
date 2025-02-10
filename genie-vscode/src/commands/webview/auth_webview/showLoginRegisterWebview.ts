@@ -1,6 +1,6 @@
 import * as vscode from 'vscode';
 import { activateCodeCommands } from '../../../extension';
-import { BASE_API } from '../../../auth/config';
+import { getBaseApi } from '../../../auth/config';
 import { GenieCommandsProvider } from '../../sidebarCommandRegister/GenieCommandsProvider';
 let activeWebview: vscode.WebviewPanel | null = null; // Keep track of the active webview
  
@@ -25,8 +25,9 @@ export function showLoginRegisterWebview(
         }
     );
  
-    const formAction = mode === 'login' ? `${BASE_API}/auth/login` : `${BASE_API}/auth/register`;
- 
+    // const formAction = mode === 'login' ? `${BASE_API}/auth/login` : `${BASE_API}/auth/register`;
+    const formAction = mode === 'login' ? `${getBaseApi()}/auth/login` : `${getBaseApi()}/auth/register`;
+
     const message_html = `
         ${error_message ? `<div class="alert alert-danger" role="alert">${error_message}</div>` : ''}
         ${success_message ? `<div class="alert alert-success" role="alert">${success_message}</div>` : ''}

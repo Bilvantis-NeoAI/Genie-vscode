@@ -1,10 +1,10 @@
 import axios from "axios";
-import { BASE_API } from "../../auth/config";
+import { getBaseApi  } from "../../auth/config";
 import { getAuthHeaders } from "../../auth/apiHeaders";
 
 export async function postReviewCode(code: string, language: string, authToken: string, project_name: any, branch_name: string): Promise<any> {
     const response = await axios.post(
-      `${BASE_API}/review/code`,
+      `${getBaseApi()}/review/code`,
       { code, language, project_name, branch_name },
       {
         headers: getAuthHeaders(authToken),
@@ -17,7 +17,7 @@ export async function postReviewCode(code: string, language: string, authToken: 
 
 export async function postPerformanceReview(code: string, language: string, authToken: string, project_name: any, branch_name: string): Promise<any> {
   const response = await axios.post(
-    `${BASE_API}/review/performance`,
+    `${getBaseApi()}/review/performance`,
     { code, language, project_name, branch_name },
     {
       headers: getAuthHeaders(authToken),
@@ -28,7 +28,7 @@ export async function postPerformanceReview(code: string, language: string, auth
 
 export async function postSecurityReview(code: string, language: string, authToken: string, project_name: any, branch_name: string): Promise<any> {
   const response = await axios.post(
-    `${BASE_API}/review/security`,
+    `${getBaseApi()}/review/security`,
     { code, language, project_name, branch_name },
     {
       headers: getAuthHeaders(authToken),
@@ -39,7 +39,7 @@ export async function postSecurityReview(code: string, language: string, authTok
 
 export async function postSyntaxReview(code: string, language: string, authToken: string, project_name: any, branch_name: string): Promise<any> {
   const response = await axios.post(
-    `${BASE_API}/review/syntax`,
+    `${getBaseApi()}/review/syntax`,
     { code, language, project_name, branch_name },
     {
       headers: getAuthHeaders(authToken),
@@ -50,7 +50,7 @@ export async function postSyntaxReview(code: string, language: string, authToken
 
 export async function postOverallReview(code: string, language: string, authToken: string, project_name: any, branch_name: string): Promise<any> {
   const response = await axios.post(
-    `${BASE_API}/review/overall`,
+    `${getBaseApi()}/review/overall`,
     { code, language, project_name, branch_name },
     {
       headers: getAuthHeaders(authToken),
@@ -61,7 +61,7 @@ export async function postOverallReview(code: string, language: string, authToke
 
 export async function postOwaspReview(code: string, language: string, authToken: string, project_name: any, branch_name: string): Promise<any> {
   const response = await axios.post(
-    `${BASE_API}/review/owasp`,
+    `${getBaseApi()}/review/owasp`,
     { code, language, project_name, branch_name },
     {
       headers: getAuthHeaders(authToken),
@@ -72,7 +72,7 @@ export async function postOwaspReview(code: string, language: string, authToken:
 
 export async function postTechDebtReview(code: string, language: string, authToken: string, project_name: any, branch_name: string): Promise<any> {
   const response = await axios.post(
-    `${BASE_API}/review/tech-debt`,
+    `${getBaseApi()}/review/tech-debt`,
     { code, language, project_name, branch_name },
     {
       headers: getAuthHeaders(authToken),
@@ -83,7 +83,7 @@ export async function postTechDebtReview(code: string, language: string, authTok
 
 export async function postOrgStdReview(code: string, language: string, authToken: string, project_name: any, branch_name: string): Promise<any> {
   const response = await axios.post(
-    `${BASE_API}/review/org-std-review`,
+    `${getBaseApi}/review/org-std-review`,
     { code, language, project_name, branch_name },
     {
       headers: getAuthHeaders(authToken),
@@ -94,7 +94,7 @@ export async function postOrgStdReview(code: string, language: string, authToken
 
 export async function postCkReview(code: string, language: string, authToken: string, project_name: any, branch_name: string): Promise<any> {
   const response = await axios.post(
-    `${BASE_API}/review/CK-review`,
+    `${getBaseApi()}/review/CK-review`,
     { code, language, project_name, branch_name },
     {
       headers: getAuthHeaders(authToken),

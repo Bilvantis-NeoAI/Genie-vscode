@@ -102,7 +102,7 @@ export function showUrlWebview(
                     vscode.window.showInformationMessage(message.message);
                     
                     if (message.userUrl) {
-                        exchangeUrl(message.userUrl); 
+                        exchangeUrl(context, message.userUrl); 
                     }
                     context.globalState.update('urlSubmitted', true);
                     let urlSubmitted = context.globalState.get<boolean>("urlSubmitted") || false;

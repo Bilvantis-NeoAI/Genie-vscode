@@ -21,6 +21,9 @@ import { registerUnittestCodeAssistantCommand } from "./commands/assistant/unitt
 import { LoginRegisterCommandsProvider } from "./commands/sidebarCommandRegister/LoginRegisterCommandsProvider";
 import { GenieCommandsProvider } from "./commands/sidebarCommandRegister/GenieCommandsProvider";
 import { registerCkReviewCommand } from "./commands/review/ckReview";
+import { registerFilewiseUnitTestCodeAssistantCommand } from "./commands/assistant/filewiseUnitTestCodeAssistant";
+import { loadBaseApi, exchangeUrl, getBaseApi } from "./auth/config";
+
 
 const jwt = require('jsonwebtoken');
 export let userId: string | undefined;
@@ -48,6 +51,9 @@ export async function activate(context: vscode.ExtensionContext) {
       showLoginRegisterWebview(context, "register");
     })
   );
+
+  loadBaseApi(context);
+  console.log("Current BASE_API:", getBaseApi());
 
 //   context.globalState.update("authToken", undefined);
 // context.globalState.update("urlSubmitted", false);
@@ -139,6 +145,7 @@ export function activateCodeCommands(context: vscode.ExtensionContext) {
   registerRefactorCodeAssistantCommand(context, authToken);
   registerExplainCodeAssistantCommand(context, authToken);
   registerUnittestCodeAssistantCommand(context, authToken);
+  registerFilewiseUnitTestCodeAssistantCommand(context, authToken);
 }
  
  

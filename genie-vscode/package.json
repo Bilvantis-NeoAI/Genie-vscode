@@ -1,5 +1,5 @@
 {
-  "name": "genie-vscode",
+  "name": "genie-vscode-hsbc",
   "displayName": "Genie_vscode",
   "description": "A VS extension to comment code, review code, generate docstrings, unit tests, analyze code metrics, generate logs, and handle errors",
   "version": "0.0.1",
@@ -91,6 +91,10 @@
       {
         "command": "extension.refactorCode",
         "title": "Refactor Code"
+      },
+      {
+        "command": "extension.assistantFilewiseUnitTestCode",
+        "title": "Filewise Unit Test Code"
       }
     ],
     "viewsContainers": {
