@@ -153,7 +153,7 @@ export function filewiseUnitTestCodeAssistantWebviewContent(content: string, tit
                         {
                             table: {
                                 headerRows: 1,
-                                widths: [30, '*', '*', '*'],
+                                widths: ['10%', '30%', '30%', '30%'],
                                 body: [
                                     [
                                         { text: 'S.No', bold: true, fillColor: '#E9E5E5', fontSize: 10, alignment: 'center' },
