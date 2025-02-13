@@ -199,6 +199,11 @@ export function filewiseUnitTestCodeAssistantWebviewContent(content: string, tit
                 const index = checkbox.getAttribute('data-index');
                 selectedTestCases.push(parsedContent.testcases[index]);
             });
+            
+            if (selectedTestCases.length === 0) {
+                vscode.postMessage({ command: 'noTestCaseSelected', message: 'Please select at least one test case.' });
+                return;
+              }
 
             // Generate PDF content for selected test cases
             const docDefinition = {
@@ -284,7 +289,12 @@ export function filewiseUnitTestCodeAssistantWebviewContent(content: string, tit
               const index = checkbox.getAttribute('data-index');
               selectedTestCases.push(parsedContent.testcases[index]);
           });
- 
+        
+          if (selectedTestCases.length === 0) {
+                vscode.postMessage({ command: 'noTestCaseSelected', message: 'Please select at least one test case.' });
+                return;
+              }
+
           // Combine selected test cases into a single string
           let parentData = [];
           const selectedCode = selectedTestCases.map((testCase) => {
@@ -314,7 +324,12 @@ export function filewiseUnitTestCodeAssistantWebviewContent(content: string, tit
                 const index = checkbox.getAttribute('data-index');
                 selectedTestCases.push(parsedContent.testcases[index]);
             });
- 
+
+            if (selectedTestCases.length === 0) {
+                vscode.postMessage({ command: 'noTestCaseSelected', message: 'Please select at least one test case.' });
+                return;
+              }
+                
             // Combine selected test cases into a single string
             let parentData = [];
             const selectedCode = selectedTestCases.map((testCase) => {

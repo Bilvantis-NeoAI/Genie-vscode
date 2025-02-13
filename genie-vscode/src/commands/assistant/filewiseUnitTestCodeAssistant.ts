@@ -45,6 +45,10 @@ export function registerFilewiseUnitTestCodeAssistantCommand(context: vscode.Ext
               case 'reject':
                 panel.dispose();
                 break;
+                case 'noTestCaseSelected':
+                  vscode.window.showErrorMessage(message.message);
+                  break;
+              
             }
           }
         );
