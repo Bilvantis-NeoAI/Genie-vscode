@@ -31,13 +31,13 @@ export function registerFilewiseUnitTestCodeAssistantCommand(context: vscode.Ext
  
         await vscode.window.withProgress(progressOptions, async () => {
           const response = await postFilewiseUnitTestCodeAssistant(text, language, authToken, project_name, branch_name);
-
+          
           const formattedContent = JSON.stringify(response, null, 2);        
           const panel = vscode.window.createWebviewPanel("filewiseUnitTestCodeAssistant", "Filewise Unit Test Code Assistant", vscode.ViewColumn.Beside, {
             enableScripts: true,
           });
  
-          panel.webview.html = filewiseUnitTestCodeAssistantWebviewContent(formattedContent, "Filewise Unit Test Code Assistant");
+          panel.webview.html = filewiseUnitTestCodeAssistantWebviewContent(formattedContent, "Filewise Unit Test Code Assistant", language);
  
           // Listen for messages from the webview
           panel.webview.onDidReceiveMessage((message) => {
