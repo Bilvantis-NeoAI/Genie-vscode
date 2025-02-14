@@ -83,7 +83,7 @@ export async function postTechDebtReview(code: string, language: string, authTok
 
 export async function postOrgStdReview(code: string, language: string, authToken: string, project_name: any, branch_name: string): Promise<any> {
   const response = await axios.post(
-    `${getBaseApi}/review/org-std-review`,
+    `${getBaseApi()}/review/org-std-review`,
     { code, language, project_name, branch_name },
     {
       headers: getAuthHeaders(authToken),
