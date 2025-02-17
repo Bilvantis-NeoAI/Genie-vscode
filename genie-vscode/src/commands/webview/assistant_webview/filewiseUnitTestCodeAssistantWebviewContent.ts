@@ -154,6 +154,12 @@ export function filewiseUnitTestCodeAssistantWebviewContent(content: string, tit
     <body>
       <div id="floating-window">
         <div id="header">${escapeHtml(title)}</div>
+        <br/>
+        <label>
+        <input type="checkbox" id="select-all-checkbox" /> Select All
+        </label>
+        <br/>
+        <br/>
         <div id="content">
           ${testCasesHtml}
         </div>
@@ -165,12 +171,29 @@ export function filewiseUnitTestCodeAssistantWebviewContent(content: string, tit
         </div>
       </div>
       <script>
-          const vscode = acquireVsCodeApi();
-          const parsedContent = ${jsonData};
-          const unitTests = ${unitTests};
-          const pythonCode = ${JSON.stringify(pythonCode)};
-          const language = '${language}';
-          console.log("language", language)
+        const vscode = acquireVsCodeApi();
+        const parsedContent = ${jsonData};
+        const unitTests = ${unitTests};
+        const pythonCode = ${JSON.stringify(pythonCode)};
+        const language = '${language}';
+
+        document.getElementById("select-all-checkbox").addEventListener("change", function () {
+            const isChecked = this.checked;
+            document.querySelectorAll('.testcase-checkbox').forEach(checkbox => {
+                checkbox.checked = isChecked;
+            });
+        });
+
+        // Uncheck "Select All" if any checkbox is manually unchecked
+        document.querySelectorAll('.testcase-checkbox').forEach(checkbox => {
+            checkbox.addEventListener('change', function () {
+                if (!this.checked) {
+                    document.getElementById("select-all-checkbox").checked = false;
+                }
+            });
+        });
+
+
  
           // Function to show/hide buttons based on the language
           function updateButtonVisibility(language) {
