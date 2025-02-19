@@ -1,14 +1,14 @@
 import axios from "axios";
 // import { BASE_API } from "../../auth/config";
 import { getAuthHeaders } from "../../auth/apiHeaders";
-import { GITKB_BASE_API } from "../../auth/config";
-import { basename } from "path";
+// import { GITKB_BASE_API } from "../../auth/config";
+import { getGitKbApi } from "../../auth/config";
 
 // const BASE_URL = "http://localhost:9000";
 
 export async function postQueAnsRepositoryGitKB(question: string, authToken: string): Promise<any> {  
     const response = await axios.post(
-      `${GITKB_BASE_API}/explain`,
+      `${getGitKbApi()}/explain`,
       { question },
       {
         headers: getAuthHeaders(authToken),
@@ -19,7 +19,7 @@ export async function postQueAnsRepositoryGitKB(question: string, authToken: str
 
   export async function postGetCodeGitKB(question: string, authToken: string): Promise<any> {
     const response = await axios.post(
-      `${GITKB_BASE_API}/get_code`,
+      `${getGitKbApi()}/get_code`,
       { question },
       {
         headers: getAuthHeaders(authToken),

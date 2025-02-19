@@ -1,5 +1,3 @@
-import * as XLSX from 'xlsx';
-
 export function reviewGetWebViewContent(
   content: string,
   title: string
@@ -36,14 +34,6 @@ export function reviewGetWebViewContent(
   const showQuality = parsedContent.hasOwnProperty("quality");
   const showStandardsAdherence =
     parsedContent.hasOwnProperty("standardsAdherence");
-
-  // Extract unique severities from the issues
-  const uniqueSeverities = [
-    ...new Set(
-      parsedContent.issues.map((issue) => issue.severity.toLowerCase())
-    ),
-  ];
-  const reviewContentJSON = JSON.stringify(parsedContent, null, 2);
 
   return `<!DOCTYPE html>
 <html lang="en">

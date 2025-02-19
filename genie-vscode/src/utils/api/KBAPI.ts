@@ -2,7 +2,8 @@ import axios from "axios";
 // import { BASE_API } from "../../auth/config";
 import { getAuthHeaders } from "../../auth/apiHeaders";
 import { ANSWER_CONFIG } from "../../auth/config";
-import { KB_BASE_API } from "../../auth/config";
+// import { KB_BASE_API } from "../../auth/config";
+import { getKbBaseApi } from "../../auth/config";
 
 const answer_config = ANSWER_CONFIG;
 
@@ -16,7 +17,7 @@ export async function knowledgeBaseQA(
   formData.append("question", question);
   formData.append("answer_config", answer_config);
 
-  const response = await axios.post(`${KB_BASE_API}/answer`, formData, {
+  const response = await axios.post(`${getKbBaseApi()}/answer`, formData, {
     headers: {
       ...getAuthHeaders(authToken),
       "Content-Type": "multipart/form-data", // Ensure proper content type for form data
