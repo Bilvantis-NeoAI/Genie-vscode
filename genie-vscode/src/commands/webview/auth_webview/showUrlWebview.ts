@@ -59,15 +59,15 @@ export function showUrlWebview(
             <form id="authForm">
                 <div class="form-group">
                     <label for="url">Backend Domain:</label>
-                    <input type="text" id="url" name="url" class="form-control" value='http://34.46.36.105:3000' required>
+                    <input type="text" id="url" name="url" class="form-control" value='http://34.46.36.105:3000/genieapi' required>
                 </div> 
                 <div class="form-group">
                     <label for="gurl">Git Knowledge Base Domain:</label>
-                    <input type="text" id="gurl" name="gurl" class="form-control" value='http://34.46.36.105:3001' required>
+                    <input type="text" id="gurl" name="gurl" class="form-control" value='http://34.46.36.105:3001/gitkbapi' required>
                 </div>
                  <div class="form-group">
                     <label for="kurl">Knowledge Base Domain:</label>
-                    <input type="text" id="kurl" name="kurl" class="form-control" value='http://34.100.243.119:9000' required>
+                    <input type="text" id="kurl" name="kurl" class="form-control" value='http://34.100.243.119:9000/kbmsapi' required>
                 </div>                       
                 <button type="submit" class="btn btn-primary btn-block">Submit</button>
             </form>
@@ -114,16 +114,8 @@ export function showUrlWebview(
                 case 'urlRegisterSuccess':
                     vscode.window.showInformationMessage(message.message);
                     
-                    if (message.userUrl) {
-                        exchangeUrl(message.userUrl); 
-                    }
-                    if (message.GUrl) {
-                        updateGitKbBaseApi(message.GUrl);
-                       
-                    }
-                    if (message.KUrl) {
-                        updateKbBaseApi(message.KUrl);
-                       
+                    if (message.userUrl && message.KUrl && message.GUrl) {
+                        exchangeUrl(context, message.userUrl, message.KUrl, message.GUrl); 
                     }
 
                     context.globalState.update('urlSubmitted', true);
@@ -144,13 +136,13 @@ export function showUrlWebview(
         undefined,
         context.subscriptions
     );
-    // Function to update GITKB_BASE_API
-    function updateGitKbBaseApi(newUrl: string) {
-        require('../../../auth/config').GITKB_BASE_API = newUrl;
-    }
+    // // Function to update GITKB_BASE_API
+    // function updateGitKbBaseApi(newUrl: string) {
+    //     require('../../../auth/config').GITKB_BASE_API = newUrl;
+    // }
     
-    // Function to update KB_BASE_API
-    function updateKbBaseApi(newUrl: string) {
-        require('../../../auth/config').KB_BASE_API = newUrl;
-    }
+    // // Function to update KB_BASE_API
+    // function updateKbBaseApi(newUrl: string) {
+    //     require('../../../auth/config').KB_BASE_API = newUrl;
+    // }
 }

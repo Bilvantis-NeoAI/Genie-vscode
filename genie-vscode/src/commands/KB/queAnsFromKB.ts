@@ -2,6 +2,9 @@ import * as vscode from "vscode";
 import { ANSWER_CONFIG } from "../../auth/config";
 import { knowledgeBaseQA } from "../../utils/api/KBAPI";
 import { knowledgeBaseQAWebviewContent } from "../webview/KB_webview/queAnsFromKBWebviewContent";
+
+let panel: vscode.WebviewPanel | undefined;
+
 export function registerKnowledgeBaseQACommand(
   context: vscode.ExtensionContext,
   authToken: string
@@ -28,7 +31,7 @@ export function registerKnowledgeBaseQACommand(
             title: "Getting Response From KB",
             cancellable: false,
           };
-
+          
           await vscode.window.withProgress(progressOptions, async () => {
             // Fetch response from knowledge base API
             const KBresponse = await knowledgeBaseQA(
@@ -38,8 +41,23 @@ export function registerKnowledgeBaseQACommand(
             );
 
             const formattedContent = JSON.stringify(KBresponse, null, 2);
-
-            const panel = vscode.window.createWebviewPanel("knowledgeBaseQA", "Knowledge Base QA", vscode.ViewColumn.One, {});
+        if (panel) {
+          panel.reveal(vscode.ViewColumn.One);
+        }
+        else {
+          panel = vscode.window.createWebviewPanel(
+            "knowledgeBaseQA",
+            "Knowledge Base QA",
+            vscode.ViewColumn.One,
+            {
+              enableScripts: true,
+              retainContextWhenHidden: true,
+            }
+          );
+          panel.onDidDispose(() => {
+            panel = undefined;
+          });
+        }
           panel.webview.html = knowledgeBaseQAWebviewContent(formattedContent, "Knowledge Base QA");
         });
       } catch (error:any) {

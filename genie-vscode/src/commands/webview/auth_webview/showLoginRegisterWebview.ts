@@ -1,6 +1,7 @@
 import * as vscode from 'vscode';
 import { activateCodeCommands } from '../../../extension';
-import { BASE_API } from '../../../auth/config';
+// import { BASE_API } from '../../../auth/config';
+import { getBaseApi } from '../../../auth/config';
 
 import { GenieCommandsProvider } from '../../sidebarCommandRegister/GenieCommandsProvider';
 let activeWebview: vscode.WebviewPanel | null = null; // Keep track of the active webview
@@ -26,8 +27,12 @@ export function showLoginRegisterWebview(
         }
     );
  
-    const formAction = mode === 'login' ? `${BASE_API}/auth/login` : `${BASE_API}/auth/register`;
- 
+    // const formAction = mode === 'login' ? `${BASE_API}/auth/login` : `${BASE_API}/auth/register`;
+    
+    // const formAction = mode === 'login' ? `${BASE_API}/auth/login` : `${BASE_API}/auth/register`;
+
+    const formAction = mode === 'login' ? `${getBaseApi()}/auth/login` : `${getBaseApi()}/auth/register`;
+
     const message_html = `
         ${error_message ? `<div class="alert alert-danger" role="alert">${error_message}</div>` : ''}
         ${success_message ? `<div class="alert alert-success" role="alert">${success_message}</div>` : ''}
@@ -77,13 +82,13 @@ export function showLoginRegisterWebview(
                 <div class="form-group">
                     <!-- Email Field -->
                     <label for="email">Email:</label>
-                    <input type="email" id="email" name="email" class="form-control" required>
+                    <input type="email" id="email" name="email" class="form-control" value="manoj.behera@bilvantis.io" required>
                 </div>
                 <div class="form-group">
                 <!-- Password Field -->
                 <label for="password">Password:</label>
                 <div class="input-group">
-                    <input type="password" id="password" name="password" class="form-control" required>
+                    <input type="password" id="password" name="password" class="form-control" value="Steephen@1291" required>
                     <div class="input-group-append">
                         <button class="btn btn-outline-secondary toggle-password" type="button" tabindex="-1">
                             <i class="fas fa-eye"></i>
