@@ -26,7 +26,10 @@ export function knowledgeBaseQAWebviewContent(question: string, title: string): 
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>${title}</title>
-    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600&display=swap" rel="stylesheet">  
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.2.4/pdfmake.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.2.4/vfs_fonts.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.17.0/xlsx.full.min.js"></script>
     <style>
         body {
             font-family: 'Poppins', sans-serif;
@@ -44,9 +47,6 @@ export function knowledgeBaseQAWebviewContent(question: string, title: string): 
             margin-bottom: 10px;
             padding-bottom: 5px;
         }
-            .table-container {
-        overflow-x: auto; /* Add horizontal scroll for small screens */
-      }
         pre, code {
             background-color: #f9f9f9;
             border-radius: 5px;
@@ -64,6 +64,22 @@ export function knowledgeBaseQAWebviewContent(question: string, title: string): 
             padding: 10px;
             border-radius: 5px;
         }
+        .button-container {
+          display: flex;
+          justify-content: flex-end; /* Align button to the right */
+          margin-bottom: 10px;
+        }
+         button.download-btn {
+            padding: 5px 10px;
+            background-color: #07439C;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+          }
+    button.download-btn:hover {
+        background-color: #035f99;
+    }
     </style>
   </head>
   <body>
@@ -71,11 +87,50 @@ export function knowledgeBaseQAWebviewContent(question: string, title: string): 
         <h1>${title}</h1>
     </div>
     <div id="content">
+      <div class="button-container">
+          <button id="downloadButton" class="download-btn">Download as PDF</button>
+      </div>
         <h2>Question:</h2>
         <p class="formatted-text">${parsedContent.text || "No content available for Text 1"}</p>
         <h2>Answer:</h2>
         ${formatAnswer(parsedContent.text2 || "No content available for Text 2")}
     </div>
+    <script>
+      const json_data = ${JSON.stringify(parsedContent, null, 2)};
+
+      document.getElementById("downloadButton").addEventListener("click", () => {
+          const docDefinition = {
+              pageOrientation: 'landscape',
+              content: [
+                  { text: '${title}', style: 'header' },
+                  { text: 'Question:', style: 'subheader' },
+                  { text: json_data.text || 'No Question Provided', style: 'content' },
+                  { text: 'Answer:', style: 'subheader' },
+                  { text: json_data.text2 || 'No Answer Provided', style: 'content' }
+              ],
+              styles: {
+                  header: {
+                      fontSize: 18,
+                      bold: true,
+                      alignment: 'center',
+                      margin: [0, 0, 0, 10]
+                  },
+                  subheader: {
+                      fontSize: 14,
+                      bold: true,
+                      margin: [0, 10, 0, 5]
+                  },
+                  content: {
+                      fontSize: 12,
+                      margin: [0, 0, 0, 10]
+                  }
+              }
+          };
+
+        pdfMake.createPdf(docDefinition).download('${title}_${new Date().toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' }).replace(/ /g, '_').toLowerCase()}.pdf'); 
+      });
+    </script>
+
   </body>
   </html>`;
   }
