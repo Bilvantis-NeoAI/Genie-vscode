@@ -32,7 +32,16 @@ export class GenieCommandsProvider implements vscode.TreeDataProvider<GenieComma
       ]);
     } else if (element.label === "Review") {
       return Promise.resolve([
-        new GenieCommand("All Review", "extension.reviewAll", 'file-code', 'Check for syntax errors and inconsistencies.'),
+        // new GenieCommand("CK Review", "extension.reviewCK", 'graph-line', 'Perform a CK metrics review for your code.'),
+        // new GenieCommand("Code Overall Review", "extension.reviewOverall", 'file-code', 'Perform an overall review of your code.'),
+        // new GenieCommand("Code Review", "extension.reviewCode", 'file-text', 'Review specific sections of your code.'),
+        // new GenieCommand("Tech Debt Review", "extension.reviewTechDebt", 'flame', 'Identify and analyze technical debt.'),
+        // new GenieCommand("Org Std Review", "extension.reviewOrgStd", 'organization', 'Ensure adherence to organizational coding standards.'),
+        // new GenieCommand("Owasp Review", "extension.reviewOwasp", 'shield', 'Perform a security review based on OWASP guidelines.'),
+        // new GenieCommand("Performance Review", "extension.reviewPerformance", 'pulse', 'Analyze and improve code performance.'),
+        // new GenieCommand("Security Review", "extension.reviewSecurity", 'lock', 'Identify security vulnerabilities in your code.'),
+        // new GenieCommand("Syntax Review", "extension.reviewSyntax", 'checklist', 'Check for syntax errors and inconsistencies.'),
+        new GenieCommand("All Review", "extension.reviewAll", 'file-code', 'Perform All Reviews in one Feature.'),
         
       ]);
     } 

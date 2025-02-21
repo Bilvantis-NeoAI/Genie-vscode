@@ -25,6 +25,42 @@
         "title": "Show Login Page"
       },
       {
+        "command": "extension.reviewCode",
+        "title": " code Review Selected"
+      },
+      {
+        "command": "extension.reviewPerformance",
+        "title": "Performance Review Selected"
+      },
+      {
+        "command": "extension.reviewSecurity",
+        "title": "Security Review Selected"
+      },
+      {
+        "command": "extension.reviewSyntax",
+        "title": "Syntax Review Selected"
+      },
+      {
+        "command": "extension.reviewOverall",
+        "title": "Overall Review Selected"
+      },
+      {
+        "command": "extension.reviewOwasp",
+        "title": "Owasp Review Selected"
+      },
+      {
+        "command": "extension.reviewTechDebt",
+        "title": "Tech Debt Review Selected"
+      },
+      {
+        "command": "extension.reviewOrgStd",
+        "title": "Org Std Review Selected"
+      },
+      {
+        "command": "extension.reviewCK",
+        "title": "CK Review Selected"
+      },
+      {
         "command": "extension.addComments",
         "title": "Add Comments To Selected Code"
       },
