@@ -1,18 +1,11 @@
 import * as vscode from "vscode";
-import { registerCodeReviewCommand } from "./commands/review/codeReview";
-import { registerOverallReviewCommand } from "./commands/review/overallReview";
-import { registerPerformanceReviewCommand } from "./commands/review/performanceReview";
-import { registerSecurityReviewCommand } from "./commands/review/securityReview";
-import { registerSyntaxReviewCommand } from "./commands/review/syntaxReview";
+
 import { showLoginRegisterWebview } from "./commands/webview/auth_webview/showLoginRegisterWebview";
 import { showUrlWebview } from "./commands/webview/auth_webview/showUrlWebview";
 import { showLoginPrompt } from "./auth/authDialog";
-import { registerOwaspReviewCommand } from "./commands/review/owaspReview";
-import { registerTechDebtReviewCommand } from "./commands/review/techDebtReview";
 import { registerAddDocstringsAssistantCommand } from "./commands/assistant/addDocstringAssistant";
 import { registerCodeGenerationAssistantCommand } from "./commands/assistant/codeGenerationAssistant";
 import { registerAddCommentsAssistantCommand } from "./commands/assistant/addCommentsCodeAssistant";
-import { registerOrgStdReviewCommand } from "./commands/review/orgStdReview";
 import { registerAddLoggingAssistantCommand } from "./commands/assistant/addLoggingAssistant";
 import { registerErrorHandlingAssistantCommand } from "./commands/assistant/addErrorHandlingAssistant";
 import { registerRefactorCodeAssistantCommand } from "./commands/assistant/refactorCodeAssistant";
@@ -20,10 +13,9 @@ import { registerExplainCodeAssistantCommand } from "./commands/assistant/explai
 import { registerUnittestCodeAssistantCommand } from "./commands/assistant/unittestCodeAssistant";
 import { LoginRegisterCommandsProvider } from "./commands/sidebarCommandRegister/LoginRegisterCommandsProvider";
 import { GenieCommandsProvider } from "./commands/sidebarCommandRegister/GenieCommandsProvider";
-import { registerCkReviewCommand } from "./commands/review/ckReview";
 import { registerFilewiseUnitTestCodeAssistantCommand } from "./commands/assistant/filewiseUnitTestCodeAssistant";
 import { loadBaseApi, exchangeUrl, getBaseApi } from "./auth/config";
-
+import { registerAllReviewCommand } from "./commands/review/allReview";
 
 const jwt = require('jsonwebtoken');
 export let userId: string | undefined;
@@ -126,15 +118,8 @@ export function activateCodeCommands(context: vscode.ExtensionContext) {
     return;
   }
   // Register all review commands
-  registerCodeReviewCommand(context, authToken);
-  registerPerformanceReviewCommand(context, authToken);
-  registerSecurityReviewCommand(context, authToken);
-  registerSyntaxReviewCommand(context, authToken);
-  registerOverallReviewCommand(context, authToken);
-  registerOwaspReviewCommand(context, authToken);
-  registerTechDebtReviewCommand(context, authToken);
-  registerOrgStdReviewCommand(context, authToken);
-  registerCkReviewCommand(context, authToken);
+  registerAllReviewCommand(context, authToken);
+  
  
   //Register all Assistant Commands
   registerAddCommentsAssistantCommand(context, authToken);
