@@ -39,7 +39,7 @@ export function registerPerformanceReviewCommand(context: vscode.ExtensionContex
 
         const progressOptions: vscode.ProgressOptions = {
           location: vscode.ProgressLocation.Notification,
-          title: "Performance Reviewing",
+          title: "Performing Performance Review",
           cancellable: true,
         };
 

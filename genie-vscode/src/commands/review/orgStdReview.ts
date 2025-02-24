@@ -42,7 +42,7 @@ export function registerOrgStdReviewCommand(context: vscode.ExtensionContext, au
 
         const progressOptions: vscode.ProgressOptions = {
           location: vscode.ProgressLocation.Notification,
-          title: "Org Std Reviewing",
+          title: "Performing Org Std Review",
           cancellable: true,
         };
 
@@ -76,16 +76,16 @@ export function registerOrgStdReviewCommand(context: vscode.ExtensionContext, au
           panel.webview.html = reviewGetWebViewContent(formattedContent, "Org Std Review");
         }
         catch(error: any) {
-                    if (error.name === "AbortError" || error.message === "canceled") {
-                      wasCancelled = true;
-                    } else {
-                      vscode.window.showErrorMessage(`Error Org Std Review: ${error.message || "An unknown error occurred."}`);
-                    }
-                  } finally {
-                    if (wasCancelled) {
-                      vscode.window.showWarningMessage("Org Std Review process was canceled.");
-                    }
-                  }
+          if (error.name === "AbortError" || error.message === "canceled") {
+            wasCancelled = true;
+          } else {
+            vscode.window.showErrorMessage(`Error Org Std Review: ${error.message || "An unknown error occurred."}`);
+          }
+        } finally {
+          if (wasCancelled) {
+            vscode.window.showWarningMessage("Org Std Review process was canceled.");
+          }
+        }
 
         });
       } catch (error:any) {

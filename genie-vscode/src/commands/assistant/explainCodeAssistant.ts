@@ -38,7 +38,7 @@ export function registerExplainCodeAssistantCommand(context: vscode.ExtensionCon
 
         const progressOptions: vscode.ProgressOptions = {
           location: vscode.ProgressLocation.Notification,
-          title: "Explain Code",
+          title: "Explaining Code",
           cancellable: true,
         };
 

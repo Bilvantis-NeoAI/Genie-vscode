@@ -40,7 +40,7 @@ export function registerSyntaxReviewCommand(context: vscode.ExtensionContext, au
 
         const progressOptions: vscode.ProgressOptions = {
           location: vscode.ProgressLocation.Notification,
-          title: "Syntax Reviewing",
+          title: "Performing Syntax Review",
           cancellable: true,
         };
 

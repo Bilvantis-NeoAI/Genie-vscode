@@ -44,7 +44,7 @@ export function registerOverallReviewCommand(context: vscode.ExtensionContext, a
 
         const progressOptions: vscode.ProgressOptions = {
           location: vscode.ProgressLocation.Notification,
-          title: "Code Overall Reviewing",
+          title: "Performing Code Overall Review",
           cancellable: true,
         };
 

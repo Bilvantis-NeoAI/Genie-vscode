@@ -39,7 +39,7 @@ export function registerFilewiseUnitTestCodeAssistantCommand(context: vscode.Ext
 
         const progressOptions: vscode.ProgressOptions = {
           location: vscode.ProgressLocation.Notification,
-          title: "Assistant Filewise Unit Test Code",
+          title: "Generating Test Cases for given file",
           cancellable: true,
         };
  

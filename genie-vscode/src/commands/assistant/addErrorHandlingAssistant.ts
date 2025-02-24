@@ -35,7 +35,7 @@ export function registerErrorHandlingAssistantCommand(context: vscode.ExtensionC
         abortController = new AbortController();
         const progressOptions: vscode.ProgressOptions = {
           location: vscode.ProgressLocation.Notification,
-          title: "Error Handling",
+          title: "Adding Error & Exception Handling",
           cancellable: true,
         };
  

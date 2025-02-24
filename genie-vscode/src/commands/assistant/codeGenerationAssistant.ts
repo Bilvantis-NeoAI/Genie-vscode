@@ -37,7 +37,7 @@ export function registerCodeGenerationAssistantCommand(context: vscode.Extension
 
         const progressOptions: vscode.ProgressOptions = {
           location: vscode.ProgressLocation.Notification,
-          title: "Code Generation",
+          title: "Generating Code",
           cancellable: true,
         };
  
