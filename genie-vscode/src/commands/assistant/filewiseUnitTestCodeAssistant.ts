@@ -4,11 +4,21 @@ import { filewiseUnitTestCodeAssistantWebviewContent } from "../webview/assistan
 import { getGitInfo } from "../gitInfo";
 
 let abortController = new AbortController(); 
+let isExecuting = false;
 
 export function registerFilewiseUnitTestCodeAssistantCommand(context: vscode.ExtensionContext, authToken: string) {
   const testCases = vscode.commands.registerCommand("extension.assistantFilewiseUnitTestCode", async () => {
-    const editor = vscode.window.activeTextEditor;
-    if (editor) {
+      if (isExecuting) {
+        vscode.window.showWarningMessage("Filewise Unit Test Code is already in progress.");
+        return;
+      }
+      isExecuting = true;
+      const editor = vscode.window.activeTextEditor;
+      if (!editor) {
+        vscode.window.showWarningMessage("No active editor found!");
+        isExecuting = false;
+        return;
+      }
       // const selection = editor.selection;
       const text = editor.document.getText();
       
@@ -82,8 +92,9 @@ export function registerFilewiseUnitTestCodeAssistantCommand(context: vscode.Ext
  
       } catch (error:any) {
         vscode.window.showErrorMessage(`Error Filewise Unit Test Code: ${error.message || "An unknown error occurred."}`);
+      } finally {
+        isExecuting = false;
       }
-    }
   });
  
   context.subscriptions.push(testCases);

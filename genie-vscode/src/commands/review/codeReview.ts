@@ -5,11 +5,22 @@ import { getGitInfo } from "../gitInfo";
 
 let panel: vscode.WebviewPanel | undefined;
 let abortController = new AbortController();
+let isExecuting = false;
 
 export function registerCodeReviewCommand(context: vscode.ExtensionContext, authToken: string) {
   const reviewCode = vscode.commands.registerCommand("extension.reviewCode", async () => {
+    if (isExecuting) {
+      vscode.window.showWarningMessage("Code review is already in progress.");
+      return;
+    }
+    isExecuting = true;
+
     const editor = vscode.window.activeTextEditor;
-    if (editor){
+    if (!editor) {
+      vscode.window.showWarningMessage("No active editor found!");
+      isExecuting = false;
+      return;
+    }
     const selection = editor.selection;
     const text = editor.document.getText(selection);
     if (!text) {
@@ -77,15 +88,12 @@ export function registerCodeReviewCommand(context: vscode.ExtensionContext, auth
           if (wasCancelled) {
             vscode.window.showWarningMessage("Code Review process was canceled.");
           }
-        }
-
-        
+        } 
       });
-
-      // vscode.window.showInformationMessage("Code review completed successfully.");
     } catch (error: any) {
       vscode.window.showErrorMessage(`Error Code Review: ${error.message || "An unknown error occurred."}`);
-    }
+    } finally {
+      isExecuting = false;
   }
   });
 

@@ -4,11 +4,21 @@ import { postCodeGenerationAssistant } from "../../utils/api/assistantAPI";
 import { getGitInfo } from "../gitInfo";
 
 let abortController = new AbortController(); 
+let isExecuting = false;
 
 export function registerCodeGenerationAssistantCommand(context: vscode.ExtensionContext, authToken: string) {
   const codeGeneration = vscode.commands.registerCommand("extension.codeGeneration", async () => {
-    const editor = vscode.window.activeTextEditor;
-    if (editor) {
+      if (isExecuting) {
+        vscode.window.showWarningMessage("Generate Code is already in progress.");
+        return;
+      }
+      isExecuting = true;
+      const editor = vscode.window.activeTextEditor;
+      if (!editor) {
+        vscode.window.showWarningMessage("No active editor found!");
+        isExecuting = false;
+        return;
+      }
       const selection = editor.selection;
       const text = editor.document.getText(selection);
       if (!text) {
@@ -87,8 +97,9 @@ export function registerCodeGenerationAssistantCommand(context: vscode.Extension
  
       } catch (error: any) {    
         vscode.window.showErrorMessage(`Error Code Generation: ${error.message || "An unknown error occurred."}`);    
+      } finally {
+        isExecuting = false;
       }
-    }
   });
   context.subscriptions.push(codeGeneration);
 }

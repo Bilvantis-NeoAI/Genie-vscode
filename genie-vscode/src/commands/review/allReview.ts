@@ -4,12 +4,24 @@ import { reviewAllWebViewContent } from "../webview/review_Webview/reviewAllWebv
 import { getGitInfo } from "../gitInfo";
 
 let panel: vscode.WebviewPanel | undefined;
-let abortController = new AbortController(); // Initialize to avoid null errors
+let abortController = new AbortController(); 
+let isExecuting = false;
 
 export function registerAllReviewCommand(context: vscode.ExtensionContext, authToken: string) {
   const reviewAllCode = vscode.commands.registerCommand("extension.reviewAll", async () => {
-    const editor = vscode.window.activeTextEditor;
-    if (editor) {
+      if (isExecuting) {
+        vscode.window.showWarningMessage("Overall review is already in progress.");
+        return;
+      }
+  
+      isExecuting = true;
+
+      const editor = vscode.window.activeTextEditor;
+      if (!editor) {
+        vscode.window.showWarningMessage("No active editor found!");
+        isExecuting = false;
+        return;
+      }
       const selection = editor.selection;
       const text = editor.document.getText(selection);
       if (!text) {
@@ -85,7 +97,8 @@ export function registerAllReviewCommand(context: vscode.ExtensionContext, authT
 
       } catch (error: any) {
         vscode.window.showErrorMessage(`Error Over All Review: ${error.message || "An unknown error occurred."}`);
-      }
+      } finally {
+        isExecuting = false;
     }
   });
 

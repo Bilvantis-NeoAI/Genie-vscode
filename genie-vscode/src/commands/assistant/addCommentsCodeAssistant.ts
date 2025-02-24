@@ -5,24 +5,31 @@ import { postAddCommentsAssistant } from "../../utils/api/assistantAPI";
 import { getGitInfo } from "../gitInfo";
 
 let abortController = new AbortController();
+let isExecuting = false;
+
 export function registerAddCommentsAssistantCommand(context: vscode.ExtensionContext, authToken: string) {
   const addComments = vscode.commands.registerCommand("extension.addComments", async () => {
-    const editor = vscode.window.activeTextEditor;
-    if (editor) {
+      if (isExecuting) {
+        vscode.window.showWarningMessage("Comment code is already in progress.");
+        return;
+      }
+      isExecuting = true;
+      const editor = vscode.window.activeTextEditor;
+      if (!editor) {
+        vscode.window.showWarningMessage("No active editor found!");
+        isExecuting = false; 
+        return;
+      }
       const selection = editor.selection;
       const text = editor.document.getText(selection);
       if (!text) {
         vscode.window.showWarningMessage("No code selected. Please select code to assistant.");
         return;
       }
-      
       const language = editor.document.languageId;
-
       const workspacePath = vscode.workspace.workspaceFolders?.[0]?.uri.fsPath || "";
       // Fetch Git information using the getGitInfo function
       const { project_name, branch_name } = await getGitInfo(workspacePath);
-
- 
       try {
         abortController = new AbortController();
         const progressOptions: vscode.ProgressOptions = {
@@ -66,8 +73,6 @@ export function registerAddCommentsAssistantCommand(context: vscode.ExtensionCon
                 break;
             }
           });
-
-
           } 
           catch (error: any) {
             if (error.name === "AbortError" || error.message === "canceled") {
@@ -75,21 +80,18 @@ export function registerAddCommentsAssistantCommand(context: vscode.ExtensionCon
               // return; // Prevent error message when canceled
             } else {
               vscode.window.showErrorMessage(`Error Add Comments Code: ${error.message || "An unknown error occurred."}`);
-
-            }
-            
+            }       
           } finally {
             if (wasCancelled) {
               vscode.window.showWarningMessage("Add Comments Code process was cancelled.");
             }
           }
         });
- 
  } catch (error: any) {
          vscode.window.showErrorMessage(`Error Add Comments Code: ${error.message || "An unknown error occurred."}`);
-       }
-     }
-   });
- 
+        } finally {
+          isExecuting = false;
+        }
+   }); 
    context.subscriptions.push(addComments);
  }

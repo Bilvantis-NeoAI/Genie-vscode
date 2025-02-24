@@ -5,11 +5,21 @@ import { getGitInfo } from "../gitInfo";
 
 let panel: vscode.WebviewPanel | undefined;
 let abortController = new AbortController();
+let isExecuting = false;
 
 export function registerExplainCodeAssistantCommand(context: vscode.ExtensionContext, authToken: string) {
   const explainCode = vscode.commands.registerCommand("extension.explainCode", async () => {
-    const editor = vscode.window.activeTextEditor;
-    if (editor) {
+      if (isExecuting) {
+        vscode.window.showWarningMessage("Explain Code is already in progress.");
+        return;
+      }
+      isExecuting = true;
+      const editor = vscode.window.activeTextEditor;
+      if (!editor) {
+        vscode.window.showWarningMessage("No active editor found!");
+        isExecuting = false; 
+        return;
+      }
       const selection = editor.selection;
       const text = editor.document.getText(selection);
       if (!text) {
@@ -62,11 +72,6 @@ export function registerExplainCodeAssistantCommand(context: vscode.ExtensionCon
                 });
             }
             panel.webview.html = explainCodeAssistantWebViewContent(formattedContent, "Explain Code Assistant");
-          
-
-
-
-
 
           }
 
@@ -89,9 +94,10 @@ export function registerExplainCodeAssistantCommand(context: vscode.ExtensionCon
         });
       } catch (error:any) {
         vscode.window.showErrorMessage(`Error Explain Code: ${error.message || "An unknown error occurred."}`);
-
+      } finally {
+        isExecuting = false;
       }
-    }
+    
   });
 
   context.subscriptions.push(explainCode);

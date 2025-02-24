@@ -4,13 +4,27 @@ import { postOverallReview } from "../../utils/api/reviewAPI";
 import { reviewGetWebViewContent } from "../webview/review_Webview/reviewWebviewContent";
 import { getGitInfo } from "../gitInfo";
 
+
 let panel: vscode.WebviewPanel | undefined;
 let abortController = new AbortController();
+let isExecuting = false;
 
 export function registerOverallReviewCommand(context: vscode.ExtensionContext, authToken: string) {
   const reviewOverall = vscode.commands.registerCommand("extension.reviewOverall", async () => {
-    const editor = vscode.window.activeTextEditor;
-    if (editor) {
+      
+      if (isExecuting) {
+        vscode.window.showWarningMessage("Overall review is already in progress.");
+        return;
+      }
+      
+      isExecuting = true;
+
+      const editor = vscode.window.activeTextEditor;
+      if (!editor) {
+        vscode.window.showWarningMessage("No active editor found!");
+        isExecuting = false; // Reset before returning
+        return;
+      }
       const selection = editor.selection;
       const text = editor.document.getText(selection);
       if (!text) {
@@ -76,16 +90,13 @@ export function registerOverallReviewCommand(context: vscode.ExtensionContext, a
               if (wasCancelled) {
                 vscode.window.showWarningMessage("Code Over All Review process was canceled.");
               }
-            }
-
-
-
-          
+            }  
         });
       } catch (error:any) {
         vscode.window.showErrorMessage(`Error Code Over All Review: ${error.message || "An unknown error occurred."}`);
+      } finally {
+        isExecuting = false;
       }
-    }
   });
 
   context.subscriptions.push(reviewOverall);
