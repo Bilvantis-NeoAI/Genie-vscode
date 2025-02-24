@@ -29,7 +29,7 @@ export function registerSecurityReviewCommand(context: vscode.ExtensionContext, 
 
         const progressOptions: vscode.ProgressOptions = {
           location: vscode.ProgressLocation.Notification,
-          title: "Security Reviewing",
+          title: "Performing Security Review",
           cancellable: true,
         };
 

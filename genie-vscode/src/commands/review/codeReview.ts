@@ -26,7 +26,7 @@ export function registerCodeReviewCommand(context: vscode.ExtensionContext, auth
 
       const progressOptions: vscode.ProgressOptions = {
         location: vscode.ProgressLocation.Notification,
-        title: "Code Reviewing",
+        title: "Performing Code Review",
         cancellable: true,
       };
 

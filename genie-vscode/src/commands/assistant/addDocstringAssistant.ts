@@ -27,7 +27,7 @@ export function registerAddDocstringsAssistantCommand(context: vscode.ExtensionC
 
         const progressOptions: vscode.ProgressOptions = {
           location: vscode.ProgressLocation.Notification,
-          title: "Add Docstrings",
+          title: "Adding Docstrings",
           cancellable: true, // Allow user to cancel
         };
 

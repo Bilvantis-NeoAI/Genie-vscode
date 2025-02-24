@@ -28,7 +28,7 @@ export function registerRefactorCodeAssistantCommand(context: vscode.ExtensionCo
 
         const progressOptions: vscode.ProgressOptions = {
           location: vscode.ProgressLocation.Notification,
-          title: "Refactor Code",
+          title: "Refactoring Code",
           cancellable: true,
         };
  

@@ -27,8 +27,8 @@ export function registerCkReviewCommand(context: vscode.ExtensionContext, authTo
  
       const progressOptions: vscode.ProgressOptions = {
         location: vscode.ProgressLocation.Notification,
-        title: "CK Reviewing",
-        
+        title: "Performing CK Review",
+
         cancellable: true,
       };
  

@@ -27,7 +27,7 @@ export function registerAddCommentsAssistantCommand(context: vscode.ExtensionCon
         abortController = new AbortController();
         const progressOptions: vscode.ProgressOptions = {
           location: vscode.ProgressLocation.Notification,
-          title: "Add Comments Code",
+          title: "Adding Comments to the Code",
           cancellable: true,
         };
  

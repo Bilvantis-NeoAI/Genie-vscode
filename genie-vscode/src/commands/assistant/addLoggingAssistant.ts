@@ -25,7 +25,7 @@ export function registerAddLoggingAssistantCommand(context: vscode.ExtensionCont
 
         const progressOptions: vscode.ProgressOptions = {
           location: vscode.ProgressLocation.Notification,
-          title: "Add Logging",
+          title: "Adding Log Statements",
           cancellable: true,
         };
  

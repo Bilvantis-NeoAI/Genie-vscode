@@ -30,7 +30,7 @@ export function registerUnittestCodeAssistantCommand(context: vscode.ExtensionCo
         abortController = new AbortController();
         const progressOptions: vscode.ProgressOptions = {
           location: vscode.ProgressLocation.Notification,
-          title: "Unit Test Code",
+          title: "Generating Test Cases",
           cancellable: true,
         };
 

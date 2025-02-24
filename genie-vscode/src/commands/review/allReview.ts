@@ -27,7 +27,7 @@ export function registerAllReviewCommand(context: vscode.ExtensionContext, authT
 
         const progressOptions: vscode.ProgressOptions = {
           location: vscode.ProgressLocation.Notification,
-          title: "Over All Reviewing",
+          title: "Performing Overall Review",
           cancellable: true, // Allow user to cancel
         };
 
@@ -55,8 +55,8 @@ export function registerAllReviewCommand(context: vscode.ExtensionContext, authT
               panel.reveal(vscode.ViewColumn.One);
             } else {
               panel = vscode.window.createWebviewPanel(
-                "OverAllReview",
-                "Over All Review",
+                "OverallReview",
+                "Overall Review",
                 vscode.ViewColumn.One,
                 {
                   enableScripts: true,
@@ -69,22 +69,22 @@ export function registerAllReviewCommand(context: vscode.ExtensionContext, authT
               });
             }
 
-            panel.webview.html = reviewAllWebViewContent(formattedContent, "Over All Review");
+            panel.webview.html = reviewAllWebViewContent(formattedContent, "Overall Review");
           } catch (error: any) {
             if (error.name === "AbortError" || error.message === "canceled") {
               wasCancelled = true;
             } else {
-              vscode.window.showErrorMessage(`Error Over All Review: ${error.message || "An unknown error occurred."}`);
+              vscode.window.showErrorMessage(`Error Overall Review: ${error.message || "An unknown error occurred."}`);
             }
           } finally {
             if (wasCancelled) {
-              vscode.window.showWarningMessage("Over All Review process was canceled.");
+              vscode.window.showWarningMessage("Overall Review process was canceled.");
             }
           }
         });
 
       } catch (error: any) {
-        vscode.window.showErrorMessage(`Error Over All Review: ${error.message || "An unknown error occurred."}`);
+        vscode.window.showErrorMessage(`Error Overall Review: ${error.message || "An unknown error occurred."}`);
       }
     }
   });
