@@ -3,6 +3,8 @@ import { postRefactorCodeAssistant } from "../../utils/api/assistantAPI";
 import { refactorCodeAssistantWebviewContent } from "../webview/assistant_webview/refactorCodeAssistantWebviewContent";
 import { getGitInfo } from "../gitInfo";
 
+let abortController = new AbortController();
+
 export function registerRefactorCodeAssistantCommand(context: vscode.ExtensionContext, authToken: string) {
   const refactorCode = vscode.commands.registerCommand("extension.refactorCode", async () => {
     const editor = vscode.window.activeTextEditor;
@@ -22,21 +24,31 @@ export function registerRefactorCodeAssistantCommand(context: vscode.ExtensionCo
       const { project_name, branch_name } = await getGitInfo(workspacePath);
 
       try {
+        abortController = new AbortController();
+
         const progressOptions: vscode.ProgressOptions = {
           location: vscode.ProgressLocation.Notification,
           title: "Refactor Code",
-          cancellable: false,
+          cancellable: true,
         };
  
-        await vscode.window.withProgress(progressOptions, async () => {
-          const response = await postRefactorCodeAssistant(text, language, authToken, project_name, branch_name);
-         
-          const formattedContent = JSON.stringify(response, null, 2);
+        await vscode.window.withProgress(progressOptions, async (progess, cancel) => {
+          let wasCancelled = false;
+          cancel.onCancellationRequested(() => {
+            abortController.abort();
+            wasCancelled = true;         
+          });
+
+          try {
+            const response = await postRefactorCodeAssistant(text, language, authToken, project_name, branch_name, {signal: abortController.signal});
+            if (wasCancelled) {
+              return;
+            }
+            const formattedContent = JSON.stringify(response, null, 2);
        
           const panel = vscode.window.createWebviewPanel("refactorCodeAssistant", "Refactor Code Assistant", vscode.ViewColumn.Beside, {
             enableScripts: true,
           });
- 
           panel.webview.html = refactorCodeAssistantWebviewContent(formattedContent, "Refactor Code Assistant");
  
           // Listen for messages from the webview
@@ -55,11 +67,25 @@ export function registerRefactorCodeAssistantCommand(context: vscode.ExtensionCo
                 break;
             }
           });
+          }
+          catch (error: any) {
+            if (error.name === "AbortError" || error.message === "canceled") {
+              wasCancelled = true;
+              // return; // Prevent error message when canceled
+            } else {
+              vscode.window.showErrorMessage(`Error Refactoring Code: ${error.message || "An unknown error occurred."}`);
+
+            }
+            
+          } finally {
+            if (wasCancelled) {
+              vscode.window.showWarningMessage("Refactor Code process was cancelled.");
+            }
+          }
         });
  
       } catch (error:any) {
-        const errorMessage = error.message || "An unknown error occurred.";
-        vscode.window.showErrorMessage(`Error Refactoring Code: ${errorMessage}`);
+        vscode.window.showErrorMessage(`Error Refactor Code: ${error.message || "An unknown error occurred."}`);
       }
     }
   });

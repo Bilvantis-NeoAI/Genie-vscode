@@ -4,6 +4,7 @@ import { reviewGetWebViewContent } from "../webview/review_Webview/reviewWebview
 import { getGitInfo } from "../gitInfo";
  
 let panel: vscode.WebviewPanel | undefined;
+let abortController = new AbortController();
  
 export function registerCkReviewCommand(context: vscode.ExtensionContext, authToken: string) {
   const reviewCode = vscode.commands.registerCommand("extension.reviewCK", async () => {
@@ -21,15 +22,29 @@ export function registerCkReviewCommand(context: vscode.ExtensionContext, authTo
  
     try {
       const { project_name, branch_name } = await getGitInfo(workspacePath);
+
+      abortController = new AbortController();
  
       const progressOptions: vscode.ProgressOptions = {
         location: vscode.ProgressLocation.Notification,
         title: "CK Reviewing",
-        cancellable: false,
+        
+        cancellable: true,
       };
  
-      await vscode.window.withProgress(progressOptions, async () => {
-        const reviewComments = await postCkReview(text, language, authToken, project_name, branch_name);
+      await vscode.window.withProgress(progressOptions, async (progress, cancel) => {
+        let wasCancelled = false;
+
+        cancel.onCancellationRequested(() => {
+          abortController.abort(); // Cancel the request
+          wasCancelled = true;
+        });
+
+        try {
+          const reviewComments = await postCkReview(text, language, authToken, project_name, branch_name, {signal: abortController.signal});
+          if (wasCancelled) {
+            return;
+          }
         const formattedContent = JSON.stringify(reviewComments, null, 2);
  
         // Reuse or create the webview panel
@@ -52,12 +67,33 @@ export function registerCkReviewCommand(context: vscode.ExtensionContext, authTo
         }
  
         panel.webview.html = reviewGetWebViewContent(formattedContent, "CK Review");
+
+
+
+        }
+        catch (error: any) {
+          if (error.name === "AbortError" || error.message === "canceled") {
+            wasCancelled = true;
+          } else {
+            vscode.window.showErrorMessage(`Error CK Review: ${error.message || "An unknown error occurred."}`);
+          }
+        } finally {
+          if (wasCancelled) {
+            vscode.window.showWarningMessage("CK Review process was canceled.");
+          }
+        }
+
+
+
+
+
+
+        
       });
  
       // vscode.window.showInformationMessage("Code review completed successfully.");
     } catch (error: any) {
-      const errorMessage = error.message || "An unknown error occurred.";
-      vscode.window.showErrorMessage(`Error CK Review: ${errorMessage}`);
+      vscode.window.showErrorMessage(`Error CK Review: ${error.message || "An unknown error occurred."}`);
     }
   }
   });

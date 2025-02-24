@@ -3,6 +3,8 @@ import { postFilewiseUnitTestCodeAssistant } from "../../utils/api/assistantAPI"
 import { filewiseUnitTestCodeAssistantWebviewContent } from "../webview/assistant_webview/filewiseUnitTestCodeAssistantWebviewContent";
 import { getGitInfo } from "../gitInfo";
 
+let abortController = new AbortController(); 
+
 export function registerFilewiseUnitTestCodeAssistantCommand(context: vscode.ExtensionContext, authToken: string) {
   const testCases = vscode.commands.registerCommand("extension.assistantFilewiseUnitTestCode", async () => {
     const editor = vscode.window.activeTextEditor;
@@ -23,14 +25,23 @@ export function registerFilewiseUnitTestCodeAssistantCommand(context: vscode.Ext
       const { project_name, branch_name } = await getGitInfo(workspacePath);
       
       try {
+        abortController = new AbortController();
+
         const progressOptions: vscode.ProgressOptions = {
           location: vscode.ProgressLocation.Notification,
           title: "Assistant Filewise Unit Test Code",
-          cancellable: false,
+          cancellable: true,
         };
  
-        await vscode.window.withProgress(progressOptions, async () => {
-          const response = await postFilewiseUnitTestCodeAssistant(text, language, authToken, project_name, branch_name);
+        await vscode.window.withProgress(progressOptions, async (progress, cancel) => {
+          let wasCancelled = false;
+          cancel.onCancellationRequested(() => {
+            abortController.abort();
+            wasCancelled = true;
+          });
+
+          try {
+            const response = await postFilewiseUnitTestCodeAssistant(text, language, authToken, project_name, branch_name, {signal: abortController.signal,});
           
           const formattedContent = JSON.stringify(response, null, 2);        
           const panel = vscode.window.createWebviewPanel("filewiseUnitTestCodeAssistant", "Filewise Unit Test Code Assistant", vscode.ViewColumn.Beside, {
@@ -52,11 +63,25 @@ export function registerFilewiseUnitTestCodeAssistantCommand(context: vscode.Ext
             }
           }
         );
+          }
+          catch (error: any) {
+            if (error.name === "AbortError" || error.message === "canceled") {
+              wasCancelled = true;
+              // return; // Prevent error message when canceled
+            } else {
+              vscode.window.showErrorMessage(`Error Filewise Unit Test Code: ${error.message || "An unknown error occurred."}`);
+
+            }
+            
+          } finally {
+            if (wasCancelled) {
+              vscode.window.showWarningMessage("Filewise Unit Test Code process was cancelled.");
+            }
+          }
         });
  
       } catch (error:any) {
-        const errorMessage = error.message || "An unknown error occurred.";
-        vscode.window.showErrorMessage(`Error Test Cases Review: ${errorMessage}`);
+        vscode.window.showErrorMessage(`Error Filewise Unit Test Code: ${error.message || "An unknown error occurred."}`);
       }
     }
   });

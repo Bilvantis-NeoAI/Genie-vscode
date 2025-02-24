@@ -5,6 +5,7 @@ import { getGitInfo } from "../gitInfo";
 import { log } from "console";
 
 let panel: vscode.WebviewPanel | undefined;
+let abortController = new AbortController(); 
 
 export function registerUnittestCodeAssistantCommand(context: vscode.ExtensionContext, authToken: string) {
   const unittestCode = vscode.commands.registerCommand("extension.unittestCode", async () => {
@@ -26,37 +27,61 @@ export function registerUnittestCodeAssistantCommand(context: vscode.ExtensionCo
       
 
       try {
+        abortController = new AbortController();
         const progressOptions: vscode.ProgressOptions = {
           location: vscode.ProgressLocation.Notification,
           title: "Unit Test Code",
-          cancellable: false,
+          cancellable: true,
         };
 
-        await vscode.window.withProgress(progressOptions, async () => {
-          const unittestCodes = await postUnittestCodeAssistant(text, language, authToken, project_name, branch_name);
-          const formattedContent = JSON.stringify(unittestCodes, null, 2);
-          
-          if (panel) {
-            panel.reveal(vscode.ViewColumn.One);
-          } else {
-            panel = vscode.window.createWebviewPanel(
-              "unittestCodeAssistant", 
-              "Unit Test Code Assistant", 
-              vscode.ViewColumn.One, 
-              {
-                enableScripts: true,
-                retainContextWhenHidden: true,
-              });
-              panel.onDidDispose(() => {
-                panel = undefined;
-              });
+        await vscode.window.withProgress(progressOptions, async (progess, cancel) => {
+          let wasCancelled = false;
+          cancel.onCancellationRequested(() => {
+            abortController.abort();
+            wasCancelled = true;    
+          });
+
+          try {
+            const unittestCodes = await postUnittestCodeAssistant(text, language, authToken, project_name, branch_name, {signal: abortController.signal});
+            if (wasCancelled) {
+              return;
+            }
+            const formattedContent = JSON.stringify(unittestCodes, null, 2);
+            if (panel) {
+              panel.reveal(vscode.ViewColumn.One);
+            } else {
+              panel = vscode.window.createWebviewPanel(
+                "unittestCodeAssistant", 
+                "Unit Test Code Assistant", 
+                vscode.ViewColumn.One, 
+                {
+                  enableScripts: true,
+                  retainContextWhenHidden: true,
+                });
+                panel.onDidDispose(() => {
+                  panel = undefined;
+                });
+            }
+            
+            panel.webview.html = unittestCodeAssistantWebViewContent(formattedContent, "Unit Test Code Assistant");           
           }
-          
-          panel.webview.html = unittestCodeAssistantWebViewContent(formattedContent, "Unit Test Code Assistant");
+          catch (error: any) {
+            if (error.name === "AbortError" || error.message === "canceled") {
+              wasCancelled = true;
+              // return; // Prevent error message when canceled
+            } else {
+              vscode.window.showErrorMessage(`Error Unit Test Code: ${error.message || "An unknown error occurred."}`);
+
+            }
+            
+          } finally {
+            if (wasCancelled) {
+              vscode.window.showWarningMessage("Unit Test Code process was cancelled.");
+            }
+          } 
         });
       } catch (error:any) {
-        const errorMessage = error.message || "An unknown error occurred.";
-        vscode.window.showErrorMessage(`Error Unit Test Code: ${errorMessage}`);
+        vscode.window.showErrorMessage(`Error Unit Test Code: ${error.message || "An unknown error occurred."}`);
       }
     }
   });

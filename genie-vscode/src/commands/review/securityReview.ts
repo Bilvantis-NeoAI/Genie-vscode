@@ -5,6 +5,7 @@ import { reviewGetWebViewContent } from "../webview/review_Webview/reviewWebview
 import { getGitInfo } from "../gitInfo";
 
 let panel: vscode.WebviewPanel | undefined;
+let abortController = new AbortController();
 
 export function registerSecurityReviewCommand(context: vscode.ExtensionContext, authToken: string) {
   const reviewSecurity = vscode.commands.registerCommand("extension.reviewSecurity", async () => {
@@ -24,14 +25,29 @@ export function registerSecurityReviewCommand(context: vscode.ExtensionContext, 
       const { project_name, branch_name } = await getGitInfo(workspacePath);
 
       try {
+        abortController = new AbortController();
+
         const progressOptions: vscode.ProgressOptions = {
           location: vscode.ProgressLocation.Notification,
           title: "Security Reviewing",
-          cancellable: false,
+          cancellable: true,
         };
 
-        await vscode.window.withProgress(progressOptions, async () => {
-          const reviewSecurity = await postSecurityReview(text, language, authToken, project_name, branch_name);
+        await vscode.window.withProgress(progressOptions, async (progress, cancel) => {
+          let wasCancelled = false;
+
+          cancel.onCancellationRequested(() => {
+            abortController.abort(); // Cancel the request
+            wasCancelled = true;
+          });
+
+          try {
+          const reviewSecurity = await postSecurityReview(text, language, authToken, project_name, branch_name, {signal: abortController.signal});
+
+          if (wasCancelled) {
+            return;
+          }
+
           const formattedContent = JSON.stringify(reviewSecurity, null, 2);
 
           if (panel) {
@@ -50,10 +66,21 @@ export function registerSecurityReviewCommand(context: vscode.ExtensionContext, 
               });
           }
           panel.webview.html = reviewGetWebViewContent(formattedContent, "Security Review");
+        }
+        catch (error: any) {
+          if (error.name === "AbortError" || error.message === "canceled") {
+            wasCancelled = true;
+          } else {
+            vscode.window.showErrorMessage(`Error Security Review: ${error.message || "An unknown error occurred."}`);
+          }
+        } finally {
+          if (wasCancelled) {
+            vscode.window.showWarningMessage("Security Review process was canceled.");
+          }
+        }
         });
       } catch (error:any) {
-        const errorMessage = error.message || "An unknown error occurred.";
-        vscode.window.showErrorMessage(`Error Security Review: ${errorMessage}`);
+        vscode.window.showErrorMessage(`Error Security Review: ${error.message || "An unknown error occurred."}`);
       }
     }
   });

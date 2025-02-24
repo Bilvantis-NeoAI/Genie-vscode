@@ -5,6 +5,7 @@ import { reviewGetWebViewContent } from "../webview/review_Webview/reviewWebview
 import { getGitInfo } from "../gitInfo";
 
 let panel: vscode.WebviewPanel | undefined;
+let abortController = new AbortController();
 
 export function registerOverallReviewCommand(context: vscode.ExtensionContext, authToken: string) {
   const reviewOverall = vscode.commands.registerCommand("extension.reviewOverall", async () => {
@@ -25,37 +26,64 @@ export function registerOverallReviewCommand(context: vscode.ExtensionContext, a
       try {
         // Fetch Git information using the getGitInfo function
         const { project_name, branch_name } = await getGitInfo(workspacePath);
+        abortController = new AbortController();
+
         const progressOptions: vscode.ProgressOptions = {
           location: vscode.ProgressLocation.Notification,
           title: "Code Overall Reviewing",
-          cancellable: false,
+          cancellable: true,
         };
 
-        await vscode.window.withProgress(progressOptions, async () => {
-          const reviewOverall = await postOverallReview(text, language, authToken, project_name, branch_name);
-          const formattedContent = JSON.stringify(reviewOverall, null, 2);
-          if (panel) {
-            panel.reveal(vscode.ViewColumn.One);
-          } else {
-            panel = vscode.window.createWebviewPanel(
-              "codeOverallReview", 
-              "Code Overall Review", 
-              vscode.ViewColumn.One, 
-              {
-              enableScripts: true,
-              retainContextWhenHidden: true,
+        await vscode.window.withProgress(progressOptions, async (progress, cancel) => {
+          let wasCancelled = false;
+
+          cancel.onCancellationRequested(() => {
+            abortController.abort(); // Cancel the request
+            wasCancelled = true;
+          });
+
+          try {
+            const reviewOverall = await postOverallReview(text, language, authToken, project_name, branch_name, {signal: abortController.signal});
+            if (wasCancelled) {
+              return;
+            }
+            const formattedContent = JSON.stringify(reviewOverall, null, 2);
+            if (panel) {
+              panel.reveal(vscode.ViewColumn.One);
+            } else {
+              panel = vscode.window.createWebviewPanel(
+                "codeOverallReview", 
+                "Code Overall Review", 
+                vscode.ViewColumn.One, 
+                {
+                enableScripts: true,
+                retainContextWhenHidden: true,
+                }
+              );
+              panel.onDidDispose(() => {
+                  panel = undefined;
+                });
+            }
+            panel.webview.html = reviewGetWebViewContent(formattedContent, "Code Overall Review");
+            }
+            catch (error: any) {
+              if (error.name === "AbortError" || error.message === "canceled") {
+                wasCancelled = true;
+              } else {
+                vscode.window.showErrorMessage(`Error Code Over All Review: ${error.message || "An unknown error occurred."}`);
               }
-            );
-            panel.onDidDispose(() => {
-                panel = undefined;
-              });
-          }
-         
-          panel.webview.html = reviewGetWebViewContent(formattedContent, "Code Overall Review");
+            } finally {
+              if (wasCancelled) {
+                vscode.window.showWarningMessage("Code Over All Review process was canceled.");
+              }
+            }
+
+
+
+          
         });
       } catch (error:any) {
-        const errorMessage = error.message || "An unknown error occurred.";
-              vscode.window.showErrorMessage(`Error Overall Review: ${errorMessage}`);
+        vscode.window.showErrorMessage(`Error Code Over All Review: ${error.message || "An unknown error occurred."}`);
       }
     }
   });
