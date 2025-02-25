@@ -4,11 +4,21 @@ import { addDocstringsAssistantWebviewContent } from "../webview/assistant_webvi
 import { getGitInfo } from "../gitInfo";
 
 let abortController = new AbortController(); 
+let isExecuting = false;
 
 export function registerAddDocstringsAssistantCommand(context: vscode.ExtensionContext, authToken: string) {
   const addDocstrings = vscode.commands.registerCommand("extension.addDocstrings", async () => {
-    const editor = vscode.window.activeTextEditor;
-    if (editor) {
+      if (isExecuting) {
+        vscode.window.showWarningMessage("Add Docstring is already in progress.");
+        return;
+      }
+      isExecuting = true;
+      const editor = vscode.window.activeTextEditor;
+      if (!editor) {
+        vscode.window.showWarningMessage("No active editor found!");
+        isExecuting = false; 
+        return;
+      }
       const selection = editor.selection;
       const text = editor.document.getText(selection);
       if (!text) {
@@ -86,8 +96,9 @@ export function registerAddDocstringsAssistantCommand(context: vscode.ExtensionC
 
       } catch (error: any) {
         vscode.window.showErrorMessage(`Error Add Docstring Code: ${error.message || "An unknown error occurred."}`);
+      } finally {
+        isExecuting = false;
       }
-    }
   });
 
   context.subscriptions.push(addDocstrings);

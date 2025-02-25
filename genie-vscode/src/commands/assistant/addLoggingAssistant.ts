@@ -4,11 +4,21 @@ import { addLoggingAssistantWebviewContent } from "../webview/assistant_webview/
 import { getGitInfo } from "../gitInfo";
 
 let abortController = new AbortController(); 
+let isExecuting = false;
 
 export function registerAddLoggingAssistantCommand(context: vscode.ExtensionContext, authToken: string) {
   const addLogging = vscode.commands.registerCommand("extension.addLogging", async () => {
-    const editor = vscode.window.activeTextEditor;
-    if (editor) {
+      if (isExecuting) {
+        vscode.window.showWarningMessage("Add Logging is already in progress.");
+        return;
+      }
+      isExecuting = true;
+      const editor = vscode.window.activeTextEditor;
+      if (!editor) {
+        vscode.window.showWarningMessage("No active editor found!");
+        isExecuting = false; 
+        return;
+      }
       const selection = editor.selection;
       const text = editor.document.getText(selection);
       if (!text) {
@@ -83,8 +93,9 @@ export function registerAddLoggingAssistantCommand(context: vscode.ExtensionCont
  
       } catch (error:any) {
         vscode.window.showErrorMessage(`Error Add Logging: ${error.message || "An unknown error occurred."}`);
+      } finally {
+        isExecuting = false;
       }
-    }
   });
  
   context.subscriptions.push(addLogging);

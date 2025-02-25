@@ -6,11 +6,22 @@ import { getGitInfo } from "../gitInfo";
 
 let panel: vscode.WebviewPanel | undefined;
 let abortController = new AbortController();
+let isExecuting = false;
 
 export function registerSecurityReviewCommand(context: vscode.ExtensionContext, authToken: string) {
   const reviewSecurity = vscode.commands.registerCommand("extension.reviewSecurity", async () => {
-    const editor = vscode.window.activeTextEditor;
-    if (editor) {
+    
+      if (isExecuting) {
+        vscode.window.showWarningMessage("Security review is already in progress.");
+        return;
+      }
+      isExecuting = true;
+      const editor = vscode.window.activeTextEditor;
+      if (!editor) {
+        vscode.window.showWarningMessage("No active editor found!");
+        isExecuting = false;
+        return;
+      }
       const selection = editor.selection;
       const text = editor.document.getText(selection);
       if (!text) {
@@ -81,10 +92,10 @@ export function registerSecurityReviewCommand(context: vscode.ExtensionContext, 
         });
       } catch (error:any) {
         vscode.window.showErrorMessage(`Error Security Review: ${error.message || "An unknown error occurred."}`);
+      } finally {
+        isExecuting = false;
       }
-    }
   });
-
   context.subscriptions.push(reviewSecurity);
 }
 

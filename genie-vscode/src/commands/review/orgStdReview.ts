@@ -6,11 +6,23 @@ import { getGitInfo } from "../gitInfo";
 
 let panel: vscode.WebviewPanel | undefined;
 let abortController = new AbortController();
+let isExecuting = false;
 
 export function registerOrgStdReviewCommand(context: vscode.ExtensionContext, authToken: string) {
   const reviewOrgStd = vscode.commands.registerCommand("extension.reviewOrgStd", async () => {
-    const editor = vscode.window.activeTextEditor;
-    if (editor) {
+    
+      if (isExecuting) {
+        vscode.window.showWarningMessage("Org Std review is already in progress.");
+        return;
+      }
+      isExecuting = true;
+
+      const editor = vscode.window.activeTextEditor;
+      if (!editor) {
+        vscode.window.showWarningMessage("No active editor found!");
+        isExecuting = false; // Reset before returning
+        return;
+      }
       const selection = editor.selection;
       const text = editor.document.getText(selection);
       if (!text) {
@@ -78,8 +90,9 @@ export function registerOrgStdReviewCommand(context: vscode.ExtensionContext, au
         });
       } catch (error:any) {
         vscode.window.showErrorMessage(`Error Org Std Review: ${error.message || "An unknown error occurred."}`);
-    }
-  }
+      } finally {
+        isExecuting = false;
+      }
   });
 
   context.subscriptions.push(reviewOrgStd);

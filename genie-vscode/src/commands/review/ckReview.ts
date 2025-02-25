@@ -5,11 +5,21 @@ import { getGitInfo } from "../gitInfo";
  
 let panel: vscode.WebviewPanel | undefined;
 let abortController = new AbortController();
+let isExecuting = false;
  
 export function registerCkReviewCommand(context: vscode.ExtensionContext, authToken: string) {
   const reviewCode = vscode.commands.registerCommand("extension.reviewCK", async () => {
+    if (isExecuting) {
+      vscode.window.showWarningMessage("CK review is already in progress.");
+      return;
+    }
+    isExecuting = true;
     const editor = vscode.window.activeTextEditor;
-    if (editor){
+    if (!editor) {
+      vscode.window.showWarningMessage("No active editor found!");
+      isExecuting = false; // Reset before returning
+      return;
+    }
     const selection = editor.selection;
     const text = editor.document.getText(selection);
     if (!text) {
@@ -82,20 +92,15 @@ export function registerCkReviewCommand(context: vscode.ExtensionContext, authTo
             vscode.window.showWarningMessage("CK Review process was canceled.");
           }
         }
-
-
-
-
-
-
-        
       });
  
       // vscode.window.showInformationMessage("Code review completed successfully.");
     } catch (error: any) {
       vscode.window.showErrorMessage(`Error CK Review: ${error.message || "An unknown error occurred."}`);
+    } finally {
+      isExecuting = false;
     }
-  }
+  
   });
  
   context.subscriptions.push(reviewCode);

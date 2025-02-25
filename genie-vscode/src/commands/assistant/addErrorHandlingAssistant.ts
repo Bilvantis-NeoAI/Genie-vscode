@@ -4,11 +4,21 @@ import { addErrorHandlingAssistantWebviewContent } from "../webview/assistant_we
 import { getGitInfo } from "../gitInfo";
 
 let abortController = new AbortController();
+let isExecuting = false;
 
 export function registerErrorHandlingAssistantCommand(context: vscode.ExtensionContext, authToken: string) {
   const commentCode = vscode.commands.registerCommand("extension.errorHandling", async () => {
-    const editor = vscode.window.activeTextEditor;
-    if (editor) {
+      if (isExecuting) {
+        vscode.window.showWarningMessage("Error Handler is already in progress.");
+        return;
+      }
+      isExecuting = true;
+      const editor = vscode.window.activeTextEditor;
+      if (!editor) {
+        vscode.window.showWarningMessage("No active editor found!");
+        isExecuting = false;
+        return;
+      }
       const selection = editor.selection;
       const text = editor.document.getText(selection);
       if (!text) {
@@ -87,7 +97,8 @@ export function registerErrorHandlingAssistantCommand(context: vscode.ExtensionC
  
       } catch (error:any) {
         vscode.window.showErrorMessage(`Error Add Error Handler: ${error.message || "An unknown error occurred."}`);
-      }
+      } finally {
+        isExecuting = false;
     }
   });
  

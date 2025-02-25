@@ -225,11 +225,11 @@ export function reviewAllWebViewContent(content: string, title: string): string 
                     { text: 'Issues:', style: 'subheader', fontSize: 18 },
                     ...Object.entries(updatedJsonData.issues).flatMap(([category, issues]) => 
                         issues.length > 0 ? [
-                            { text: category.replace(/_/g, ' ').toUpperCase(), style: 'subheader' },
+                            { text: category.replace(/_/g, ' ').replace(/^\w/, (c) => c.toUpperCase()) + ':', style: 'subheader' },
                             {
                                 table: {
                                     headerRows: 1,
-                                    widths: [30, '*', '*', '*', 50, 40],
+                                    widths: ['10%', '21%', '21%', '23%', '15%', '10%'],
                                     body: [
                                         [
                                             { text: 'S.No', bold: true, fillColor: '#E9E5E5', fontSize: 10, alignment: 'center' },
@@ -258,7 +258,7 @@ export function reviewAllWebViewContent(content: string, title: string): string 
                     subheader: { fontSize: 14, bold: true, margin: [0, 10, 0, 5] }
                 }
             };
-            pdfMake.createPdf(docDefinition).download('${title}_Report.pdf');
+             pdfMake.createPdf(docDefinition).download('${title}_${new Date().toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' }).replace(/ /g, '_').toLowerCase()}.pdf');
         });
         document.getElementById("downloadButtonExcel").addEventListener("click", () => {
     const updatedJsonData = {...json_data, issues};
@@ -290,7 +290,7 @@ export function reviewAllWebViewContent(content: string, title: string): string 
     XLSX.utils.book_append_sheet(workbook, summarySheet, 'Summary');
 
     // Write the workbook to a file
-    XLSX.writeFile(workbook, '${title}_Report.xlsx');
+    XLSX.writeFile(workbook, '${title}_${new Date().toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' }).replace(/ /g, '_').toLowerCase()}.xlsx');
 });
 
 

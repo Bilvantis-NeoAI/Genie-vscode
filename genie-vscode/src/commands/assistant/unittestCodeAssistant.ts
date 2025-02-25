@@ -5,12 +5,22 @@ import { getGitInfo } from "../gitInfo";
 import { log } from "console";
 
 let panel: vscode.WebviewPanel | undefined;
-let abortController = new AbortController(); 
+let abortController = new AbortController();
+let isExecuting = false; 
 
 export function registerUnittestCodeAssistantCommand(context: vscode.ExtensionContext, authToken: string) {
   const unittestCode = vscode.commands.registerCommand("extension.unittestCode", async () => {
-    const editor = vscode.window.activeTextEditor;
-    if (editor) {
+      if (isExecuting) {
+        vscode.window.showWarningMessage("Unit Test Code is already in progress.");
+        return;
+      }
+      isExecuting = true;
+      const editor = vscode.window.activeTextEditor;
+      if (!editor) {
+        vscode.window.showWarningMessage("No active editor found!");
+        isExecuting = false;
+        return;
+      }
       const selection = editor.selection;
       const text = editor.document.getText(selection);
       if (!text) {
@@ -82,8 +92,9 @@ export function registerUnittestCodeAssistantCommand(context: vscode.ExtensionCo
         });
       } catch (error:any) {
         vscode.window.showErrorMessage(`Error Unit Test Code: ${error.message || "An unknown error occurred."}`);
+      } finally {
+        isExecuting = false;
       }
-    }
   });
 
   context.subscriptions.push(unittestCode);

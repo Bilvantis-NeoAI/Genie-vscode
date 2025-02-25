@@ -6,11 +6,22 @@ import { getGitInfo } from "../gitInfo";
 
 let panel: vscode.WebviewPanel | undefined;
 let abortController = new AbortController();
+let isExecuting = false;
 
 export function registerPerformanceReviewCommand(context: vscode.ExtensionContext, authToken: string) {
   const reviewPerformance = vscode.commands.registerCommand("extension.reviewPerformance", async () => {
-    const editor = vscode.window.activeTextEditor;
-    if (editor) {
+    
+      if (isExecuting) {
+        vscode.window.showWarningMessage("Performance review is already in progress.");
+        return;
+      }
+      isExecuting = true;
+      const editor = vscode.window.activeTextEditor;
+      if (!editor) {
+        vscode.window.showWarningMessage("No active editor found!");
+        isExecuting = false; // Reset before returning
+        return;
+      }
       const selection = editor.selection;
       const text = editor.document.getText(selection);
       if (!text) {
@@ -80,8 +91,9 @@ export function registerPerformanceReviewCommand(context: vscode.ExtensionContex
         });
       } catch (error:any) {
         vscode.window.showErrorMessage(`Error Performance Review: ${error.message || "An unknown error occurred."}`);
-      }
-    }
+      } finally {
+        isExecuting = false;
+      } 
   });
 
   context.subscriptions.push(reviewPerformance);
