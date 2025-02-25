@@ -43,7 +43,7 @@ export class GenieCommandsProvider implements vscode.TreeDataProvider<GenieComma
           // new GenieCommand("Performance Review", "extension.reviewPerformance", 'pulse', 'Analyze and improve code performance.'),
           // new GenieCommand("Security Review", "extension.reviewSecurity", 'lock', 'Identify security vulnerabilities in your code.'),
           // new GenieCommand("Syntax Review", "extension.reviewSyntax", 'checklist', 'Check for syntax errors and inconsistencies.'),
-          new GenieCommand("Over All Review", "extension.reviewAll", 'file-code', 'Perform All Reviews in one Feature.'),
+          new GenieCommand("Overall Review", "extension.reviewAll", 'file-code', 'Perform All Reviews in one Feature.'),
         ]);
       }
       else {
