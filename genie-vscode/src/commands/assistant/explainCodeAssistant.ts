@@ -24,6 +24,7 @@ export function registerExplainCodeAssistantCommand(context: vscode.ExtensionCon
       const text = editor.document.getText(selection);
       if (!text) {
         vscode.window.showWarningMessage("No code selected. Please select code to assistant.");
+        isExecuting = false;
         return;
       }
       const language = editor.document.languageId;

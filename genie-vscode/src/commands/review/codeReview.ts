@@ -25,6 +25,7 @@ export function registerCodeReviewCommand(context: vscode.ExtensionContext, auth
     const text = editor.document.getText(selection);
     if (!text) {
       vscode.window.showWarningMessage("No code selected. Please select code to review.");
+      isExecuting = false;
       return;
     }
 

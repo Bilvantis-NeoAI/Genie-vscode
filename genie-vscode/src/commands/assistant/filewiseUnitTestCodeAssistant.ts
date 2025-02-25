@@ -26,6 +26,7 @@ export function registerFilewiseUnitTestCodeAssistantCommand(context: vscode.Ext
       // Validate if the language is either 'java' or 'python'
       if (language !== 'java' && language !== 'python') {
         vscode.window.showErrorMessage('Only Java and Python files are allowed for this operation.');
+        isExecuting = false;
         return;
       }
       

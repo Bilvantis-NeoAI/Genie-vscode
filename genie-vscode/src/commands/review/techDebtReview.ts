@@ -6,15 +6,26 @@ import { getGitInfo } from "../gitInfo";
 
 let panel: vscode.WebviewPanel | undefined;
 let abortController = new AbortController();
+let isExecuting = false;
 
 export function registerTechDebtReviewCommand(context: vscode.ExtensionContext, authToken: string) {
   const reviewTechDebt = vscode.commands.registerCommand("extension.reviewTechDebt", async () => {
-    const editor = vscode.window.activeTextEditor;
-    if (editor) {
+      if (isExecuting) {
+        vscode.window.showWarningMessage("Tech Debt review is already in progress.");
+        return;
+      }
+      isExecuting = true;
+      const editor = vscode.window.activeTextEditor;
+      if (!editor) {
+        vscode.window.showWarningMessage("No active editor found!");
+        isExecuting = false; 
+        return;
+      }
       const selection = editor.selection;
       const text = editor.document.getText(selection);
       if (!text) {
         vscode.window.showWarningMessage("No code selected. Please select code to review.");
+        isExecuting = false;
         return;
       }
       const language = editor.document.languageId;
@@ -80,8 +91,10 @@ export function registerTechDebtReviewCommand(context: vscode.ExtensionContext, 
         });
       } catch (error: any) {
          vscode.window.showErrorMessage(`Error Tech Debt Review: ${error.message || "An unknown error occurred."}`);
-      }
-    }
+        } finally {
+          isExecuting = false;
+        }
+    
   });
 
   context.subscriptions.push(reviewTechDebt);

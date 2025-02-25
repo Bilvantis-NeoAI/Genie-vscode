@@ -23,6 +23,7 @@ export function registerCodeGenerationAssistantCommand(context: vscode.Extension
       const text = editor.document.getText(selection);
       if (!text) {
             vscode.window.showWarningMessage("No code selected. Please select code to assistant.");
+            isExecuting = false;
             return;
           }
       

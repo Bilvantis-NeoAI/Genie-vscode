@@ -22,13 +22,14 @@ export function registerOverallReviewCommand(context: vscode.ExtensionContext, a
       const editor = vscode.window.activeTextEditor;
       if (!editor) {
         vscode.window.showWarningMessage("No active editor found!");
-        isExecuting = false; // Reset before returning
+        isExecuting = false; 
         return;
       }
       const selection = editor.selection;
       const text = editor.document.getText(selection);
       if (!text) {
         vscode.window.showWarningMessage("No code selected. Please select code to review.");
+        isExecuting = false;
         return;
       }
 
