@@ -103,6 +103,10 @@
       {
         "command": "extension.knowledgeBaseQueAns",
         "title": "Get Response From KB"
+      },
+      {
+        "command": "extension.reviewAll",
+        "title": "All Review Selected"
       }
     ],
     "viewsContainers": {

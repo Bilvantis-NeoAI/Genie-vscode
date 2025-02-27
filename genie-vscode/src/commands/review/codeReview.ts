@@ -4,15 +4,28 @@ import { reviewGetWebViewContent } from "../webview/review_Webview/reviewWebview
 import { getGitInfo } from "../gitInfo";
 
 let panel: vscode.WebviewPanel | undefined;
+let abortController = new AbortController();
+let isExecuting = false;
 
 export function registerCodeReviewCommand(context: vscode.ExtensionContext, authToken: string) {
   const reviewCode = vscode.commands.registerCommand("extension.reviewCode", async () => {
+    if (isExecuting) {
+      vscode.window.showWarningMessage("Code review is already in progress.");
+      return;
+    }
+    isExecuting = true;
+
     const editor = vscode.window.activeTextEditor;
-    if (editor){
+    if (!editor) {
+      vscode.window.showWarningMessage("No active editor found!");
+      isExecuting = false;
+      return;
+    }
     const selection = editor.selection;
     const text = editor.document.getText(selection);
     if (!text) {
       vscode.window.showWarningMessage("No code selected. Please select code to review.");
+      isExecuting = false;
       return;
     }
 
@@ -21,15 +34,26 @@ export function registerCodeReviewCommand(context: vscode.ExtensionContext, auth
 
     try {
       const { project_name, branch_name } = await getGitInfo(workspacePath);
+      abortController = new AbortController();
 
       const progressOptions: vscode.ProgressOptions = {
         location: vscode.ProgressLocation.Notification,
-        title: "Code Reviewing",
-        cancellable: false,
+        title: "Performing Code Review",
+        cancellable: true,
       };
 
-      await vscode.window.withProgress(progressOptions, async () => {
-        const reviewComments = await postReviewCode(text, language, authToken, project_name, branch_name);
+      await vscode.window.withProgress(progressOptions, async (progress, cancel) => {
+        let wasCancelled = false;
+        cancel.onCancellationRequested(() => {
+          abortController.abort(); // Cancel the request
+          wasCancelled = true;
+        });
+
+        try {
+          const reviewComments = await postReviewCode(text, language, authToken, project_name, branch_name, {signal: abortController.signal});
+          if (wasCancelled) {
+            return;
+          }
         const formattedContent = JSON.stringify(reviewComments, null, 2);
 
         // Reuse or create the webview panel
@@ -52,13 +76,25 @@ export function registerCodeReviewCommand(context: vscode.ExtensionContext, auth
         }
 
         panel.webview.html = reviewGetWebViewContent(formattedContent, "Code Review");
-      });
 
-      // vscode.window.showInformationMessage("Code review completed successfully.");
+
+        }
+        catch (error: any) {
+          if (error.name === "AbortError" || error.message === "canceled") {
+            wasCancelled = true;
+          } else {
+            vscode.window.showErrorMessage(`Error Code Review: ${error.message || "An unknown error occurred."}`);
+          }
+        } finally {
+          if (wasCancelled) {
+            vscode.window.showWarningMessage("Code Review process was canceled.");
+          }
+        } 
+      });
     } catch (error: any) {
-      const errorMessage = error.message || "An unknown error occurred.";
-      vscode.window.showErrorMessage(`Error Code Review: ${errorMessage}`);
-    }
+      vscode.window.showErrorMessage(`Error Code Review: ${error.message || "An unknown error occurred."}`);
+    } finally {
+      isExecuting = false;
   }
   });
 

@@ -5,15 +5,28 @@ import { reviewGetWebViewContent } from "../webview/review_Webview/reviewWebview
 import { getGitInfo } from "../gitInfo";
 
 let panel: vscode.WebviewPanel | undefined;
+let abortController = new AbortController();
+let isExecuting = false;
 
 export function registerPerformanceReviewCommand(context: vscode.ExtensionContext, authToken: string) {
   const reviewPerformance = vscode.commands.registerCommand("extension.reviewPerformance", async () => {
-    const editor = vscode.window.activeTextEditor;
-    if (editor) {
+    
+      if (isExecuting) {
+        vscode.window.showWarningMessage("Performance review is already in progress.");
+        return;
+      }
+      isExecuting = true;
+      const editor = vscode.window.activeTextEditor;
+      if (!editor) {
+        vscode.window.showWarningMessage("No active editor found!");
+        isExecuting = false; // Reset before returning
+        return;
+      }
       const selection = editor.selection;
       const text = editor.document.getText(selection);
       if (!text) {
         vscode.window.showWarningMessage("No code selected. Please select code to review.");
+        isExecuting = false;
         return;
       }
       const language = editor.document.languageId;
@@ -23,14 +36,26 @@ export function registerPerformanceReviewCommand(context: vscode.ExtensionContex
       const { project_name, branch_name } = await getGitInfo(workspacePath);
 
       try {
+        abortController = new AbortController();
+
         const progressOptions: vscode.ProgressOptions = {
           location: vscode.ProgressLocation.Notification,
-          title: "Performance Reviewing",
-          cancellable: false,
+          title: "Performing Performance Review",
+          cancellable: true,
         };
 
-        await vscode.window.withProgress(progressOptions, async () => {
-          const reviewPerformance = await postPerformanceReview(text, language, authToken, project_name, branch_name);
+        await vscode.window.withProgress(progressOptions, async (progress, cancel) => {
+          let wasCancelled = false;
+          cancel.onCancellationRequested(() => {
+            abortController.abort(); // Cancel the request
+            wasCancelled = true;
+          });
+
+          try {
+          const reviewPerformance = await postPerformanceReview(text, language, authToken, project_name, branch_name, {signal: abortController.signal});
+          if (wasCancelled) {
+            return;
+          }
           const formattedContent = JSON.stringify(reviewPerformance, null, 2);
 
           if (panel) {
@@ -50,12 +75,26 @@ export function registerPerformanceReviewCommand(context: vscode.ExtensionContex
 
           }
           panel.webview.html = reviewGetWebViewContent(formattedContent, "Performance Review");
+            
+          }
+          catch (error: any) {
+            if (error.name === "AbortError" || error.message === "canceled") {
+              wasCancelled = true;
+            } else {
+              vscode.window.showErrorMessage(`Error Performance Review: ${error.message || "An unknown error occurred."}`);
+            }
+          } finally {
+            if (wasCancelled) {
+              vscode.window.showWarningMessage("Performance Review process was canceled.");
+            }
+          }
+
         });
       } catch (error:any) {
-        const errorMessage = error.message || "An unknown error occurred.";
-        vscode.window.showErrorMessage(`Error Performance Review: ${errorMessage}`);
-      }
-    }
+        vscode.window.showErrorMessage(`Error Performance Review: ${error.message || "An unknown error occurred."}`);
+      } finally {
+        isExecuting = false;
+      } 
   });
 
   context.subscriptions.push(reviewPerformance);
