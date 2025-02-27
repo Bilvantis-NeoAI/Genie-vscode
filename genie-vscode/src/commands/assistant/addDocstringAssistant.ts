@@ -22,7 +22,8 @@ export function registerAddDocstringsAssistantCommand(context: vscode.ExtensionC
       const selection = editor.selection;
       const text = editor.document.getText(selection);
       if (!text) {
-        vscode.window.showWarningMessage("No code selected. Please select code to assist.");
+        vscode.window.showWarningMessage("No code selected. Please select code to assistant.");
+        isExecuting = false;
         return;
       }
 

@@ -26,6 +26,7 @@ export function registerPerformanceReviewCommand(context: vscode.ExtensionContex
       const text = editor.document.getText(selection);
       if (!text) {
         vscode.window.showWarningMessage("No code selected. Please select code to review.");
+        isExecuting = false;
         return;
       }
       const language = editor.document.languageId;

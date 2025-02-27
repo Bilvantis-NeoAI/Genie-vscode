@@ -6,15 +6,26 @@ import { getGitInfo } from "../gitInfo";
 
 let panel: vscode.WebviewPanel | undefined;
 let abortController = new AbortController();
+let isExecuting = false;
 
 export function registerOwaspReviewCommand(context: vscode.ExtensionContext, authToken: string) {
   const reviewOwasp = vscode.commands.registerCommand("extension.reviewOwasp", async () => {
-    const editor = vscode.window.activeTextEditor;
-    if (editor) {
+      if (isExecuting) {
+              vscode.window.showWarningMessage("OWASP review is already in progress.");
+              return;
+            }
+      isExecuting = true;
+      const editor = vscode.window.activeTextEditor;
+      if (!editor) {
+        vscode.window.showWarningMessage("No active editor found!");
+        isExecuting = false; // Reset before returning
+        return;
+      }
       const selection = editor.selection;
       const text = editor.document.getText(selection);
       if (!text) {
         vscode.window.showWarningMessage("No code selected. Please select code to review.");
+        isExecuting = false;
         return;
       }
       const language = editor.document.languageId;
@@ -81,8 +92,10 @@ export function registerOwaspReviewCommand(context: vscode.ExtensionContext, aut
         });
       } catch (error:any) {
         vscode.window.showErrorMessage(`Error Owasp Review: ${error.message || "An unknown error occurred."}`);
+      } finally {
+        isExecuting = false;
       }
-    }
+    
   });
 
   context.subscriptions.push(reviewOwasp);
