@@ -4,6 +4,7 @@ import { knowledgeBaseQA } from "../../utils/api/KBAPI";
 import { knowledgeBaseQAWebviewContent } from "../webview/KB_webview/queAnsFromKBWebviewContent";
 
 let panel: vscode.WebviewPanel | undefined;
+let abortController = new AbortController();
 
 export function registerKnowledgeBaseQACommand(
   context: vscode.ExtensionContext,
@@ -26,19 +27,29 @@ export function registerKnowledgeBaseQACommand(
         }
 
         try {
+          abortController = new AbortController();
           const progressOptions: vscode.ProgressOptions = {
             location: vscode.ProgressLocation.Notification,
             title: "Getting Response From KB",
-            cancellable: false,
+            cancellable: true,
           };
           
-          await vscode.window.withProgress(progressOptions, async () => {
+          await vscode.window.withProgress(progressOptions, async (progress, cancel) => {
+            let wasCancelled = false;
+            cancel.onCancellationRequested(() => {
+              abortController.abort();
+              wasCancelled = true;    
+            });
+            try{
             // Fetch response from knowledge base API
             const KBresponse = await knowledgeBaseQA(
               question,
               ANSWER_CONFIG,
-              authToken
+              authToken, {signal: abortController.signal}
             );
+            if (wasCancelled) {
+              return;
+            }
 
             const formattedContent = JSON.stringify(KBresponse, null, 2);
         if (panel) {
@@ -59,10 +70,25 @@ export function registerKnowledgeBaseQACommand(
           });
         }
           panel.webview.html = knowledgeBaseQAWebviewContent(formattedContent, "Knowledge Base QA");
+      }
+      catch (error: any) {
+                  if (error.name === "AbortError" || error.message === "canceled") {
+                    wasCancelled = true;
+                    // return; // Prevent error message when canceled
+                  } else {
+                    vscode.window.showErrorMessage(`Error Get Response From KB: ${error.message || "An unknown error occurred."}`);
+      
+                  }
+                  
+                } finally {
+                  if (wasCancelled) {
+                    vscode.window.showWarningMessage("Get Response From KB process was cancelled.");
+                  }
+                } 
         });
       } catch (error:any) {
-        const errorMessage = error.message || "An unknown error occurred.";
-        vscode.window.showErrorMessage(`Error Get Response From KB: ${errorMessage}`);
+        vscode.window.showErrorMessage(`Error Get Response From KB: ${error.message || "An unknown error occurred."}`);
+       
       }
     }
   });

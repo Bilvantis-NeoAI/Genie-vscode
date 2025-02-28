@@ -2,6 +2,8 @@ import * as vscode from "vscode";
 import { getCodeGitKBWebviewContent } from "../webview/gitKB_webview/getCodeGitKBWebviewContent";
 import { postGetCodeGitKB } from "../../utils/api/gitKBAPI";
 
+let abortController = new AbortController();
+
 export function registerGetCodeGitKBCommand(context: vscode.ExtensionContext, authToken: string) {
   const getCodeGitKB = vscode.commands.registerCommand("extension.getCodeGitKB", async () => {
     const editor = vscode.window.activeTextEditor;
@@ -13,17 +15,27 @@ export function registerGetCodeGitKBCommand(context: vscode.ExtensionContext, au
         return;
       }
   
-
       try {
+        abortController = new AbortController();
         const progressOptions: vscode.ProgressOptions = {
           location: vscode.ProgressLocation.Notification,
           title: "Get Code From Git KB",
-          cancellable: false,
+          cancellable: true,
         };
  
-        await vscode.window.withProgress(progressOptions, async () => {
-          const response = await postGetCodeGitKB(text, authToken);
-         
+        await vscode.window.withProgress(progressOptions, async (progress, cancel) => {
+          let wasCancelled = false;
+
+          cancel.onCancellationRequested(() => {
+            abortController.abort();
+            wasCancelled = true;    
+          });
+
+          try {
+          const response = await postGetCodeGitKB(text, authToken, {signal: abortController.signal});
+          if (wasCancelled) {
+            return;
+          }
           const formattedContent = JSON.stringify(response, null, 2);
        
           const panel = vscode.window.createWebviewPanel("getCodeFromGitKB", "Get Code From Git KB", vscode.ViewColumn.Beside, {
@@ -48,11 +60,25 @@ export function registerGetCodeGitKBCommand(context: vscode.ExtensionContext, au
                 break;
             }
           });
+        }
+        catch (error: any) {
+          if (error.name === "AbortError" || error.message === "canceled") {
+            wasCancelled = true;
+            // return; // Prevent error message when canceled
+          } else {
+            vscode.window.showErrorMessage(`Error Get Code: ${error.message || "An unknown error occurred."}`);
+
+          }
+          
+        } finally {
+          if (wasCancelled) {
+            vscode.window.showWarningMessage("Get Code process was cancelled.");
+          }
+        }
         });
  
       } catch (error:any) {
-        const errorMessage = error.message || "An unknown error occurred.";
-        vscode.window.showErrorMessage(`Error Get Code: ${errorMessage}`);
+        vscode.window.showErrorMessage(`Error Get Code: ${error.message || "An unknown error occurred."}`);
       }
     }
   });

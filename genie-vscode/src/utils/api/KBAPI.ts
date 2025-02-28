@@ -10,7 +10,8 @@ const answer_config = ANSWER_CONFIG;
 export async function knowledgeBaseQA(
   question: string,
   answer_config: string,
-  authToken: string
+  authToken: string,
+  options?: { signal?: AbortSignal }
 ): Promise<any> {
   // Create a new FormData instance
   const formData = new FormData();
@@ -22,6 +23,7 @@ export async function knowledgeBaseQA(
       ...getAuthHeaders(authToken),
       "Content-Type": "multipart/form-data", // Ensure proper content type for form data
     },
+    signal: options?.signal,
   });
 
   return response.data;
