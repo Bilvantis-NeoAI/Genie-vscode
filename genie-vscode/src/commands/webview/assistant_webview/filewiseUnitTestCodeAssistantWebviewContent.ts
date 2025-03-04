@@ -8,6 +8,7 @@ export function filewiseUnitTestCodeAssistantWebviewContent(content: string, tit
     interface ParsedContent {
         testcases: TestCase[];
         error?: string;
+        imports: string[];
     }
    
     function escapeHtml(html: string): string {
@@ -19,9 +20,11 @@ export function filewiseUnitTestCodeAssistantWebviewContent(content: string, tit
     }
    
     let parsedContent: ParsedContent;
+   
     try {
         parsedContent = JSON.parse(content);
-        
+        console.log("PARSED CONTENT:", parsedContent);
+       
         // If the response contains an error, display it in the same format as test cases
         if (parsedContent.error) {
             return `
@@ -40,8 +43,8 @@ export function filewiseUnitTestCodeAssistantWebviewContent(content: string, tit
             </div>
         `;
     }
-    
-    
+   
+   
     const testCasesHtml = parsedContent.testcases.map((testCase, index) => {
         const dataHtml = testCase.data.length === 0
             ? `<p><strong>Data:</strong> No data available</p>`
@@ -75,7 +78,9 @@ export function filewiseUnitTestCodeAssistantWebviewContent(content: string, tit
    
     const jsonData = JSON.stringify(parsedContent, null, 2);
     const unitTests = JSON.stringify(parsedContent.testcases);
-    const pythonFileContent = parsedContent.testcases.map((testCase) => {
+    const importStatements = parsedContent.imports.join('\n');
+    console.log("imports:", importStatements);
+    const finalTestCases = parsedContent.testcases.map((testCase) => {
         // Convert test data into commented code
         const dataComments = testCase.data.map((dataArray, index) => {
             let formattedData = "";
@@ -94,7 +99,8 @@ export function filewiseUnitTestCodeAssistantWebviewContent(content: string, tit
         return `${dataComments}\n${testCase.testcase.trim()}`; // Add data as comment above the testcase
     }).join("\n\n");
    
-    const pythonCode = pythonFileContent;
+    const finalCode = importStatements + "\n\n" + finalTestCases;
+    console.log(finalCode);
    
     return `
       <!DOCTYPE html>
@@ -191,16 +197,16 @@ export function filewiseUnitTestCodeAssistantWebviewContent(content: string, tit
           const vscode = acquireVsCodeApi();
           const parsedContent = ${jsonData};
           const unitTests = ${unitTests};
-          const pythonCode = ${JSON.stringify(pythonCode)};
+          const finalCode = ${JSON.stringify(finalCode)};
           const language = '${language}';
-  
+ 
           document.getElementById("select-all-checkbox").addEventListener("change", function () {
               const isChecked = this.checked;
               document.querySelectorAll('.testcase-checkbox').forEach(checkbox => {
                   checkbox.checked = isChecked;
               });
           });
-  
+ 
           // Uncheck "Select All" if any checkbox is manually unchecked
           document.querySelectorAll('.testcase-checkbox').forEach(checkbox => {
               checkbox.addEventListener('change', function () {
@@ -209,8 +215,8 @@ export function filewiseUnitTestCodeAssistantWebviewContent(content: string, tit
                   }
               });
           });
-  
-  
+ 
+ 
    
             // Function to show/hide buttons based on the language
             function updateButtonVisibility(language) {
@@ -239,12 +245,12 @@ export function filewiseUnitTestCodeAssistantWebviewContent(content: string, tit
                   const index = checkbox.getAttribute('data-index');
                   selectedTestCases.push(parsedContent.testcases[index]);
               });
-              
+             
               if (selectedTestCases.length === 0) {
                   vscode.postMessage({ command: 'noTestCaseSelected', message: 'Please select at least one test case.' });
                   return;
                 }
-  
+ 
               // Generate PDF content for selected test cases
               const docDefinition = {
                     pageOrientation: 'landscape',
@@ -254,13 +260,15 @@ export function filewiseUnitTestCodeAssistantWebviewContent(content: string, tit
                         {
                             table: {
                                 headerRows: 1,
-                                widths: ['10%', '30%', '30%', '30%'],
+                                widths: ['6%', '26%', '26%', '26%','8%','8%'],
                                 body: [
                                     [
                                         { text: 'S.No', bold: true, fillColor: '#E9E5E5', fontSize: 10, alignment: 'center' },
                                         { text: 'Description', bold: true, fillColor: '#E9E5E5', fontSize: 10, alignment: 'center' },
                                         { text: 'Test Case', bold: true, fillColor: '#E9E5E5', fontSize: 10, alignment: 'center' },
-                                        { text: 'Data', bold: true, fillColor: '#E9E5E5', fontSize: 10, alignment: 'center' }
+                                        { text: 'Data', bold: true, fillColor: '#E9E5E5', fontSize: 10, alignment: 'center' },
+                                        { text: 'Confidence Score', bold: true, fillColor: '#E9E5E5', fontSize: 10, alignment: 'center' },
+                                        { text: 'Intervention Needed', bold: true, fillColor: '#E9E5E5', fontSize: 10, alignment: 'center' }
                                     ],
                                     ...selectedTestCases.map((testCase, index) => [
                                         { text: String(index + 1), fontSize: 10, alignment: 'center' },
@@ -281,7 +289,9 @@ export function filewiseUnitTestCodeAssistantWebviewContent(content: string, tit
                                                 return "Data " + (i + 1) + ": " + formattedData;
                                             }).join("\\n"),
                                             fontSize: 10
-                                        }
+                                        },
+                                        { text: testCase.confidence_score, fontSize: 10,alignment: 'center' },
+                                        { text: testCase.intervention_needed, fontSize: 10, alignment: 'center' }
                                     ])
                                 ]
                             },
@@ -315,12 +325,12 @@ export function filewiseUnitTestCodeAssistantWebviewContent(content: string, tit
                         }
                     }
                 };
-  
+ 
                 // Download PDF with selected test cases
                 pdfMake.createPdf(docDefinition).download('${escapeHtml(title)}_' + new Date().toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' }).replace(/ /g, '_').toLowerCase() + '.pdf');
             });
-  
-  
+ 
+ 
             document.getElementById("download-py").addEventListener("click", () => {
             // Gather selected test cases
             const selectedTestCases = [];
@@ -329,12 +339,13 @@ export function filewiseUnitTestCodeAssistantWebviewContent(content: string, tit
                 const index = checkbox.getAttribute('data-index');
                 selectedTestCases.push(parsedContent.testcases[index]);
             });
-          
+         
             if (selectedTestCases.length === 0) {
                   vscode.postMessage({ command: 'noTestCaseSelected', message: 'Please select at least one test case.' });
                   return;
                 }
-  
+ 
+ 
             // Combine selected test cases into a single string
             let parentData = [];
             const selectedCode = selectedTestCases.map((testCase) => {
@@ -347,7 +358,7 @@ export function filewiseUnitTestCodeAssistantWebviewContent(content: string, tit
             }).join("\\n\\n");
    
           // Download Python file with selected test cases
-          const blob = new Blob([selectedCode], { type: 'text/plain' });
+          const blob = new Blob([finalCode], { type: 'text/plain' });
           const url = URL.createObjectURL(blob);
           const a = document.createElement('a');
           a.href = url;
@@ -364,12 +375,12 @@ export function filewiseUnitTestCodeAssistantWebviewContent(content: string, tit
                   const index = checkbox.getAttribute('data-index');
                   selectedTestCases.push(parsedContent.testcases[index]);
               });
-  
+ 
               if (selectedTestCases.length === 0) {
                   vscode.postMessage({ command: 'noTestCaseSelected', message: 'Please select at least one test case.' });
                   return;
                 }
-                  
+                 
               // Combine selected test cases into a single string
               let parentData = [];
               const selectedCode = selectedTestCases.map((testCase) => {
@@ -382,7 +393,7 @@ export function filewiseUnitTestCodeAssistantWebviewContent(content: string, tit
               }).join("\\n\\n");
    
               // Download Java file with selected test cases
-              const blob = new Blob([selectedCode], { type: 'text/plain' });
+              const blob = new Blob([finalCode], { type: 'text/plain' });
               const url = URL.createObjectURL(blob);
               const a = document.createElement('a');
               a.href = url;
@@ -401,4 +412,5 @@ export function filewiseUnitTestCodeAssistantWebviewContent(content: string, tit
   }
    
    
-  
+ 
+ 

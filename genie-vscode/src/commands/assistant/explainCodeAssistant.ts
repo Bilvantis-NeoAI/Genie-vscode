@@ -53,6 +53,7 @@ export function registerExplainCodeAssistantCommand(context: vscode.ExtensionCon
 
           try {
             const explainCodes = await postExplainCodeAssistant(text, language, authToken, project_name, branch_name, {signal: abortController.signal,});
+             
             if (wasCancelled) {
               return;
             }
