@@ -3,15 +3,27 @@ import { getCodeGitKBWebviewContent } from "../webview/gitKB_webview/getCodeGitK
 import { postGetCodeGitKB } from "../../utils/api/gitKBAPI";
 
 let abortController = new AbortController();
+let isExecuting = false;
 
 export function registerGetCodeGitKBCommand(context: vscode.ExtensionContext, authToken: string) {
   const getCodeGitKB = vscode.commands.registerCommand("extension.getCodeGitKB", async () => {
-    const editor = vscode.window.activeTextEditor;
-    if (editor) {
+      if (isExecuting) {
+        vscode.window.showWarningMessage("Get code is already in progress.");
+        return;
+      }
+
+      isExecuting = true;
+      const editor = vscode.window.activeTextEditor;
+      if (!editor) {
+        vscode.window.showWarningMessage("No active editor found!");
+        isExecuting = false;
+        return;
+      }
       const selection = editor.selection;
       const text = editor.document.getText(selection);
       if (!text) {
         vscode.window.showWarningMessage("No code selected. Please select code to getcode from GitKB.");
+        isExecuting = false;
         return;
       }
   
@@ -79,7 +91,8 @@ export function registerGetCodeGitKBCommand(context: vscode.ExtensionContext, au
  
       } catch (error:any) {
         vscode.window.showErrorMessage(`Error Get Code: ${error.message || "An unknown error occurred."}`);
-      }
+      } finally {
+        isExecuting = false;
     }
   });
  

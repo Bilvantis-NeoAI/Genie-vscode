@@ -5,6 +5,7 @@ import { knowledgeBaseQAWebviewContent } from "../webview/KB_webview/queAnsFromK
 
 let panel: vscode.WebviewPanel | undefined;
 let abortController = new AbortController();
+let isExecuting = false;
 
 export function registerKnowledgeBaseQACommand(
   context: vscode.ExtensionContext,
@@ -13,16 +14,27 @@ export function registerKnowledgeBaseQACommand(
   const knowledgeBaseQueAns = vscode.commands.registerCommand(
     "extension.knowledgeBaseQueAns",
     async () => {
-      const editor = vscode.window.activeTextEditor;
+        if (isExecuting) {
+                vscode.window.showWarningMessage("Get Response From KB is already in progress.");
+                return;
+              }
+          
+        isExecuting = true;
+        const editor = vscode.window.activeTextEditor;
 
-      if (editor) {
+        if (!editor) {
+          vscode.window.showWarningMessage("No active editor found!");
+          isExecuting = false;
+          return;
+        }
         const selection = editor.selection;
         const question = editor.document.getText(selection); // Selected text is the question
 
         if (!question.trim()) {
-          vscode.window.showErrorMessage(
+          vscode.window.showWarningMessage(
             "Please select some text to use as the question."
           );
+          isExecuting = false;
           return;
         }
 
@@ -89,8 +101,10 @@ export function registerKnowledgeBaseQACommand(
       } catch (error:any) {
         vscode.window.showErrorMessage(`Error Get Response From KB: ${error.message || "An unknown error occurred."}`);
        
-      }
+      } finally {
+        isExecuting = false;
     }
+    
   });
 
   context.subscriptions.push(knowledgeBaseQueAns);

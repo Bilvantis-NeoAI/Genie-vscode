@@ -5,15 +5,27 @@ import { explainGitKBWebViewContent } from "../webview/gitKB_webview/explainGitK
 
 let panel: vscode.WebviewPanel | undefined;
 let abortController = new AbortController();
+let isExecuting = false;
 
 export function registerExplainGitKBCommand(context: vscode.ExtensionContext, authToken: string) {
   const explainGitKB = vscode.commands.registerCommand("extension.explainGitKB", async () => {
-    const editor = vscode.window.activeTextEditor;
-    if (editor) {
+      if (isExecuting) {
+        vscode.window.showWarningMessage("Explain is already in progress.");
+        return;
+      }
+
+      isExecuting = true;
+      const editor = vscode.window.activeTextEditor;
+      if (!editor) {
+        vscode.window.showWarningMessage("No active editor found!");
+        isExecuting = false;
+        return;
+      }
       const selection = editor.selection;
       const text = editor.document.getText(selection);
       if (!text) {
         vscode.window.showWarningMessage("No code selected. Please select code to explain from GitKB.");
+        isExecuting = false;
         return;
       }
 
@@ -76,8 +88,10 @@ export function registerExplainGitKBCommand(context: vscode.ExtensionContext, au
         });
       } catch (error:any) {
         vscode.window.showErrorMessage(`Error Explain Code: ${error.message || "An unknown error occurred."}`);
-      }
+      } finally {
+        isExecuting = false;
     }
+    
   });
 
   context.subscriptions.push(explainGitKB);
