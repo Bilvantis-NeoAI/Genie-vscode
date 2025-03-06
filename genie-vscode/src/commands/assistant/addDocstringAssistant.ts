@@ -60,11 +60,11 @@ export function registerAddDocstringsAssistantCommand(context: vscode.ExtensionC
 
             const formattedContent = JSON.stringify(response, null, 2);
 
-            const panel = vscode.window.createWebviewPanel("addDocstringsAssistant", "Add Docstrings Assistant", vscode.ViewColumn.Beside, {
+            const panel = vscode.window.createWebviewPanel("addDocstringsAssistant", "Docstrings Assistant", vscode.ViewColumn.Beside, {
               enableScripts: true,
             });
 
-            panel.webview.html = addDocstringsAssistantWebviewContent(formattedContent, "Add Docstrings Assistant");
+            panel.webview.html = addDocstringsAssistantWebviewContent(formattedContent, "Docstrings Assistant");
 
             panel.webview.onDidReceiveMessage((message) => {
               switch (message.command) {
