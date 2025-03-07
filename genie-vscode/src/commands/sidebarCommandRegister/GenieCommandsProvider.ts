@@ -1,4 +1,5 @@
 import * as vscode from "vscode";
+import { review_config } from "../../auth/config";
 
 // GenieCommandsProvider class provides the data for the tree view
 export class GenieCommandsProvider implements vscode.TreeDataProvider<GenieCommand | GenieCategory> {
@@ -32,18 +33,47 @@ export class GenieCommandsProvider implements vscode.TreeDataProvider<GenieComma
         new GenieCommand("Filewise Unit Test Code", "extension.assistantFilewiseUnitTestCode", 'code-oss', 'Generate the Unit Test Cases for entire file.')
       ]);
     } else if (element.label === "Review") {
-      return Promise.resolve([
-        new GenieCommand("CK Review", "extension.reviewCK", 'graph-line', 'Perform a CK metrics review for your code.'),
-        new GenieCommand("Code Overall Review", "extension.reviewOverall", 'file-code', 'Perform an overall review of your code.'),
-        new GenieCommand("Code Review", "extension.reviewCode", 'file-text', 'Review specific sections of your code.'),
-        new GenieCommand("Tech Debt Review", "extension.reviewTechDebt", 'flame', 'Identify and analyze technical debt.'),
-        new GenieCommand("Org Std Review", "extension.reviewOrgStd", 'organization', 'Ensure adherence to organizational coding standards.'),
-        new GenieCommand("Owasp Review", "extension.reviewOwasp", 'shield', 'Perform a security review based on OWASP guidelines.'),
-        new GenieCommand("Performance Review", "extension.reviewPerformance", 'pulse', 'Analyze and improve code performance.'),
-        new GenieCommand("Security Review", "extension.reviewSecurity", 'lock', 'Identify security vulnerabilities in your code.'),
-        new GenieCommand("Syntax Review", "extension.reviewSyntax", 'checklist', 'Check for syntax errors and inconsistencies.'),
+      // return Promise.resolve([
+      //   new GenieCommand("CK Review", "extension.reviewCK", 'graph-line', 'Perform a CK metrics review for your code.'),
+      //   new GenieCommand("Code Overall Review", "extension.reviewOverall", 'file-code', 'Perform an overall review of your code.'),
+      //   new GenieCommand("Code Review", "extension.reviewCode", 'file-text', 'Review specific sections of your code.'),
+      //   new GenieCommand("Tech Debt Review", "extension.reviewTechDebt", 'flame', 'Identify and analyze technical debt.'),
+      //   new GenieCommand("Org Std Review", "extension.reviewOrgStd", 'organization', 'Ensure adherence to organizational coding standards.'),
+      //   new GenieCommand("Owasp Review", "extension.reviewOwasp", 'shield', 'Perform a security review based on OWASP guidelines.'),
+      //   new GenieCommand("Performance Review", "extension.reviewPerformance", 'pulse', 'Analyze and improve code performance.'),
+      //   new GenieCommand("Security Review", "extension.reviewSecurity", 'lock', 'Identify security vulnerabilities in your code.'),
+      //   new GenieCommand("Syntax Review", "extension.reviewSyntax"
+      // , 'checklist', 'Check for syntax errors and inconsistencies.'),
         
-      ]);
+      // ]);
+      if (review_config === 'HSBC') {
+        return Promise.resolve([
+          // new GenieCommand("CK Review", "extension.reviewCK", 'graph-line', 'Perform a CK metrics review for your code.'),
+          // new GenieCommand("Code Overall Review", "extension.reviewOverall", 'file-code', 'Perform an overall review of your code.'),
+          // new GenieCommand("Code Review", "extension.reviewCode", 'file-text', 'Review specific sections of your code.'),
+          // // new GenieCommand("Tech Debt Review", "extension.reviewTechDebt", 'flame', 'Identify and analyze technical debt.'), added in code review
+          // new GenieCommand("Org Std Review", "extension.reviewOrgStd", 'organization', 'Ensure adherence to organizational coding standards.'),
+          // // new GenieCommand("Owasp Review", "extension.reviewOwasp", 'shield', 'Perform a security review based on OWASP guidelines.'), added in security
+          // new GenieCommand("Performance Review", "extension.reviewPerformance", 'pulse', 'Analyze and improve code performance.'),
+          // new GenieCommand("Security Review", "extension.reviewSecurity", 'lock', 'Identify security vulnerabilities in your code.'),
+          // new GenieCommand("Syntax Review", "extension.reviewSyntax", 'checklist', 'Check for syntax errors and inconsistencies.'),
+          new GenieCommand("Overall Review", "extension.reviewAll", 'file-code', 'Perform All Reviews in one Feature.'),
+        ]);
+      }
+      else {
+        return Promise.resolve([
+          new GenieCommand("CK Review", "extension.reviewCK", 'graph-line', 'Perform a CK metrics review for your code.'),
+          new GenieCommand("Code Overall Review", "extension.reviewOverall", 'file-code', 'Perform an overall review of your code.'),
+          new GenieCommand("Code Review", "extension.reviewCode", 'file-text', 'Review specific sections of your code.'),
+          // new GenieCommand("Tech Debt Review", "extension.reviewTechDebt", 'flame', 'Identify and analyze technical debt.'), added in code review
+          new GenieCommand("Org Std Review", "extension.reviewOrgStd", 'organization', 'Ensure adherence to organizational coding standards.'),
+          // new GenieCommand("Owasp Review", "extension.reviewOwasp", 'shield', 'Perform a security review based on OWASP guidelines.'),  added in security
+          new GenieCommand("Performance Review", "extension.reviewPerformance", 'pulse', 'Analyze and improve code performance.'),
+          new GenieCommand("Security Review", "extension.reviewSecurity", 'lock', 'Identify security vulnerabilities in your code.'),
+          new GenieCommand("Syntax Review", "extension.reviewSyntax", 'checklist', 'Check for syntax errors and inconsistencies.'),
+          // new GenieCommand("Over All Review", "extension.reviewAll", 'file-code', 'Perform All Reviews in one Feature.'),
+        ]);
+      }
     } else if (element.label === "Git - Knowledge Base") {
       return Promise.resolve([
         new GenieCommand("Explain", "extension.explainGitKB", 'comment', 'Get explanations form Git concepts.'),

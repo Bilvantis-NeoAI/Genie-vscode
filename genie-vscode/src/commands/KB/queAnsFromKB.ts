@@ -4,6 +4,8 @@ import { knowledgeBaseQA } from "../../utils/api/KBAPI";
 import { knowledgeBaseQAWebviewContent } from "../webview/KB_webview/queAnsFromKBWebviewContent";
 
 let panel: vscode.WebviewPanel | undefined;
+let abortController = new AbortController();
+let isExecuting = false;
 
 export function registerKnowledgeBaseQACommand(
   context: vscode.ExtensionContext,
@@ -12,33 +14,54 @@ export function registerKnowledgeBaseQACommand(
   const knowledgeBaseQueAns = vscode.commands.registerCommand(
     "extension.knowledgeBaseQueAns",
     async () => {
-      const editor = vscode.window.activeTextEditor;
+        if (isExecuting) {
+                vscode.window.showWarningMessage("Get Response From KB is already in progress.");
+                return;
+              }
+          
+        isExecuting = true;
+        const editor = vscode.window.activeTextEditor;
 
-      if (editor) {
+        if (!editor) {
+          vscode.window.showWarningMessage("No active editor found!");
+          isExecuting = false;
+          return;
+        }
         const selection = editor.selection;
         const question = editor.document.getText(selection); // Selected text is the question
 
         if (!question.trim()) {
-          vscode.window.showErrorMessage(
+          vscode.window.showWarningMessage(
             "Please select some text to use as the question."
           );
+          isExecuting = false;
           return;
         }
 
         try {
+          abortController = new AbortController();
           const progressOptions: vscode.ProgressOptions = {
             location: vscode.ProgressLocation.Notification,
             title: "Getting Response From KB",
-            cancellable: false,
+            cancellable: true,
           };
           
-          await vscode.window.withProgress(progressOptions, async () => {
+          await vscode.window.withProgress(progressOptions, async (progress, cancel) => {
+            let wasCancelled = false;
+            cancel.onCancellationRequested(() => {
+              abortController.abort();
+              wasCancelled = true;    
+            });
+            try{
             // Fetch response from knowledge base API
             const KBresponse = await knowledgeBaseQA(
               question,
               ANSWER_CONFIG,
-              authToken
+              authToken, {signal: abortController.signal}
             );
+            if (wasCancelled) {
+              return;
+            }
 
             const formattedContent = JSON.stringify(KBresponse, null, 2);
         if (panel) {
@@ -59,12 +82,29 @@ export function registerKnowledgeBaseQACommand(
           });
         }
           panel.webview.html = knowledgeBaseQAWebviewContent(formattedContent, "Knowledge Base QA");
+      }
+      catch (error: any) {
+                  if (error.name === "AbortError" || error.message === "canceled") {
+                    wasCancelled = true;
+                    // return; // Prevent error message when canceled
+                  } else {
+                    vscode.window.showErrorMessage(`Error Get Response From KB: ${error.message || "An unknown error occurred."}`);
+      
+                  }
+                  
+                } finally {
+                  if (wasCancelled) {
+                    vscode.window.showWarningMessage("Get Response From KB process was cancelled.");
+                  }
+                } 
         });
       } catch (error:any) {
-        const errorMessage = error.message || "An unknown error occurred.";
-        vscode.window.showErrorMessage(`Error Get Response From KB: ${errorMessage}`);
-      }
+        vscode.window.showErrorMessage(`Error Get Response From KB: ${error.message || "An unknown error occurred."}`);
+       
+      } finally {
+        isExecuting = false;
     }
+    
   });
 
   context.subscriptions.push(knowledgeBaseQueAns);

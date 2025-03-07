@@ -5,15 +5,27 @@ import { reviewGetWebViewContent } from "../webview/review_Webview/reviewWebview
 import { getGitInfo } from "../gitInfo";
 
 let panel: vscode.WebviewPanel | undefined;
+let abortController = new AbortController();
+let isExecuting = false;
 
 export function registerTechDebtReviewCommand(context: vscode.ExtensionContext, authToken: string) {
   const reviewTechDebt = vscode.commands.registerCommand("extension.reviewTechDebt", async () => {
-    const editor = vscode.window.activeTextEditor;
-    if (editor) {
+      if (isExecuting) {
+        vscode.window.showWarningMessage("Tech Debt review is already in progress.");
+        return;
+      }
+      isExecuting = true;
+      const editor = vscode.window.activeTextEditor;
+      if (!editor) {
+        vscode.window.showWarningMessage("No active editor found!");
+        isExecuting = false; 
+        return;
+      }
       const selection = editor.selection;
       const text = editor.document.getText(selection);
       if (!text) {
         vscode.window.showWarningMessage("No code selected. Please select code to review.");
+        isExecuting = false;
         return;
       }
       const language = editor.document.languageId;
@@ -24,14 +36,27 @@ export function registerTechDebtReviewCommand(context: vscode.ExtensionContext, 
       const { project_name, branch_name } = await getGitInfo(workspacePath);
 
       try {
+        abortController = new AbortController();
+
         const progressOptions: vscode.ProgressOptions = {
           location: vscode.ProgressLocation.Notification,
-          title: "Tech Debt Reviewing",
-          cancellable: false,
+          title: "Performing Tech Debt Review",
+          cancellable: true,
         };
 
-        await vscode.window.withProgress(progressOptions, async () => {
-          const reviewTechDebt = await postTechDebtReview(text, language, authToken, project_name, branch_name);
+        await vscode.window.withProgress(progressOptions, async (progress, cancel) => {
+          let wasCancelled = false;
+
+          cancel.onCancellationRequested(() => {
+            abortController.abort(); // Cancel the request
+            wasCancelled = true;
+          });
+
+          try {
+          const reviewTechDebt = await postTechDebtReview(text, language, authToken, project_name, branch_name, {signal: abortController.signal});
+          if (wasCancelled) {
+            return;
+          }
           const formattedContent = JSON.stringify(reviewTechDebt, null, 2);
 
           if (panel) {
@@ -50,12 +75,26 @@ export function registerTechDebtReviewCommand(context: vscode.ExtensionContext, 
               });
           }
           panel.webview.html = reviewGetWebViewContent(formattedContent, "Tech Debt Review");
+        }
+        catch (error: any) {
+                    if (error.name === "AbortError" || error.message === "canceled") {
+                      wasCancelled = true;
+                    } else {
+                      vscode.window.showErrorMessage(`Error Tech Debt Review: ${error.message || "An unknown error occurred."}`);
+                    }
+                  } finally {
+                    if (wasCancelled) {
+                      vscode.window.showWarningMessage("Tech Debt Review process was canceled.");
+                    }
+                  }
+
         });
       } catch (error: any) {
-        const errorMessage = error.message || "An unknown error occurred.";
-        vscode.window.showErrorMessage(`Error reviewing code: ${errorMessage}`);
-      }
-    }
+         vscode.window.showErrorMessage(`Error Tech Debt Review: ${error.message || "An unknown error occurred."}`);
+        } finally {
+          isExecuting = false;
+        }
+    
   });
 
   context.subscriptions.push(reviewTechDebt);

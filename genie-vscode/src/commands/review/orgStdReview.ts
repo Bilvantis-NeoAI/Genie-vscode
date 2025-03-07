@@ -5,15 +5,29 @@ import { reviewGetWebViewContent } from "../webview/review_Webview/reviewWebview
 import { getGitInfo } from "../gitInfo";
 
 let panel: vscode.WebviewPanel | undefined;
+let abortController = new AbortController();
+let isExecuting = false;
 
 export function registerOrgStdReviewCommand(context: vscode.ExtensionContext, authToken: string) {
   const reviewOrgStd = vscode.commands.registerCommand("extension.reviewOrgStd", async () => {
-    const editor = vscode.window.activeTextEditor;
-    if (editor) {
+    
+      if (isExecuting) {
+        vscode.window.showWarningMessage("Org Std review is already in progress.");
+        return;
+      }
+      isExecuting = true;
+
+      const editor = vscode.window.activeTextEditor;
+      if (!editor) {
+        vscode.window.showWarningMessage("No active editor found!");
+        isExecuting = false; // Reset before returning
+        return;
+      }
       const selection = editor.selection;
       const text = editor.document.getText(selection);
       if (!text) {
         vscode.window.showWarningMessage("No code selected. Please select code to review.");
+        isExecuting = false;
         return;
       }
       const language = editor.document.languageId;
@@ -25,14 +39,27 @@ export function registerOrgStdReviewCommand(context: vscode.ExtensionContext, au
       try {
         // Fetch Git information using the getGitInfo function
         const { project_name, branch_name } = await getGitInfo(workspacePath);
+        abortController = new AbortController();
+
         const progressOptions: vscode.ProgressOptions = {
           location: vscode.ProgressLocation.Notification,
-          title: "Org Std Reviewing",
-          cancellable: false,
+          title: "Performing Org Std Review",
+          cancellable: true,
         };
 
-        await vscode.window.withProgress(progressOptions, async () => {
-          const reviewOrgStds = await postOrgStdReview(text, language, authToken, project_name, branch_name);
+        await vscode.window.withProgress(progressOptions, async (progress, cancel) => {
+          let wasCancelled = false;
+
+          cancel.onCancellationRequested(() => {
+            abortController.abort(); // Cancel the request
+            wasCancelled = true;
+          });
+
+          try {
+          const reviewOrgStds = await postOrgStdReview(text, language, authToken, project_name, branch_name, {signal: abortController.signal, });
+          if (wasCancelled) {
+            return;
+          }
           const formattedContent = JSON.stringify(reviewOrgStds, null, 2);
 
           if (panel) {
@@ -48,12 +75,25 @@ export function registerOrgStdReviewCommand(context: vscode.ExtensionContext, au
           });
           }
           panel.webview.html = reviewGetWebViewContent(formattedContent, "Org Std Review");
+        }
+        catch(error: any) {
+          if (error.name === "AbortError" || error.message === "canceled") {
+            wasCancelled = true;
+          } else {
+            vscode.window.showErrorMessage(`Error Org Std Review: ${error.message || "An unknown error occurred."}`);
+          }
+        } finally {
+          if (wasCancelled) {
+            vscode.window.showWarningMessage("Org Std Review process was canceled.");
+          }
+        }
+
         });
       } catch (error:any) {
-        const errorMessage = error.message || "An unknown error occurred.";
-        vscode.window.showErrorMessage(`Error Org Std Review: ${errorMessage}`);
+        vscode.window.showErrorMessage(`Error Org Std Review: ${error.message || "An unknown error occurred."}`);
+      } finally {
+        isExecuting = false;
       }
-    }
   });
 
   context.subscriptions.push(reviewOrgStd);

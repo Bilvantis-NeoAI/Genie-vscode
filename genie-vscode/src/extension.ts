@@ -26,6 +26,7 @@ import { loadBaseApi, getGitKbApi, getKbBaseApi, getBaseApi } from "./auth/confi
 import { registerExplainGitKBCommand } from "./commands/gitKB/explainGitKB";
 import { registerGetCodeGitKBCommand } from "./commands/gitKB/getCodeGitKB";
 import { registerKnowledgeBaseQACommand } from "./commands/KB/queAnsFromKB";
+import { registerAllReviewCommand } from "./commands/review/allReview";
 
 const jwt = require('jsonwebtoken');
 export let userId: string | undefined;
@@ -140,6 +141,7 @@ export function activateCodeCommands(context: vscode.ExtensionContext) {
   registerTechDebtReviewCommand(context, authToken);
   registerOrgStdReviewCommand(context, authToken);
   registerCkReviewCommand(context, authToken);
+  registerAllReviewCommand(context, authToken);
  
   //Register all Assistant Commands
   registerAddCommentsAssistantCommand(context, authToken);

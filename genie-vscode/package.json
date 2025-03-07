@@ -1,17 +1,19 @@
 {
-  "name": "genie-vscode",
+  "name": "genie-vscode-bilvantis",
   "displayName": "Genie_vscode",
   "description": "A VS extension to comment code, review code, generate docstrings, unit tests, analyze code metrics, generate logs, and handle errors",
-  "version": "1.1.0",
+  "version": "0.0.1",
   "publisher": "Bilvantis",
   "type": "commonjs",
   "engines": {
-    "vscode": "^1.95.0"
+    "vscode": "^1.92.0"
   },
   "categories": [
     "Other"
   ],
-  "activationEvents": ["*"],
+  "activationEvents": [
+    "*"
+  ],
   "main": "./out/extension.js",
   "contributes": {
     "commands": [
@@ -103,6 +105,10 @@
       {
         "command": "extension.knowledgeBaseQueAns",
         "title": "Get Response From KB"
+      },
+      {
+        "command": "extension.reviewAll",
+        "title": "All Review Selected"
       }
     ],
     "viewsContainers": {
@@ -138,7 +144,8 @@
   "devDependencies": {
     "@types/mocha": "^10.0.9",
     "@types/node": "20.x",
-    "@types/vscode": "^1.95.0",
+    "@types/vscode": "^1.92.0",
+    "@types/web": "^0.0.208",
     "@types/xlsx": "^0.0.36",
     "@typescript-eslint/eslint-plugin": "^8.10.0",
     "@typescript-eslint/parser": "^8.7.0",

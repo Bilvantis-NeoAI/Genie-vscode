@@ -1,8 +1,24 @@
 export function explainCodeAssistantWebViewContent(content: string, title: string): string {
+    interface keyComponents {
+        name: string;
+        description: string;
+    }
+     interface logicFlow {
+        step: string;
+        purpose: string;
+     }
+
+     interface algorithms {
+        name: string;
+        description:string
+     }
+     
     interface explanation {
         overview: string;
         detailedExplanation: string;
-        status?: string;
+        keyComponents: keyComponents[];
+        logicFlow: logicFlow[];
+        algorithms: algorithms[];
     }
 
     interface ParsedContent {
@@ -122,6 +138,7 @@ export function explainCodeAssistantWebViewContent(content: string, title: strin
                 <td>${parsedContent.remarks}</td>
             </tr>
         </table>
+        <br/>
         <h2>Explanaton:</h2>
         <table id="issuesTable">
             <thead>
@@ -129,7 +146,6 @@ export function explainCodeAssistantWebViewContent(content: string, title: strin
                     <th>S.No</th>
                     <th>Overview</th>
                     <th>Detailed Explanation</th>
-                    <th>Status</th>
                 </tr>
             </thead>
             <tbody id="issuesBody">
@@ -140,141 +156,256 @@ export function explainCodeAssistantWebViewContent(content: string, title: strin
                             <td>${index + 1}</td>
                             <td>${explanation.overview}</td>
                             <td>${explanation.detailedExplanation}
-                            
-                            <td>
-                                <select class="status-dropdown" onchange="updateStatus(${index}, this.value)">
-                                    <option value="Accept" ${
-                                      explanation.status === "Accept"
-                                        ? "selected"
-                                        : ""
-                                    }>Accept</option>
-                                    <option value="Reject" ${
-                                      explanation.status === "Reject"
-                                        ? "selected"
-                                        : ""
-                                    }>Reject</option>
-                                </select>
-                            </td>
                         </tr>
                     `
                     )
                     .join('')}
             </tbody>
         </table>
+        <br/>
+
+        <h2>Key Components:</h2>
+        <table id="keyComponentsTable">
+            <thead>
+                <tr>
+                    <th>S.No</th>
+                    <th>Name</th>
+                    <th>Description</th>
+                </tr>
+            </thead>
+            <tbody>
+                ${parsedContent.explanation
+                    .flatMap((explanation) =>
+                        explanation.keyComponents.map((component, compIndex) => `
+                        <tr>
+                            <td>${compIndex + 1}</td> 
+                            <td>${component.name}</td>
+                            <td>${component.description}</td>
+                        </tr>
+                    `)).join('')}
+            </tbody>
+        </table>
+        <br/>
+        <h2>Logic Flow:</h2>
+        <table id="keyComponentsTable">
+            <thead>
+                <tr>
+                    <th>S.No</th>
+                    <th>Name</th>
+                    <th>Description</th>
+                </tr>
+            </thead>
+            <tbody>
+                ${parsedContent.explanation
+                    .flatMap((explanation) =>
+                        explanation.logicFlow.map((component, compIndex) => `
+                        <tr>
+                            <td>${compIndex + 1}</td> 
+                            <td>${component.step}</td>
+                            <td>${component.purpose}</td>
+                        </tr>
+                    `)).join('')}
+            </tbody>
+        </table>
+        <br />
+        <h2>Algorithms:</h2>
+        <table id="keyComponentsTable">
+            <thead>
+                <tr>
+                    <th>S.No</th>
+                    <th>Name</th>
+                    <th>Description</th>
+                </tr>
+            </thead>
+            <tbody>
+                ${parsedContent.explanation
+                    .flatMap((explanation) =>
+                        explanation.algorithms.map((component, compIndex) => `
+                        <tr>
+                            <td>${compIndex + 1}</td> 
+                            <td>${component.name}</td>
+                            <td>${component.description}</td>
+                        </tr>
+                    `)).join('')}
+            </tbody>
+        </table>
+
     </div>
-    <script>
+   <script>
         const json_data = ${JSON.stringify(parsedContent, null, 2)};
         const explanation = ${JSON.stringify(parsedContent.explanation)};
+    document.getElementById("downloadButton").addEventListener("click", () => {
+        
 
-        function updateStatus(index, value) {
-            explanation[index].status = value;
-        }
-
-        document.getElementById("downloadButton").addEventListener("click", () => {
-    const docDefinition = {
-        pageOrientation: 'landscape',
-        content: [
-            { text: '${title}', style: 'header' },
-            { text: 'Summary:', style: 'subheader' },
-            {
-                table: {
-                    widths: [100, '*'],
-                    body: [
-                        [
-                            { text: 'Quality', bold: true, fillColor: '#E9E5E5', fontSize: 10, alignment: 'center' },
-                            { text: 'Remarks', bold: true, fillColor: '#E9E5E5', fontSize: 10, alignment: 'center' },
-                        ],
-                        [
-                            { text: json_data.quality || '', fontSize: 10, alignment: 'center' },
-                            { text: json_data.remarks || '', fontSize: 10 }
+        const docDefinition = {
+            pageOrientation: 'landscape',
+            content: [
+                { text: '${title}', style: 'header' },
+                { text: 'Summary:', style: 'subheader' },
+                {
+                    table: {
+                        widths: [100, '*'],
+                        body: [
+                            [
+                                { text: 'Quality', bold: true, fillColor: '#E9E5E5', fontSize: 10, alignment: 'center' },
+                                { text: 'Remarks', bold: true, fillColor: '#E9E5E5', fontSize: 10, alignment: 'center' }
+                            ],
+                            [
+                                { text: json_data.quality || '', fontSize: 10, alignment: 'center' },
+                                { text: json_data.remarks || '', fontSize: 10 }
+                            ]
                         ]
-                    ]
+                    }
                 },
-                layout: {
-                    hLineWidth: () => 0.5,
-                    vLineWidth: () => 0.5,
-                    hLineColor: () => '#CCCCCC',
-                    vLineColor: () => '#CCCCCC',
-                    paddingLeft: () => 5,
-                    paddingRight: () => 5,
-                    paddingTop: () => 5,
-                    paddingBottom: () => 5
-                }
-            },
-            { text: 'Explanation:', style: 'subheader' },
-            {
-                table: {
-                    headerRows: 1,
-                    widths: [30, '*', '*', 40],
-                    body: [
-                        [
-                            { text: 'S.No', bold: true, fillColor: '#E9E5E5', fontSize: 10, alignment: 'center' },
-                            { text: 'Overview', bold: true, fillColor: '#E9E5E5', fontSize: 10, alignment: 'center' },
-                            { text: 'Detailed Explanation', bold: true, fillColor: '#E9E5E5', fontSize: 10, alignment: 'center' },
-                            { text: 'Status', bold: true, fillColor: '#E9E5E5', fontSize: 10, alignment: 'center' },
-                        ],
-                        ...explanation.map((explanation, index) => [
-                            { text: index + 1, fontSize: 10, alignment: 'center'},
-                            { text: explanation.overview, fontSize: 10 },
-                            { text: explanation.detailedExplanation, fontSize: 10 },
-                            { text: explanation.status || 'Accept', fontSize: 10, alignment: 'center' }
-                        ])
-                    ]
+
+                { text: 'Explanation:', style: 'subheader' },
+                {
+                    table: {
+                        headerRows: 1,
+                        widths: ['5%', '45%', '50%'],
+                        body: [
+                            [
+                                { text: 'S.No', bold: true, fillColor: '#E9E5E5', fontSize: 10, alignment: 'center' },
+                                { text: 'Overview', bold: true, fillColor: '#E9E5E5', fontSize: 10, alignment: 'center' },
+                                { text: 'Detailed Explanation', bold: true, fillColor: '#E9E5E5', fontSize: 10, alignment: 'center' }
+                            ],
+                            ...explanation.map((item, index) => [
+                                { text: index + 1, fontSize: 10, alignment: 'center' },
+                                { text: item.overview, fontSize: 10 },
+                                { text: item.detailedExplanation, fontSize: 10 }
+                            ])
+                        ]
+                    }
                 },
-                layout: {
-                    hLineWidth: () => 0.5,
-                    vLineWidth: () => 0.5,
-                    hLineColor: () => '#CCCCCC',
-                    vLineColor: () => '#CCCCCC',
-                    paddingLeft: () => 5,
-                    paddingRight: () => 5,
-                    paddingTop: () => 5,
-                    paddingBottom: () => 5
+
+                { text: 'Key Components:', style: 'subheader' },
+                {
+                    table: {
+                        headerRows: 1,
+                        widths: ['5%', '25%', '70%'],
+                        body: [
+                            [   
+                                { text: 'S.No', bold: true, fillColor: '#E9E5E5', fontSize: 10, alignment: 'center' },
+                                { text: 'Name', bold: true, fillColor: '#E9E5E5', fontSize: 10, alignment: 'center' },
+                                { text: 'Description', bold: true, fillColor: '#E9E5E5', fontSize: 10, alignment: 'center' }
+                            ],
+                            ...explanation[0].keyComponents.map((component, index) => [
+                                { text: index + 1, fontSize: 10, alignment: 'center' },
+                                { text: component.name, fontSize: 10 },
+                                { text: component.description, fontSize: 10 }
+                            ])
+                        ]
+                    }
+                },
+
+                { text: 'Logic Flow:', style: 'subheader' },
+                {
+                    table: {
+                        headerRows: 1,
+                        widths: ['5%', '25%', '70%'],
+                        body: [
+                            [   
+                                { text: 'S.No', bold: true, fillColor: '#E9E5E5', fontSize: 10, alignment: 'center' },
+                                { text: 'Step', bold: true, fillColor: '#E9E5E5', fontSize: 10, alignment: 'center' },
+                                { text: 'Purpose', bold: true, fillColor: '#E9E5E5', fontSize: 10, alignment: 'center' }
+                            ],
+                            ...explanation[0].logicFlow.map((component, index) => [
+                                { text: index + 1, fontSize: 10, alignment: 'center' },
+                                { text: component.step, fontSize: 10 },
+                                { text: component.purpose, fontSize: 10 }
+                            ])
+                        ]
+                    }
+                },
+
+                { text: 'Algorithm:', style: 'subheader' },
+                {
+                    table: {
+                        headerRows: 1,
+                        widths: ['5%', '25%', '70%'],
+                        body: [
+                            [   
+                                { text: 'S.No', bold: true, fillColor: '#E9E5E5', fontSize: 10, alignment: 'center' },
+                                { text: 'Name', bold: true, fillColor: '#E9E5E5', fontSize: 10, alignment: 'center' },
+                                { text: 'Description', bold: true, fillColor: '#E9E5E5', fontSize: 10, alignment: 'center' }
+                            ],
+                            ...explanation[0].algorithms.map((component, index) => [
+                                { text: index + 1, fontSize: 10, alignment: 'center' },
+                                { text: component.name, fontSize: 10 },
+                                { text: component.description, fontSize: 10 }
+                            ])
+                        ]
+                    }
                 }
+
+            ],
+            styles: {
+                header: { fontSize: 18, bold: true, alignment: 'center', margin: [0, 0, 0, 10] },
+                subheader: { fontSize: 14, bold: true, margin: [0, 10, 0, 5] }
             }
-        ],
-        styles: {
-            header: {
-                fontSize: 18,
-                bold: true,
-                alignment: 'center',
-                margin: [0, 0, 0, 10]
-            },
-            subheader: {
-                fontSize: 14,
-                bold: true,
-                margin: [0, 10, 0, 5]
-            },
-            jsonText: {
-                fontSize: 10,
-                margin: [0, 5, 0, 10]
-            }
-        }
-    };
-    pdfMake.createPdf(docDefinition).download('${title}_${new Date().toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' }).replace(/ /g, '_').toLowerCase()}.pdf'); 
+        };
+
+        pdfMake.createPdf(docDefinition).download('${title}_${new Date().toLocaleDateString('en-GB', { 
+            day: '2-digit', month: 'short', year: 'numeric' 
+        }).replace(/ /g, '_').toLowerCase()}.pdf');
     });
+
     document.getElementById("downloadButtonExcel").addEventListener("click", () => {
       const workbook = XLSX.utils.book_new();
         const summarySheetData = [
             ['Quality', 'Remarks'],
             [json_data.quality || '', json_data.remarks || '']
         ];
+
         const explanationData = [
-            ['S.No', 'Overview', 'DetailedExplanation', 'Status'],
+            ['S.No', 'Overview', 'DetailedExplanation'],
             ...explanation.map((explanation, index) => [
                 index + 1,
                 explanation.overview,
-                explanation.detailedExplanation,
-                explanation.status || 'Accept'
+                explanation.detailedExplanation
             ])
         ];
+
+        const keyComponentsData = [
+        ['S.No', 'Name', 'Description'],
+        ...explanation[0].keyComponents.map((component, index) => [
+            index + 1,
+            component.name,
+            component.description
+        ])
+            ];
+
+        const logicFlowData = [
+        ['S.No', 'Step', 'Purpose'],
+        ...explanation[0].logicFlow.map((component, index) => [
+            index + 1,
+            component.step,
+            component.purpose
+        ])
+            ];
+
+        const algorithmsData = [
+        ['S.No', 'Name', 'Description'],
+        ...explanation[0].algorithms.map((component, index) => [
+            index + 1,
+            component.name,
+            component.description
+        ])
+            ];
  
         const summarySheet = XLSX.utils.aoa_to_sheet(summarySheetData);
         const explanationSheet = XLSX.utils.aoa_to_sheet(explanationData);
+        const keyComponentsSheet = XLSX.utils.aoa_to_sheet(keyComponentsData);
+        const logicFlowSheet = XLSX.utils.aoa_to_sheet(logicFlowData);
+        const algorithmsSheet = XLSX.utils.aoa_to_sheet(algorithmsData);
+
         
 
         XLSX.utils.book_append_sheet(workbook, summarySheet, 'Summary');
         XLSX.utils.book_append_sheet(workbook, explanationSheet, 'Explanation');
+        XLSX.utils.book_append_sheet(workbook, keyComponentsSheet, 'KeyComponents');
+        XLSX.utils.book_append_sheet(workbook, logicFlowSheet, 'LogicFlow');
+        XLSX.utils.book_append_sheet(workbook, algorithmsSheet, 'Algorithms');
  
         XLSX.writeFile(workbook, '${title}_${new Date().toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' }).replace(/ /g, '_').toLowerCase()}.xlsx');
 

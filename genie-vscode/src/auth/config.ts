@@ -3,6 +3,9 @@ import * as vscode from 'vscode';
 let BASE_API = "";
 let GITKB_BASE_API = "";
 let KB_BASE_API = "";
+
+export const review_config:string = 'HSBC';
+
 export const ANSWER_CONFIG = "chroma";
 
 // Getter function for BASE_API
