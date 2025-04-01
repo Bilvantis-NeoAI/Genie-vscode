@@ -58,6 +58,7 @@ export class GenieCommandsProvider implements vscode.TreeDataProvider<GenieComma
           // new GenieCommand("Security Review", "extension.reviewSecurity", 'lock', 'Identify security vulnerabilities in your code.'),
           // new GenieCommand("Syntax Review", "extension.reviewSyntax", 'checklist', 'Check for syntax errors and inconsistencies.'),
           new GenieCommand("Overall Review", "extension.reviewAll", 'file-code', 'Perform All Reviews in one Feature.'),
+          new GenieCommand("Debug Review", "extension.reviewDebug", "graph-line", "test the terminal")
         ]);
       }
       else {
@@ -72,6 +73,7 @@ export class GenieCommandsProvider implements vscode.TreeDataProvider<GenieComma
           new GenieCommand("Security Review", "extension.reviewSecurity", 'lock', 'Identify security vulnerabilities in your code.'),
           new GenieCommand("Syntax Review", "extension.reviewSyntax", 'checklist', 'Check for syntax errors and inconsistencies.'),
           // new GenieCommand("Over All Review", "extension.reviewAll", 'file-code', 'Perform All Reviews in one Feature.'),
+          new GenieCommand("Debug Review", "extension.reviewDebug", "graph-line", "test the terminal")
         ]);
       }
     } else if (element.label === "Git - Knowledge Base") {

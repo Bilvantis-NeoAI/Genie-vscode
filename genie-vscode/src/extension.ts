@@ -27,6 +27,8 @@ import { registerExplainGitKBCommand } from "./commands/gitKB/explainGitKB";
 import { registerGetCodeGitKBCommand } from "./commands/gitKB/getCodeGitKB";
 import { registerKnowledgeBaseQACommand } from "./commands/KB/queAnsFromKB";
 import { registerAllReviewCommand } from "./commands/review/allReview";
+import { registerTerminalReviewCommand } from "./commands/review/terminalReview";
+import { reviewTerminalContent } from "./commands/webview/review_Webview/reviewTerminalContent";
 
 const jwt = require('jsonwebtoken');
 export let userId: string | undefined;
@@ -111,6 +113,7 @@ export async function activate(context: vscode.ExtensionContext) {
     // If URL submission hasn't occurred, show URL webview
     showUrlWebview(context);
   }
+
 }
  
 export function openLoginPage(context: vscode.ExtensionContext) {
@@ -142,6 +145,7 @@ export function activateCodeCommands(context: vscode.ExtensionContext) {
   registerOrgStdReviewCommand(context, authToken);
   registerCkReviewCommand(context, authToken);
   registerAllReviewCommand(context, authToken);
+  registerTerminalReviewCommand(context, authToken);
  
   //Register all Assistant Commands
   registerAddCommentsAssistantCommand(context, authToken);
@@ -162,7 +166,6 @@ export function activateCodeCommands(context: vscode.ExtensionContext) {
   registerKnowledgeBaseQACommand(context, authToken);
 
 }
- 
  
 export function deactivate() {}
  

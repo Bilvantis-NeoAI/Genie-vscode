@@ -131,3 +131,65 @@ export async function postAllReview(
 
   return response.data;
 }
+
+
+// export async function postReviewTerminal(
+//   requestData: { 
+//     errorText: string; 
+//     filePath: string; 
+//     // fileContent: string; 
+//     fileContents: { path: string; content: string }[];
+//     language: string; 
+//     project_name: any; 
+//     branch_name: string; 
+//     authToken: string; 
+//   },
+//   options?: { signal?: AbortSignal }
+// ): Promise<object> {  // Return an object, not a string
+//   if (!requestData.errorText || !requestData.fileContents.length) {
+//     console.error("Missing required request data.");
+//     return { error: "Missing required request data" };
+//   }
+
+//   return {
+//     message: "Received Debug Review Request",
+//     "Error Text": requestData.errorText,
+//     "File Path": requestData.filePath,
+//     "File Content": requestData.fileContents,
+//     "Language": requestData.language,
+//     "Project Name": requestData.project_name,
+//     "Branch Name": requestData.branch_name,
+//     "Auth Token": requestData.authToken ? "Provided" : "Missing"
+//   };
+// }
+
+
+
+export async function postReviewTerminal(
+  requestData: {
+    errorText: string;
+    fileContents: { path: string; content: string }[];
+    language: string;
+    project_name: any;
+    branch_name: string;
+    authToken: string;
+  },
+  options?: { signal?: AbortSignal }
+): Promise<object> {
+  if (!requestData.errorText || !requestData.fileContents.length) {
+    console.error("Missing required request data.");
+    return { error: "Missing required request data" };
+  }
+  return {
+    "error_text": requestData.errorText,
+    "file_contents": requestData.fileContents.map(file => ({
+      "path": file.path,
+      "content": file.content,
+    })),
+    "language": requestData.language,
+    "project_name": requestData.project_name,
+    "branch_name": requestData.branch_name,
+    "authToken": requestData.authToken ? "Provided" : "Missing"
+  };
+
+}
