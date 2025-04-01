@@ -268,7 +268,7 @@ export function showLoginRegisterWebview(
                         context.globalState.update('authToken', message.token).then(() => {
                             vscode.window.showInformationMessage('Login Successful!');
                             const genieProvider = new GenieCommandsProvider();
-                            vscode.window.registerTreeDataProvider("genieCommands", genieProvider);
+                            vscode.window.registerTreeDataProvider("neoAICommands", genieProvider);
                             vscode.commands.executeCommand('workbench.action.closeAllEditors'); //closeActiveEditor
                             panel.dispose();
                         });

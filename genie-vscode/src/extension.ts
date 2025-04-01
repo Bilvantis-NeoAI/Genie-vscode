@@ -95,7 +95,7 @@ export async function activate(context: vscode.ExtensionContext) {
       activateCodeCommands(context);
       // Register the sidebar provider for Genie commands
       const genieProvider = new GenieCommandsProvider();
-      vscode.window.registerTreeDataProvider("genieCommands", genieProvider);
+      vscode.window.registerTreeDataProvider("neoAICommands", genieProvider);
       } else {
         // Show login/register if authToken is missing
         // showLoginRegisterWebview(context, "login");
