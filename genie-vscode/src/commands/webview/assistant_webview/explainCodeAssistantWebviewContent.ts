@@ -139,7 +139,7 @@ export function explainCodeAssistantWebViewContent(content: string, title: strin
             </tr>
         </table>
         <br/>
-        <h2>Explanaton:</h2>
+        <h2>Explanation:</h2>
         <table id="issuesTable">
             <thead>
                 <tr>
