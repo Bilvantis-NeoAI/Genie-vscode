@@ -1,6 +1,6 @@
 {
-  "name": "genie-vscode-bilvantis",
-  "displayName": "Genie_vscode",
+  "name": "neoai-vscode-bilvantis",
+  "displayName": "NeoAI_vscode",
   "description": "A VS extension to comment code, review code, generate docstrings, unit tests, analyze code metrics, generate logs, and handle errors",
   "version": "0.0.1",
   "publisher": "Bilvantis",
@@ -20,7 +20,7 @@
       {
         "command": "extension.showCommandList",
         "title": "Show Command List",
-        "category": "Genie"
+        "category": "NeoAI"
       },
       {
         "command": "extension.showLoginPage",
@@ -115,7 +115,7 @@
       "activitybar": [
         {
           "id": "genieSidebar",
-          "title": "Genie",
+          "title": "NeoAI",
           "icon": "media/Genie-lamp.svg"
         }
       ]
@@ -128,7 +128,7 @@
         },
         {
           "id": "genieCommands",
-          "name": "Genie Commands"
+          "name": "NeoAI Commands"
         }
       ]
     }
