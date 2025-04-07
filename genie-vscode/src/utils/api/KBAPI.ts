@@ -25,6 +25,7 @@ export async function knowledgeBaseQA(
     },
     signal: options?.signal,
   });
-
+  // console.log("*****", response);
+  
   return response.data;
 }

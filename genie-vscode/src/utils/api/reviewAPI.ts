@@ -165,31 +165,51 @@ export async function postAllReview(
 
 
 
-export async function postReviewTerminal(
-  requestData: {
-    errorText: string;
-    fileContents: { path: string; content: string }[];
-    language: string;
-    project_name: any;
-    branch_name: string;
-    authToken: string;
-  },
-  options?: { signal?: AbortSignal }
-): Promise<object> {
-  if (!requestData.errorText || !requestData.fileContents.length) {
-    console.error("Missing required request data.");
-    return { error: "Missing required request data" };
-  }
-  return {
-    "error_text": requestData.errorText,
-    "file_contents": requestData.fileContents.map(file => ({
-      "path": file.path,
-      "content": file.content,
-    })),
-    "language": requestData.language,
-    "project_name": requestData.project_name,
-    "branch_name": requestData.branch_name,
-    "authToken": requestData.authToken ? "Provided" : "Missing"
-  };
-
-}
+// export async function postReviewTerminal(
+//     error_text: string,
+//     file_contents: { path: string; content: string }[],
+//     language: string,
+//     project_name: any,
+//     branch_name: string,
+//     authToken: string,
+//   options?: { signal?: AbortSignal }
+// ): Promise<object> {
+//   // console.log("*** errorText:", error_text);
+//   // console.log("*** file_contents:", file_contents);
+//   // console.log("*** language:", language);
+//   // console.log("*** project_name:", project_name);
+//   // console.log("*** branch_name:", branch_name);
+//   // console.log("*** authToken:", authToken);
+//   // console.log("*** options:", options);
+  
+  
+  
+  
+  
+  
+//   const response = await axios.post(
+//     `${getBaseApi()}/assistant/bug_fixing`,  {error_text, file_contents, language, project_name, branch_name},
+//     {
+//       headers: getAuthHeaders(authToken),
+//       signal: options?.signal, // Pass the signal to Axios
+//     }
+//   );
+//   // if (!requestData.errorText || !requestData.fileContents.length) {
+//   //   console.error("Missing required request data.");
+//   //   return { error: "Missing required request data" };
+//   // }
+//   // return {
+//   //   "error_text": requestData.errorText,
+//   //   "file_contents": requestData.fileContents.map(file => ({
+//   //     "path": file.path,
+//   //     "content": file.content,
+//   //   })),
+//   //   "language": requestData.language,
+//   //   "project_name": requestData.project_name,
+//   //   "branch_name": requestData.branch_name,
+//   //   "authToken": requestData.authToken ? "Provided" : "Missing"
+//   // };
+//   console.log("**** response", response.data);
+  
+// return response.data;
+// }

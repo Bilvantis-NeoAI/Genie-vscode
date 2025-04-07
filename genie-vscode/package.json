@@ -111,7 +111,7 @@
         "title": "All Review Selected"
       },
       {
-        "command": "extension.reviewDebug",
+        "command": "extension.fixIt",
         "title": " Debug Review Selected"
       }
     ],

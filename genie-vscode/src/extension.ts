@@ -27,8 +27,8 @@ import { registerExplainGitKBCommand } from "./commands/gitKB/explainGitKB";
 import { registerGetCodeGitKBCommand } from "./commands/gitKB/getCodeGitKB";
 import { registerKnowledgeBaseQACommand } from "./commands/KB/queAnsFromKB";
 import { registerAllReviewCommand } from "./commands/review/allReview";
-import { registerTerminalReviewCommand } from "./commands/review/terminalReview";
-import { reviewTerminalContent } from "./commands/webview/review_Webview/reviewTerminalContent";
+import { registerFixItTerminalAssistantCommand } from "./commands/assistant/fitItTerminalAssistant";
+
 
 const jwt = require('jsonwebtoken');
 export let userId: string | undefined;
@@ -145,7 +145,7 @@ export function activateCodeCommands(context: vscode.ExtensionContext) {
   registerOrgStdReviewCommand(context, authToken);
   registerCkReviewCommand(context, authToken);
   registerAllReviewCommand(context, authToken);
-  registerTerminalReviewCommand(context, authToken);
+  registerFixItTerminalAssistantCommand(context, authToken);
  
   //Register all Assistant Commands
   registerAddCommentsAssistantCommand(context, authToken);
