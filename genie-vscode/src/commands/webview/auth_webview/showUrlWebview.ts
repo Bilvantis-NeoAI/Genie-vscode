@@ -67,7 +67,7 @@ export function showUrlWebview(
                 </div>
                  <div class="form-group">
                     <label for="kurl">Knowledge Base Domain:</label>
-                    <input type="text" id="kurl" name="kurl" class="form-control" value='http://34.100.243.119:9000/kbmsapi' required>
+                    <input type="text" id="kurl" name="kurl" class="form-control" value='http://34.60.74.140/kbmsapi' required>
                 </div>                       
                 <button type="submit" class="btn btn-primary btn-block">Submit</button>
             </form>
