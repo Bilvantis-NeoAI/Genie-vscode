@@ -6,8 +6,6 @@ export function fixItTerminalAssistantWebviewContent(jsonData: object, title: st
        .replace(/"/g, "&quot;")
        .replace(/'/g, "&#39;");
 
-   // console.log("📄 Formatted Content for WebView:", jsonData);
-
    if (!jsonData || typeof jsonData !== "object") {
        console.error("Invalid Data Structure:", jsonData);
        return `
@@ -16,12 +14,13 @@ export function fixItTerminalAssistantWebviewContent(jsonData: object, title: st
    }
 
    const {
-       message = "No message",
-       "error_text": errorText = "N/A",
+      //  message = "No message",
+      //  "error_text": errorText = "N/A",
        "file_contents": fileContents = [],
-       "language": language = "N/A",
-       "project_name": projectName = "N/A",
-       "branch_name": branchName = "N/A"
+      //  "language": language = "N/A",
+      //  "project_name": projectName = "N/A",
+      //  "branch_name": branchName = "N/A",
+       "detail_explanation": detailExplanation = "No explanation available"
    } = jsonData as any;
 
    const fileContentHtml = Array.isArray(fileContents) && fileContents.length
@@ -29,8 +28,7 @@ export function fixItTerminalAssistantWebviewContent(jsonData: object, title: st
            <div class="file-container">
                <h3>File: ${escapeHtml(file.path || "Unknown File")}</h3>
                <button class="copy-btn" onclick="copyToClipboard(${index})">Copy</button>
-               <pre id="file-content-${index}">${escapeHtml(file.content || "No content available")}</pre>
-               
+               <pre id="file-content-${index}">${escapeHtml(file.corrected_code || "No content available")}</pre>
            </div>
        `).join("")
        : "<p>No file content available.</p>";
@@ -40,13 +38,10 @@ export function fixItTerminalAssistantWebviewContent(jsonData: object, title: st
    <head>
        <style>
            body { font-family: Arial, sans-serif; background-color: #1e1e1e; color: #ffffff; padding: 20px; }
-           table { width: 100%; border-collapse: collapse; margin-top: 20px; background: #252526; color: #ffffff; }
-           th, td { border: 1px solid #444; padding: 10px; text-align: left; }
-           th { background: #333; }
            pre { background: #1e1e1e; padding: 10px; border-radius: 5px; overflow-x: auto; white-space: pre-wrap; word-wrap: break-word; }
-           h2 { color: #ffffff; }
+           h2, h3 { color: #ffffff; }
            .container { max-width: 900px; margin: auto; }
-          
+
            .copy-btn {
                position: absolute;
                right: 10px;
@@ -69,19 +64,22 @@ export function fixItTerminalAssistantWebviewContent(jsonData: object, title: st
                border-radius: 5px;
                background: #252526;
            }
-
+           .details-box {
+               background: #252526;
+               border: 1px solid #444;
+               border-radius: 5px;
+               padding: 15px;
+               margin-top: 20px;
+           }
        </style>
    </head>
    <body>
        <div class="container">
            <h2>${title}</h2>
-           <table>
-               <tr><th>Message</th><td>${message}</td></tr>
-               <tr><th>Error Text</th><td><pre>${errorText}</pre></td></tr>
-               <tr><th>Language</th><td>${language}</td></tr>
-               <tr><th>Project Name</th><td>${projectName}</td></tr>
-               <tr><th>Branch Name</th><td>${branchName}</td></tr>
-           </table>
+           <div class="details-box">
+               <h3>Details Explanation</h3>
+               <pre>${escapeHtml(detailExplanation)}</pre>
+           </div>
            <h3>File Contents</h3>
            ${fileContentHtml}
        </div>
@@ -110,4 +108,3 @@ export function fixItTerminalAssistantWebviewContent(jsonData: object, title: st
    </body>
    </html>`;
 }
-
