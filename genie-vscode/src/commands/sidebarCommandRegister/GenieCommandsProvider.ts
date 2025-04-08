@@ -30,7 +30,8 @@ export class GenieCommandsProvider implements vscode.TreeDataProvider<GenieComma
         new GenieCommand("Explain Code", "extension.explainCode", 'info', 'Get explanations for your code.'),
         new GenieCommand("Refactor Code", "extension.refactorCode", 'gear', 'Refactor and optimize your code.'),
         new GenieCommand("Unit Test Code", "extension.unittestCode", 'check', 'Generate unit tests for your code.'),
-        new GenieCommand("Filewise Unit Test Code", "extension.assistantFilewiseUnitTestCode", 'code-oss', 'Generate the Unit Test Cases for entire file.')
+        new GenieCommand("Filewise Unit Test Code", "extension.assistantFilewiseUnitTestCode", 'code-oss', 'Generate the Unit Test Cases for entire file.'),
+        new GenieCommand("Fix It", "extension.fixIt", "graph-line", "test the terminal")
       ]);
     } else if (element.label === "Review") {
       // return Promise.resolve([

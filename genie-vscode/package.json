@@ -109,6 +109,10 @@
       {
         "command": "extension.reviewAll",
         "title": "All Review Selected"
+      },
+      {
+        "command": "extension.fixIt",
+        "title": " Debug Review Selected"
       }
     ],
     "viewsContainers": {
