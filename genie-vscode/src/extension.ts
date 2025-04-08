@@ -27,11 +27,13 @@ import { registerExplainGitKBCommand } from "./commands/gitKB/explainGitKB";
 import { registerGetCodeGitKBCommand } from "./commands/gitKB/getCodeGitKB";
 import { registerKnowledgeBaseQACommand } from "./commands/KB/queAnsFromKB";
 import { registerAllReviewCommand } from "./commands/review/allReview";
+import { registerTerminalReviewCommand } from "./commands/review/terminalReview";
 
 const jwt = require('jsonwebtoken');
 export let userId: string | undefined;
  
 export async function activate(context: vscode.ExtensionContext) {
+  
   const loginRegisterProvider = new LoginRegisterCommandsProvider();
   // Replace the openLoginPage command registration
   vscode.window.registerTreeDataProvider("loginRegisterCommands", loginRegisterProvider);
@@ -126,6 +128,7 @@ export function openSignUpPage(context: vscode.ExtensionContext) {
  * If the auth token is not available, an error message is shown.
  */
 export function activateCodeCommands(context: vscode.ExtensionContext) {
+   
   const authToken = context.globalState.get<string>("authToken");
   if (!authToken) {
     vscode.window.showErrorMessage("Authentication is required to activate code commands.");
@@ -142,6 +145,7 @@ export function activateCodeCommands(context: vscode.ExtensionContext) {
   registerOrgStdReviewCommand(context, authToken);
   registerCkReviewCommand(context, authToken);
   registerAllReviewCommand(context, authToken);
+  registerTerminalReviewCommand(context, authToken);
  
   //Register all Assistant Commands
   registerAddCommentsAssistantCommand(context, authToken);

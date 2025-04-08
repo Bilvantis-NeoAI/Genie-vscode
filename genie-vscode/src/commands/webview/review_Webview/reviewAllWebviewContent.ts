@@ -412,6 +412,14 @@ export function reviewAllWebViewContent(content: string, title: string): string 
             border-radius: 5px;
             cursor: pointer;
         }
+        .submit-btn {
+            padding: 5px 10px;
+            background-color: #07439C;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
         .download-btn:hover {
             background-color: #035f99;
         }
@@ -425,6 +433,7 @@ export function reviewAllWebViewContent(content: string, title: string): string 
         <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
             <h1>Summary:</h1>
             <div>
+                <button id="submitReviewedCode" class="submit-btn">Apply Fixes</button>
                 <button id="downloadButton" class="download-btn">Download as PDF</button>
                 <button id="downloadButtonExcel" class="download-btn">Download as Excel</button>
             </div>

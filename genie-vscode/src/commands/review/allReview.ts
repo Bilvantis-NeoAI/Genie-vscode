@@ -196,9 +196,9 @@ export function registerAllReviewCommand(context: vscode.ExtensionContext, authT
           }
 
           panel.webview.html = reviewAllWebViewContent(formattedContent, "Overall Review") + `
-            <button id="submitReviewedCode" style="margin-top: 10px; padding: 10px; background-color: green; color: white; border: none; cursor: pointer;">Submit</button>
             <script>
               const reviewComments = ${JSON.stringify(reviewComments, null, 2)};
+              const selectedCode = ${JSON.stringify(text)};
 
               document.getElementById("submitReviewedCode").addEventListener("click", () => {
                 const vscode = acquireVsCodeApi();
@@ -220,6 +220,9 @@ export function registerAllReviewCommand(context: vscode.ExtensionContext, authT
                     updatedPayload.issues[category] = acceptedIssues;
                   }
                 }
+
+                // Add the selected code to the payload
+                updatedPayload.selectedCode = selectedCode;
                 
                 vscode.postMessage({ command: "submitReviewedCode", payload: updatedPayload });
               });
@@ -232,7 +235,7 @@ export function registerAllReviewCommand(context: vscode.ExtensionContext, authT
               if (message.command === "submitReviewedCode") {
                 try {
                   await submitReview(message.payload, authToken);
-                  vscode.window.showInformationMessage("Review submitted successfully!");
+                  vscode.window.showInformationMessage("Issues submitted successfully!");
                   const response = await submitReview(message.payload, authToken);
         
                   const formattedResponse = JSON.stringify(response, null, 2);
@@ -251,7 +254,32 @@ export function registerAllReviewCommand(context: vscode.ExtensionContext, authT
                      }
                    );
  
-                   responsePanel.webview.html = getReviewResponseWebViewContent(formattedResponse);
+                   responsePanel.webview.html = getReviewResponseWebViewContent(formattedResponse, "Overall Review");
+
+                   // Add message listener for accept/reject actions in the response panel
+                   responsePanel.webview.onDidReceiveMessage(
+                    async (msg) => {
+                      switch (msg.command) {
+                        case "accept":
+                          if (editor) {
+                            await editor.edit(editBuilder => {
+                              editBuilder.replace(selection, response.documentationAdded);
+                            });
+                            vscode.window.showInformationMessage("Selected code replaced with the fixed code.");
+                          } else {
+                            vscode.window.showWarningMessage("No active editor found to replace code.");
+                          }
+                          responsePanel.dispose();
+                          break;
+                        case "reject":
+                          responsePanel.dispose();
+                          break;
+                      }
+                    },
+                    undefined,
+                    context.subscriptions
+                  );
+                  
         
                   console.log("Response from submitReview:", formattedResponse);
                 } catch (error: any) {

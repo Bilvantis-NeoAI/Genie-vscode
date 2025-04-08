@@ -1,21 +1,141 @@
-// New helper function to generate HTML content for the review response webview
-export function getReviewResponseWebViewContent(formattedResponse: string): string {
-    return `
-      <!DOCTYPE html>
-      <html lang="en">
-      <head>
-        <meta charset="UTF-8">
-        <meta name="viewport" content="width=device-width, initial-scale=1.0">
-        <title>Review Response</title>
-        <style>
-          body { font-family: sans-serif; padding: 20px; }
-          pre { background-color: #f3f3f3; padding: 10px; border-radius: 4px; }
-        </style>
-      </head>
-      <body>
-        <h1>Review Response</h1>
-        <pre>${formattedResponse}</pre>
-      </body>
-      </html>
-    `;
+export function getReviewResponseWebViewContent(content: string, title: string): string {
+    interface ParsedContent {
+      details: string;
+      innerMonologue: string;
+      documentationAdded: string;
+    }
+    // Utility to escape HTML special characters
+    function escapeHtml(html: string): string {
+      return html.replace(/&/g, "&amp;")
+                .replace(/</g, "&lt;")
+                .replace(/>/g, "&gt;")
+                .replace(/"/g, "&quot;")
+                .replace(/'/g, "&#039;");
+    }
+
+    let parsedContent: ParsedContent;
+    try {
+      parsedContent = JSON.parse(content);
+  } catch (e) {
+      const errorMessage = e instanceof Error ? e.message : String(e);
+      return `<h1>Error parsing content</h1><p>${errorMessage}</p>`;
   }
+
+  return `
+    <!DOCTYPE html>
+    <html lang="en">
+    <head>
+      <meta charset="UTF-8">
+      <meta name="viewport" content="width=device-width, initial-scale=1.0">
+      <title>Review Response</title>
+      <link href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.24.1/themes/prism-tomorrow.min.css" rel="stylesheet" />
+      <style>
+        body {
+          margin: 0;
+          padding: 0;
+          font-family: Arial, sans-serif;
+          background-color: #2d2d2d;
+          color: #f8f8f2;
+        }
+        #floating-window {
+          position: absolute;
+          top: 50px;
+          left: 50px;
+          width: 600px;
+          height: 500px;
+          border: 1px solid #ccc;
+          background-color: #1e1e1e;
+          resize: both;
+          overflow: auto;
+          z-index: 1000;
+        }
+        #header {
+          padding: 10px;
+          cursor: move;
+          background-color: #444;
+          color: #fff;
+          border-bottom: 1px solid #ccc;
+        }
+        #content {
+          padding: 10px;
+        }
+        h3 {
+          color: #f8f8f2;
+          margin-bottom: 5px;
+        }
+        .section {
+          margin-bottom: 15px;
+        }
+        pre {
+          max-width: 100%;
+          word-wrap: break-word;
+          white-space: pre-wrap;
+          background-color: #1e1e1e;
+          padding: 10px;
+          border: 1px solid #444;
+          border-radius: 5px;
+        }
+        #buttons {
+          margin-top: 10px;
+          text-align: center;
+        }
+        button {
+          background-color: #444;
+          color: #fff;
+          border: none;
+          padding: 10px 20px;
+          cursor: pointer;
+          margin: 5px;
+        }
+        button:hover {
+          background-color: #555;
+        }
+      </style>
+    </head>
+    <body>
+      <div id="floating-window">
+        <div id="header">${title}</div>
+          <div id="content">
+            <div class="section">
+              <h3>Details:</h3>
+              <p>${parsedContent.details}</p>
+            </div>
+            <div class="section">
+              <h3>Documentation Added:</h3>
+              <pre><code>${escapeHtml(parsedContent.documentationAdded)}</code></pre>
+            </div>
+          </div>
+        <div id="buttons">
+          <button id="accept">Accept</button>
+          <button id="reject">Reject</button>
+          <button id="copy">Copy</button>
+        </div>
+      </div>
+      <script>
+        const vscode = acquireVsCodeApi();
+       
+        document.getElementById('accept').addEventListener('click', () => {
+          vscode.postMessage({ command: 'accept' });
+        });
+       
+        document.getElementById('reject').addEventListener('click', () => {
+          vscode.postMessage({ command: 'reject' });
+        
+        });
+        document.getElementById('copy').addEventListener('click', () => {
+          const copyButton = document.getElementById('copy');
+          const codeContent = document.querySelector('pre code').textContent;
+          navigator.clipboard.writeText(codeContent).then(() => {
+            copyButton.textContent = 'Copied!';
+            setTimeout(() => {
+              copyButton.textContent = 'Copy';
+            }, 2000);
+          }).catch(err => {
+            console.error('Failed to copy: ', err);
+          });
+        });
+      </script>
+    </body>
+    </html>
+  `;
+}

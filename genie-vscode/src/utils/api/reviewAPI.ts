@@ -178,3 +178,32 @@ export async function submitReview(payload: any, authToken: string) {
     throw error;
   }
 }
+
+export async function postReviewTerminal(
+  requestData: {
+    errorText: string;
+    fileContents: { path: string; content: string }[];
+    language: string;
+    project_name: any;
+    branch_name: string;
+    authToken: string;
+  },
+  options?: { signal?: AbortSignal }
+): Promise<object> {
+  if (!requestData.errorText || !requestData.fileContents.length) {
+    console.error("Missing required request data.");
+    return { error: "Missing required request data" };
+  }
+  return {
+    "error_text": requestData.errorText,
+    "file_contents": requestData.fileContents.map(file => ({
+      "path": file.path,
+      "content": file.content,
+    })),
+    "language": requestData.language,
+    "project_name": requestData.project_name,
+    "branch_name": requestData.branch_name,
+    "authToken": requestData.authToken ? "Provided" : "Missing"
+  };
+ 
+}
