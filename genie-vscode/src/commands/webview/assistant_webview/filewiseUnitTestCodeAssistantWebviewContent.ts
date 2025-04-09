@@ -347,18 +347,16 @@ export function filewiseUnitTestCodeAssistantWebviewContent(content: string, tit
  
  
             // Combine selected test cases into a single string
-            let parentData = [];
-            const selectedCode = selectedTestCases.map((testCase) => {
+            const imports = parsedContent.imports.join("\\n");
+            const selectedCode = imports + "\\n\\n" + selectedTestCases.map((testCase) => {
                 let childData = '';
-                console.log("#$#$#$#", testCase.description);
                 childData += '#' + testCase.description.replace(/,/g, '');
                 childData += "\\n" + testCase.testcase.trim();
-                parentData.push(childData);
                 return childData;
             }).join("\\n\\n");
    
           // Download Python file with selected test cases
-          const blob = new Blob([finalCode], { type: 'text/plain' });
+          const blob = new Blob([selectedCode], { type: 'text/plain' });
           const url = URL.createObjectURL(blob);
           const a = document.createElement('a');
           a.href = url;
@@ -381,19 +379,16 @@ export function filewiseUnitTestCodeAssistantWebviewContent(content: string, tit
                   return;
                 }
                  
-              // Combine selected test cases into a single string
-              let parentData = [];
-              const selectedCode = selectedTestCases.map((testCase) => {
-                  let childData = '';
-                  console.log("#$#$#$#", testCase.description);
-                  childData += '//' + testCase.description.replace(/,/g, '');
-                  childData += "\\n" + testCase.testcase.trim();
-                  parentData.push(childData);
-                  return childData;
-              }).join("\\n\\n");
+                const imports = parsedContent.imports.join("\\n");
+                const selectedCode = imports + "\\n\\n" + selectedTestCases.map((testCase) => {
+                    let childData = '';
+                    childData += '//' + testCase.description.replace(/,/g, '');
+                    childData += "\\n" + testCase.testcase.trim();
+                    return childData;
+                }).join("\\n\\n");
    
               // Download Java file with selected test cases
-              const blob = new Blob([finalCode], { type: 'text/plain' });
+              const blob = new Blob([selectedCode], { type: 'text/plain' });
               const url = URL.createObjectURL(blob);
               const a = document.createElement('a');
               a.href = url;
