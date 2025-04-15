@@ -107,6 +107,8 @@ export async function postFilewiseUnitTestCodeAssistant(code: string, language: 
       signal: options?.signal,
     }
   );
+  console.log("response data",response.data);
+  
   return response.data;
 }
 
