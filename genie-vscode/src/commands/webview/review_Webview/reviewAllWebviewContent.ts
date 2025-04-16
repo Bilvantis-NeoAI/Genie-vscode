@@ -166,7 +166,7 @@ export function reviewAllWebViewContent(content: string, title: string): string 
                                         <td>${issue.identification}</td>
                                         <td>${issue.explanation}</td>
                                         <td class="fix"><pre>${issue.fix}</pre></td>
-                                        <td class="severity-${issue.severity.toLowerCase()}">${issue.severity}</td>
+                                        <td class="severity-${(issue.severity || '').toLowerCase()}">${issue.severity || 'N/A'}</td>
                                         <td>
                                             <select class="status-dropdown" onchange="updateStatus('${category}', ${index}, this.value)">
                                                 <option value="Accept" ${
