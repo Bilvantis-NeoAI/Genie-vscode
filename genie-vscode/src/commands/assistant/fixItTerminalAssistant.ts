@@ -20,36 +20,36 @@ export function registerFixItTerminalAssistantCommand(
         vscode.window.showWarningMessage("Fix It Assistant is already in progress.");
         return;
       }
-      isExecuting = true;
+      isExecuting = true; 
 
       const editor = vscode.window.activeTextEditor;
       let errorText = "";
-      let filePath = "";
 
       if (editor) {
         const selection = editor.selection;
         errorText = editor.document.getText(selection);
       }
 
-      if (!errorText) {
-        await vscode.commands.executeCommand(
-          "workbench.action.terminal.copySelection"
-        );
-        await new Promise((resolve) => setTimeout(resolve, 500)); // Wait for clipboard update
+      if (!errorText.trim()) {
+        // Clear clipboard to detect if copySelection had any effect
+        await vscode.env.clipboard.writeText("");
+    
+        // Try to copy selection from terminal
+        await vscode.commands.executeCommand("workbench.action.terminal.copySelection");
+        await new Promise((resolve) => setTimeout(resolve, 300)); // Wait for clipboard update
+    
         errorText = await vscode.env.clipboard.readText();
-
-        if (!errorText) {
-          vscode.window.showWarningMessage(
-            "No code or terminal error selected. Please select text in the terminal and try again."
-          );
-          isExecuting = false;
-          return;
+    
+        if (!errorText.trim()) {
+            isExecuting = false; // Stop execution if no selection is found
+            return;
         }
-      }
+    }
+    
+    
 
       const projectRoot =
         vscode.workspace.workspaceFolders?.[0]?.uri.fsPath || "";
-
       const normalizedProjectRoot = path.normalize(projectRoot.toLowerCase());
 
       const fileMatches = [
@@ -71,8 +71,6 @@ export function registerFixItTerminalAssistantCommand(
 
         if (normalizedExtractedPath.startsWith(normalizedProjectRoot)) {
           projectFiles.push(extractedPath); // Store all matching project files
-        } else {
-          // console.log(`❌ Skipped Non-Project File: ${extractedPath}`);
         }
       }
 
@@ -83,6 +81,7 @@ export function registerFixItTerminalAssistantCommand(
         isExecuting = false;
         return;
       }
+
       let fileContents: { path: string; content: string }[] = [];
 
       for (const filePath of projectFiles) {
@@ -102,6 +101,7 @@ export function registerFixItTerminalAssistantCommand(
         isExecuting = false;
         return;
       }
+
       const language = editor?.document.languageId || "plaintext";
       const workspacePath =
         vscode.workspace.workspaceFolders?.[0]?.uri.fsPath || "";
@@ -127,12 +127,12 @@ export function registerFixItTerminalAssistantCommand(
 
             try {
               const assistantComments = await postAssistantTerminal(
-                  errorText,
-                  fileContents,
-                  language,
-                  project_name,
-                  branch_name,
-                  authToken,
+                errorText,
+                fileContents,
+                language,
+                project_name,
+                branch_name,
+                authToken,
                 { signal: abortController.signal }
               );
 
