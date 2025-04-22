@@ -6,79 +6,118 @@ export function filewiseUnitTestCodeAssistantWebviewContent(content: string, tit
                    .replace(/"/g, "&quot;")
                    .replace(/'/g, "&#039;");
     }
-
+ 
+ 
     function renderData(data: any): string {
         if (data === null || data === undefined ||
             (Array.isArray(data) && data.length === 0) ||
             (typeof data === 'object' && Object.keys(data).length === 0)) {
             return `<p><em>Data: No data available</em></p>`;
         }
+ 
+       
+   
+        function formatValue(val: any): string {
+            if (typeof val === 'object' && val !== null) {
+                if (Array.isArray(val)) {
+                    return `<ul>${val.map(item => `<li>${escapeHtml(String(item))}</li>`).join('')}</ul>`;
+                } else {
+                    return `<table><tbody>${
+                        Object.entries(val).map(([k, v]) =>
+                            `<tr><td><strong>${escapeHtml(k)}</strong></td><td>${formatValue(v)}</td></tr>`
+                        ).join('')
+                    }</tbody></table>`;
+                }
+            }
+            return escapeHtml(String(val));
+        }
+   
         if (typeof data === 'string' || typeof data === 'number' || typeof data === 'boolean') {
             return `<div>${escapeHtml(String(data))}</div>`;
         }
-
+   
         if (Array.isArray(data)) {
-            return `<ul>${data.map(item => `<li>${renderData(item)}</li>`).join('')}</ul>`;
+            return data.map((item, index) => {
+                let label = `Data ${index + 1}`;
+                if (typeof item === 'object' && item !== null && !Array.isArray(item)) {
+                    // Render object with key-value pairs
+                    let rows = Object.entries(item).map(([key, value]) => {
+                        return `<tr><td><strong>${escapeHtml(key)}</strong></td><td>${formatValue(value)}</td></tr>`;
+                    }).join('');
+                    return `
+                        <div>
+                            <h4>${label}</h4>
+                            <table>
+                                <tbody>
+                                    ${rows}
+                                </tbody>
+                            </table>
+                        </div>
+                    `;
+                } else {
+                    // Render primitive or array
+                    return `<div><strong>${label}:</strong> ${escapeHtml(JSON.stringify(item))}</div>`;
+                }
+            }).join('');
         }
-
+   
         if (typeof data === 'object' && data !== null) {
+            let rows = Object.entries(data).map(([key, value]) => {
+                return `<tr><td><strong>${escapeHtml(key)}</strong></td><td>${formatValue(value)}</td></tr>`;
+            }).join('');
             return `
                 <table>
                     <tbody>
-                        ${Object.entries(data).map(([key, value]) => `
-                            <tr>
-                                <td><strong>${escapeHtml(key)}</strong></td>
-                                <td>${renderData(value)}</td>
-                            </tr>
-                        `).join('')}
+                        ${rows}
                     </tbody>
                 </table>
             `;
         }
-
+   
         return `<div>${escapeHtml(JSON.stringify(data))}</div>`;
     }
-
+   
+   
     let htmlOutput = "";
     let errorOccurred = false;
     let imports = "";
-
+ 
     try {
         const parsed = JSON.parse(content);
-        console.log("parsed content", parsed);
-
+       
+ 
         imports = parsed.imports || ""; // Extract imports from response
-        console.log("Detected imports:", imports);
-
+       
+ 
         if (Array.isArray(imports)) {
             imports = imports.join('\n');
         }
-        console.log("Formatted imports:", imports);
-        
-        
+       
+       
+       
         if (parsed.testcases && Array.isArray(parsed.testcases)) {
             for (const [index, test] of parsed.testcases.entries()) {
                 htmlOutput += `
                     <section style="margin-bottom: 40px; padding: 20px; border: 2px solid #555; border-radius: 10px; background-color: #292929;">
-                        <input 
-                        type="checkbox" 
-                        class="testcase-checkbox" 
-                        data-index="${index}" 
-                        data-description="${escapeHtml(test.description || '')}" 
-                        data-testcase="${escapeHtml(test.testcase || '')}" 
+                        <input
+                        type="checkbox"
+                        class="testcase-checkbox"
+                        data-index="${index}"
+                        data-description="${escapeHtml(test.description || '')}"
+                        data-testcase="${escapeHtml(test.testcase || '')}"
                         data-data='${escapeHtml(JSON.stringify(test.data || []))}'
-                        data-confidence-score="${escapeHtml(String(test.confidence_score || ''))}" 
-                        data-intervention-needed="${escapeHtml(String(test.intervention_needed || ''))}" 
+                        data-confidence-score="${escapeHtml(String(test.confidence_score || ''))}"
+                        data-intervention-needed="${escapeHtml(String(test.intervention_needed || ''))}"
                         >
                         <label>Select this Test Case</label>
-
-                        <h3>Description</h3>
+ 
+                        <h3>Description:</h3>
                         <p>${escapeHtml(test.description || '')}</p>
-
-                        <h3>Data</h3>
+ 
+                        <h3>Data:</h3>
                         ${renderData(test.data || [])}
-
-                        <h3>Test Case</h3>
+ 
+                        <h3>Test Case:</h3>
                         <pre id="testcase-${index}">${escapeHtml(test.testcase || '')}</pre>
                     </section>
                 `;
@@ -90,18 +129,22 @@ export function filewiseUnitTestCodeAssistantWebviewContent(content: string, tit
         htmlOutput = `<p style="color:red;">Error parsing content: ${escapeHtml((err as Error).message)}</p>`;
         errorOccurred = true;
     }
-
+ 
     // Determine which buttons to show
     let downloadButtons = `
         <button onclick="downloadPDF()">Download PDF</button>
     `;
-
+ 
     if (language.toLowerCase() === 'python') {
         downloadButtons += `<button onclick="downloadPython()">Download .py</button>`;
     } else if (language.toLowerCase() === 'java') {
         downloadButtons += `<button onclick="downloadJava()">Download .java</button>`;
     }
-
+ 
+    // Add Reject button (always shown)
+    downloadButtons += `<button id="reject">Reject</button>`;
+       
+ 
     return `
     <!DOCTYPE html>
     <html lang="en">
@@ -115,7 +158,7 @@ export function filewiseUnitTestCodeAssistantWebviewContent(content: string, tit
             body {
                 margin: 0;
                 padding: 20px;
-                
+               
                 background-color: #1e1e1e;
                 color: #f8f8f2;
             }
@@ -127,7 +170,7 @@ export function filewiseUnitTestCodeAssistantWebviewContent(content: string, tit
             border-bottom: 1px solid #ccc;
             font-size: 18px;
           }
-
+ 
             pre {
                 white-space: pre-wrap;
                 word-wrap: break-word;
@@ -169,19 +212,21 @@ export function filewiseUnitTestCodeAssistantWebviewContent(content: string, tit
     </head>
     <body>
         <h2>${escapeHtml(title)}</h2>
-
+ 
         <label style="display: flex; align-items: center; gap: 8px; margin-bottom: 20px;">
         <input type="checkbox" id="select-all-checkbox" onchange="toggleSelectAll(this)">
         Select All Test Cases
         </label>
-
+ 
         ${htmlOutput}
-
+ 
+        ${downloadButtons}
+ 
         <script>
-
+           const vscode = acquireVsCodeApi();
            const imports = ${JSON.stringify(imports)};
            const pageTitle = ${JSON.stringify(title)};
-
+ 
            function getSelectedTestCases() {
                 const selected = [];
                 document.querySelectorAll('.testcase-checkbox:checked').forEach(cb => {
@@ -192,7 +237,7 @@ export function filewiseUnitTestCodeAssistantWebviewContent(content: string, tit
                     } catch {
                         data = [];
                     }
-
+ 
                     selected.push({
                         description: cb.getAttribute('data-description'),
                         testcase: cb.getAttribute('data-testcase'),
@@ -203,17 +248,19 @@ export function filewiseUnitTestCodeAssistantWebviewContent(content: string, tit
                 });
                 return selected;
             }
-
+ 
           function toggleSelectAll(checkbox) {
                 const isChecked = checkbox.checked;
                 document.querySelectorAll('.testcase-checkbox').forEach(cb => cb.checked = isChecked);
             }
-
+ 
             function downloadPDF() {
                 const testCases = getSelectedTestCases();
-                if (testCases.length === 0) return alert("No test cases selected.");
-
-
+                if (testCases.length === 0) {
+                    vscode.postMessage({ command: 'noTestCaseSelected', message: 'Please select at least one test case.' });
+                    return;
+                }
+ 
                 const docDefinition = {
                     pageOrientation: 'landscape',
                     content: [
@@ -236,7 +283,7 @@ export function filewiseUnitTestCodeAssistantWebviewContent(content: string, tit
                                         { text: String(index + 1), fontSize: 10, alignment: 'center' },
                                         { text: test.description, fontSize: 10 },
                                         { text: test.testcase, fontSize: 10 },
-                                        { text: JSON.stringify(test.data, null, 2), fontSize: 10 },
+                                        { text: JSON.stringify(test.data).replace(/\\n/g, ' '), fontSize: 10 },
                                         { text: test.confidence_score, fontSize: 10, alignment: 'center' },
                                         { text: test.intervention_needed, fontSize: 10, alignment: 'center' }
                                     ])
@@ -272,29 +319,46 @@ export function filewiseUnitTestCodeAssistantWebviewContent(content: string, tit
                         }
                     }
                 };
-
+ 
                 pdfMake.createPdf(docDefinition).download(
                     pageTitle + '_' + new Date().toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' })
                     .replace(/ /g, '_').toLowerCase() + '.pdf'
                 );
-            
+           
             }
-
-
-          function downloadPython() {
+ 
+ 
+           function downloadPython() {
                 const testCases = getSelectedTestCases();
-                if (testCases.length === 0) return alert("No test cases selected.");
-                const content = imports + "\\n\\n" + testCases.map(tc => tc.testcase).join("\\n\\n");
-                downloadFile(content, 'testcases.py');
+                if (testCases.length === 0) {
+                    vscode.postMessage({ command: 'noTestCaseSelected', message: 'Please select at least one test case.' });
+                    return;
+                }
+                // Include data along with the test case code
+                const content = imports + "\\n\\n" + testCases.map(tc => {
+                    const dataStr = JSON.stringify(tc.data);
+                    return "#Data:" + dataStr + "\\n\\n" + tc.testcase;
+                }).join("\\n\\n");
+                const filename = pageTitle + '_' + new Date().toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' })
+                    .replace(/ /g, '_').toLowerCase() + '.py';
+                downloadFile(content, filename);
             }
-
+ 
             function downloadJava() {
                 const testCases = getSelectedTestCases();
-                if (testCases.length === 0) return alert("No test cases selected.");
-                const content = imports + "\\n\\n" + testCases.map(tc => tc.testcase).join("\\n\\n");
-                downloadFile(content, 'testcases.java');
+                if (testCases.length === 0) {      
+                    vscode.postMessage({ command: 'noTestCaseSelected', message: 'Please select at least one test case.' });
+                    return;
+                }
+                // Include data along with the test case code
+                const content = imports + "\\n\\n" + testCases.map(tc => {
+                    const dataStr = JSON.stringify(tc.data);
+                    return "//Data:" + dataStr + "\\n\\n" + tc.testcase;
+                }).join("\\n\\n");
+                const filename = pageTitle + '_' + new Date().toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' })
+                    .replace(/ /g, '_').toLowerCase() + '.java';
+                downloadFile(content, filename);
             }
-
             function downloadFile(content, filename) {
                 const blob = new Blob([content], { type: 'text/plain' });
                 const link = document.createElement("a");
@@ -302,15 +366,18 @@ export function filewiseUnitTestCodeAssistantWebviewContent(content: string, tit
                 link.download = filename;
                 link.click();
             }
-
             ${errorOccurred ? `console.error("Error parsing content:", ${JSON.stringify(content)});` : ""}
-        </script>
-
-       
-        ${downloadButtons}
+            document.addEventListener('DOMContentLoaded', function() {
+                document.getElementById('reject').addEventListener('click', () => {
+                    vscode.postMessage({ command: 'reject' });
+                });
+            });
+        </script>      
     </body>
     </html>
     `;
 }
-
-
+ 
+ 
+ 
+ 
