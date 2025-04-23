@@ -337,7 +337,7 @@ export function filewiseUnitTestCodeAssistantWebviewContent(content: string, tit
                 // Include data along with the test case code
                 const content = imports + "\\n\\n" + testCases.map(tc => {
                     const dataStr = JSON.stringify(tc.data);
-                    return "#Data:" + dataStr + "\\n\\n" + tc.testcase;
+                    return "# " + tc.description + "\\n" + "# Data:" + dataStr + "\\n" + tc.testcase;
                 }).join("\\n\\n");
                 const filename = pageTitle + '_' + new Date().toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' })
                     .replace(/ /g, '_').toLowerCase() + '.py';
@@ -353,7 +353,7 @@ export function filewiseUnitTestCodeAssistantWebviewContent(content: string, tit
                 // Include data along with the test case code
                 const content = imports + "\\n\\n" + testCases.map(tc => {
                     const dataStr = JSON.stringify(tc.data);
-                    return "//Data:" + dataStr + "\\n\\n" + tc.testcase;
+                    return "// " + tc.description + "\\n" + "// Data:" + dataStr + "\\n" + tc.testcase;
                 }).join("\\n\\n");
                 const filename = pageTitle + '_' + new Date().toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' })
                     .replace(/ /g, '_').toLowerCase() + '.java';
