@@ -205,7 +205,7 @@ export function reviewGetWebViewContent(
                               issue.fix
                             }</pre></td>
                             <td>${issue.explanation}</td>
-                            <td class="severity severity-${issue.severity.toLowerCase()}">${
+                            <td class="severity severity-${(issue.severity || '').toLowerCase()}">${issue.severity || 'N/A'}</td>
                       issue.severity
                     }</td>
                             <td>
