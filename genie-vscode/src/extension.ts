@@ -27,7 +27,6 @@ import { registerExplainGitKBCommand } from "./commands/gitKB/explainGitKB";
 import { registerGetCodeGitKBCommand } from "./commands/gitKB/getCodeGitKB";
 import { registerKnowledgeBaseQACommand } from "./commands/KB/queAnsFromKB";
 import { registerAllReviewCommand } from "./commands/review/allReview";
-import { registerFixItTerminalAssistantCommand } from "./commands/assistant/fixItTerminalAssistant";
 
 
 const jwt = require('jsonwebtoken');
@@ -155,7 +154,6 @@ export function activateCodeCommands(context: vscode.ExtensionContext) {
   registerExplainCodeAssistantCommand(context, authToken);
   registerUnittestCodeAssistantCommand(context, authToken);
   registerFilewiseUnitTestCodeAssistantCommand(context, authToken);
-  registerFixItTerminalAssistantCommand(context, authToken);
     
   //Register Git KB Commands
   registerExplainGitKBCommand(context, authToken);

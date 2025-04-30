@@ -111,24 +111,3 @@ export async function postFilewiseUnitTestCodeAssistant(code: string, language: 
   
   return response.data;
 }
-
-
-export async function postAssistantTerminal(
-  error_text: string,
-  file_contents: { path: string; content: string }[],
-  language: string,
-  project_name: any,
-  branch_name: string,
-  authToken: string,
-options?: { signal?: AbortSignal }
-): Promise<object> {
-const response = await axios.post(
-  `${getBaseApi()}/assistant/bug_fixing`,  {error_text, file_contents, language, project_name, branch_name},
-  {
-    headers: getAuthHeaders(authToken),
-    signal: options?.signal, // Pass the signal to Axios
-  }
-);
-
-return response.data;
-}
