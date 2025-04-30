@@ -217,7 +217,7 @@ export function unittestCodeAssistantWebViewContent(content: string, title: stri
             {
                 table: {
                     headerRows: 1,
-                    widths: [30, '*', '*', 55, 40, 40],
+                    widths: ['5%', '36%','35%' , '8%', '8%', '8%'],
                     body: [
                         [
                             { text: 'S.No', bold: true, fillColor: '#E9E5E5', fontSize: 10, alignment: 'center' },
