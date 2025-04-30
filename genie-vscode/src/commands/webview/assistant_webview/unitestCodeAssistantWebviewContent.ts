@@ -156,7 +156,7 @@ export function unittestCodeAssistantWebViewContent(content: string, title: stri
                             <td class="testcase"><pre>${unitTests.testCase}</pre></td>
                             <td>${unitTests.explanation}
                             <td>${unitTests.importance}</td>
-                            <td class="severity severity-${unitTests.severity.toLowerCase()}">${unitTests.severity}</td>
+                            <td class="severity severity-${(unitTests.severity || '').toLowerCase()}">${unitTests.severity || 'N/A'}</td>
                             <td>
                                 <select class="status-dropdown" onchange="updateStatus(${index}, this.value)">
                                     <option value="Accept" ${
