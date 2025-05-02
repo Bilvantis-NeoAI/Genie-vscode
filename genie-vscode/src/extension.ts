@@ -1,4 +1,6 @@
 import * as vscode from "vscode";
+import { exec } from 'child_process';
+import * as path from 'path';
 import { registerCodeReviewCommand } from "./commands/review/codeReview";
 import { registerOverallReviewCommand } from "./commands/review/overallReview";
 import { registerPerformanceReviewCommand } from "./commands/review/performanceReview";
@@ -27,12 +29,14 @@ import { registerExplainGitKBCommand } from "./commands/gitKB/explainGitKB";
 import { registerGetCodeGitKBCommand } from "./commands/gitKB/getCodeGitKB";
 import { registerKnowledgeBaseQACommand } from "./commands/KB/queAnsFromKB";
 import { registerAllReviewCommand } from "./commands/review/allReview";
+import { registerArchitectureReviewCommand } from "./commands/review/architectureReview"
 
 
 const jwt = require('jsonwebtoken');
 export let userId: string | undefined;
  
 export async function activate(context: vscode.ExtensionContext) {
+
   const loginRegisterProvider = new LoginRegisterCommandsProvider();
   // Replace the openLoginPage command registration
   vscode.window.registerTreeDataProvider("loginRegisterCommands", loginRegisterProvider);
@@ -55,6 +59,7 @@ export async function activate(context: vscode.ExtensionContext) {
       showLoginRegisterWebview(context, "register");
     })
   );
+
 
   loadBaseApi(context);
   console.log("Current BASE_API:", getBaseApi());
@@ -143,6 +148,7 @@ export function activateCodeCommands(context: vscode.ExtensionContext) {
   registerOrgStdReviewCommand(context, authToken);
   registerCkReviewCommand(context, authToken);
   registerAllReviewCommand(context, authToken);
+  registerArchitectureReviewCommand(context);
  
   //Register all Assistant Commands
   registerAddCommentsAssistantCommand(context, authToken);
