@@ -18,13 +18,13 @@ export function registerArchitectureReviewCommand(context: vscode.ExtensionConte
       async (message) => {
         if (message.command === 'fetchDocumentation') {
           const { repoUrl, pat, branch } = message.payload;
-    
+
           console.log("Received inputs:", repoUrl, pat, branch);
-    
+
           const jarPath = path.join(context.extensionPath, 'resources', 'HelloWorld.jar');
           exec(`java -jar "${jarPath}"`, (error, stdout, stderr) => {
             let outputText = '';
-    
+
             if (error) {
               outputText = `Error: ${error.message}`;
             } else if (stderr) {
@@ -32,9 +32,9 @@ export function registerArchitectureReviewCommand(context: vscode.ExtensionConte
             } else {
               outputText = stdout;
             }
-    
+
             console.log("JAR Output:", outputText);
-    
+
             panel.webview.postMessage({
               command: 'displayMarkdown',
               markdown: outputText
@@ -45,9 +45,10 @@ export function registerArchitectureReviewCommand(context: vscode.ExtensionConte
       undefined,
       context.subscriptions
     );
-    
-    
+
+
   });
 
   context.subscriptions.push(runArchitectureReview);
 }
+
