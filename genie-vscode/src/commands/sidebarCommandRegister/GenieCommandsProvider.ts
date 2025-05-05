@@ -16,7 +16,8 @@ export class GenieCommandsProvider implements vscode.TreeDataProvider<GenieComma
     if (!element) {
       return Promise.resolve([
         new GenieCategory("Assistant", "extensions"),
-        new GenieCategory("Review", "list-unordered")
+        new GenieCategory("Review", "list-unordered"),
+        new GenieCategory("Documents", "book")
       ]);
     } else if (element.label === "Assistant") {
       return Promise.resolve([
@@ -44,7 +45,7 @@ export class GenieCommandsProvider implements vscode.TreeDataProvider<GenieComma
           // new GenieCommand("Security Review", "extension.reviewSecurity", 'lock', 'Identify security vulnerabilities in your code.'),
           // new GenieCommand("Syntax Review", "extension.reviewSyntax", 'checklist', 'Check for syntax errors and inconsistencies.'),
           new GenieCommand("Overall Review", "extension.reviewAll", 'file-code', 'Perform All Reviews in one Feature.'),
-          new GenieCommand("Architecture Review", "extension.architectureReview", "terminal",  "Perform an architecture review")
+          new GenieCommand("Architecture Review", "extension.architectureReview", "preview",  "Perform an architecture review")
         ]);
       }
       else {
@@ -61,7 +62,12 @@ export class GenieCommandsProvider implements vscode.TreeDataProvider<GenieComma
           // new GenieCommand("Over All Review", "extension.reviewAll", 'file-code', 'Perform All Reviews in one Feature.'),
         ]);
       }
-    } 
+    } else if (element.label === "Documents") {
+      return Promise.resolve([
+        new GenieCommand("Repo Document", "extension.repoDocumentation", 'repo-clone', 'Open the repository documentation panel.'),
+
+      ]);
+    }
 
     return Promise.resolve([]);
   }

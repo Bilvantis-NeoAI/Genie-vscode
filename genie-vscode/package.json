@@ -109,6 +109,10 @@
       {
         "command": "extension.architectureReview",
         "title": "Architecture Review"
+      },
+      {
+        "command": "extension.repoDocumentation",
+        "title": "Genie: Repository Documentation"
       }
     ],
     "viewsContainers": {

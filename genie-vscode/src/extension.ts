@@ -25,10 +25,11 @@ import { registerFilewiseUnitTestCodeAssistantCommand } from "./commands/assista
 import { loadBaseApi, exchangeUrl, getBaseApi } from "./auth/config";
 import { registerAllReviewCommand } from "./commands/review/allReview";
 import { registerArchitectureReviewCommand } from "./commands/review/architectureReview"
+import { registerRepoDocumentationCommand } from "./commands/document/repoDocumentation";
 
 const jwt = require('jsonwebtoken');
 export let userId: string | undefined;
- 
+
 export async function activate(context: vscode.ExtensionContext) {
   const loginRegisterProvider = new LoginRegisterCommandsProvider();
   // Replace the openLoginPage command registration
@@ -46,7 +47,7 @@ export async function activate(context: vscode.ExtensionContext) {
       showLoginRegisterWebview(context, "login");
     })
   );
- 
+
   context.subscriptions.push(
     vscode.commands.registerCommand("extension.register", () => {
       showLoginRegisterWebview(context, "register");
@@ -59,7 +60,7 @@ export async function activate(context: vscode.ExtensionContext) {
 //   context.globalState.update("authToken", undefined);
 // context.globalState.update("urlSubmitted", false);
   let urlSubmitted = context.globalState.get<boolean>("urlSubmitted") || false;
-  let authToken = context.globalState.get<string>("authToken");  
+  let authToken = context.globalState.get<string>("authToken");
   if (!urlSubmitted) {
     showUrlWebview(context);
   // Wait for the URL submission to complete
@@ -70,13 +71,13 @@ export async function activate(context: vscode.ExtensionContext) {
     };
     await waitForSubmission();
    }
- 
+
    urlSubmitted = context.globalState.get<boolean>("urlSubmitted") || false;
    authToken = context.globalState.get<string>("authToken");
 
    // Proceed after the URL is submitted
   if (urlSubmitted) {
-    if (authToken) {     
+    if (authToken) {
       try {
         const decodedToken = jwt.decode(authToken);
         const tokenExpiration = decodedToken.exp;
@@ -107,15 +108,15 @@ export async function activate(context: vscode.ExtensionContext) {
     showUrlWebview(context);
   }
 }
- 
+
 export function openLoginPage(context: vscode.ExtensionContext) {
   showLoginRegisterWebview(context, "login");
 }
- 
+
 export function openSignUpPage(context: vscode.ExtensionContext) {
   showLoginRegisterWebview(context, "register");
 }
- 
+
 /**
  * Activates all code-related commands using the stored auth token.
  * If the auth token is not available, an error message is shown.
@@ -138,7 +139,7 @@ export function activateCodeCommands(context: vscode.ExtensionContext) {
   registerCkReviewCommand(context, authToken);
   registerAllReviewCommand(context, authToken);
   registerArchitectureReviewCommand(context);
- 
+
   //Register all Assistant Commands
   registerAddCommentsAssistantCommand(context, authToken);
   registerAddDocstringsAssistantCommand(context, authToken);
@@ -149,12 +150,14 @@ export function activateCodeCommands(context: vscode.ExtensionContext) {
   registerExplainCodeAssistantCommand(context, authToken);
   registerUnittestCodeAssistantCommand(context, authToken);
   registerFilewiseUnitTestCodeAssistantCommand(context, authToken);
+
+  //Register all Documentation Commands
+  registerRepoDocumentationCommand(context, authToken);
 }
- 
- 
+
+
 export function deactivate() {}
- 
- 
- 
- 
- 
+
+
+
+
