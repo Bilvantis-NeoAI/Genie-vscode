@@ -11,8 +11,14 @@
   "categories": [
     "Other"
   ],
-  "activationEvents": ["*"],
+  "activationEvents": [
+    "*"
+  ],
   "main": "./out/extension.js",
+  "files": [
+    "out/**",
+    "resources/**"
+  ],
   "contributes": {
     "commands": [
       {
@@ -99,6 +105,10 @@
       {
         "command": "extension.reviewAll",
         "title": "All Review Selected"
+      },
+      {
+        "command": "extension.architectureReview",
+        "title": "Architecture Review"
       }
     ],
     "viewsContainers": {
@@ -135,6 +145,7 @@
     "@types/mocha": "^10.0.9",
     "@types/node": "20.x",
     "@types/vscode": "^1.92.0",
+    "@types/web": "^0.0.231",
     "@types/xlsx": "^0.0.36",
     "@typescript-eslint/eslint-plugin": "^8.10.0",
     "@typescript-eslint/parser": "^8.7.0",

@@ -24,6 +24,7 @@ import { registerCkReviewCommand } from "./commands/review/ckReview";
 import { registerFilewiseUnitTestCodeAssistantCommand } from "./commands/assistant/filewiseUnitTestCodeAssistant";
 import { loadBaseApi, exchangeUrl, getBaseApi } from "./auth/config";
 import { registerAllReviewCommand } from "./commands/review/allReview";
+import { registerArchitectureReviewCommand } from "./commands/review/architectureReview"
 
 const jwt = require('jsonwebtoken');
 export let userId: string | undefined;
@@ -136,6 +137,7 @@ export function activateCodeCommands(context: vscode.ExtensionContext) {
   registerOrgStdReviewCommand(context, authToken);
   registerCkReviewCommand(context, authToken);
   registerAllReviewCommand(context, authToken);
+  registerArchitectureReviewCommand(context);
  
   //Register all Assistant Commands
   registerAddCommentsAssistantCommand(context, authToken);
