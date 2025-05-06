@@ -94,9 +94,6 @@ export function getRepoDocWebviewContent(): string {
       <label for="repo_url">Repository URL</label>
       <input type="text" id="repo_url" placeholder="Enter repository URL" />
 
-      <label for="project_name">Project Name</label>
-      <input type="text" id="project_name" placeholder="Enter project name" />
-
       <label for="pat">Personal Access Token (PAT)</label>
       <input type="text" id="pat" placeholder="Enter your GitHub PAT" />
 
@@ -123,7 +120,6 @@ export function getRepoDocWebviewContent(): string {
         const downloadBtn = document.getElementById("download");
 
         const repoInput = document.getElementById("repo_url");
-        const nameInput = document.getElementById("project_name");
         const patInput = document.getElementById("pat");
         const branchInput = document.getElementById("branch");
         const markdownDisplay = document.getElementById("markdownDisplay");
@@ -132,7 +128,6 @@ export function getRepoDocWebviewContent(): string {
 
         submitBtn.addEventListener("click", () => {
           const repo_url = repoInput.value.trim();
-          const project_name = nameInput.value.trim();
           const pat = patInput.value.trim();
           const branch = branchInput.value.trim();
 
@@ -144,7 +139,6 @@ export function getRepoDocWebviewContent(): string {
           vscode.postMessage({
             command: 'fetchDocumentation',
             repo_url,
-            project_name: project_name || "",
             pat: pat || "",
             branch
           });
