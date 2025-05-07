@@ -91,13 +91,14 @@ export function getRepoDocWebviewContent(): string {
       <h1>📘 Repository Documentation</h1>
       <p>This panel allows you to fetch documentation for your project by providing the following details.</p>
 
-      <label for="repo_url">Repository URL</label>
+      <label for="repo_url">Repository URL <span style="color: red;">*</span></label>
       <input type="text" id="repo_url" placeholder="Enter repository URL" />
 
       <label for="pat">Personal Access Token (PAT)</label>
       <input type="text" id="pat" placeholder="Enter your GitHub PAT" />
 
-      <label for="branch">Branch Name</label>
+
+      <label for="branch">Branch Name <span style="color: red;">*</span></label>
       <input type="text" id="branch" placeholder="Enter branch name" />
 
       <div class="button-wrapper">
