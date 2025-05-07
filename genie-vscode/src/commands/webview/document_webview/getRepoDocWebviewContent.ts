@@ -146,13 +146,13 @@ export function getRepoDocWebviewContent(): string {
         });
 
         clearBtn.addEventListener("click", () => {
-          repoInput.value = "";
-          nameInput.value = "";
-          patInput.value = "";
-          branchInput.value = "";
+          document.getElementById("repo_url").value = "";
+          document.getElementById("pat").value = "";
+          document.getElementById("branch").value = ""; // Ensure this dynamically selects the element
           markdownDisplay.innerHTML = "";
           downloadBtn.style.display = "none";
         });
+
 
         downloadBtn.addEventListener("click", () => {
           const blob = new Blob([latestMarkdown], { type: "text/markdown" });
