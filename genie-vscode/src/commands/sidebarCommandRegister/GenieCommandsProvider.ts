@@ -64,7 +64,7 @@ export class GenieCommandsProvider implements vscode.TreeDataProvider<GenieComma
       }
     } else if (element.label === "Documents") {
       return Promise.resolve([
-        new GenieCommand("Repo Document", "extension.repoDocumentation", 'repo-clone', 'Open the repository documentation panel.'),
+        new GenieCommand("Repo Documentation", "extension.repoDocumentation", 'repo-clone', 'Open the repository documentation panel.'),
 
       ]);
     }

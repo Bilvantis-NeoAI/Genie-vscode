@@ -26,6 +26,7 @@ import { loadBaseApi, exchangeUrl, getBaseApi } from "./auth/config";
 import { registerAllReviewCommand } from "./commands/review/allReview";
 import { registerArchitectureReviewCommand } from "./commands/review/architectureReview"
 import { registerRepoDocumentationCommand } from "./commands/document/repoDocumentation";
+import { GenieReloadProvider } from "./commands/sidebarCommandRegister/GenieReloadProvider";
 
 const jwt = require('jsonwebtoken');
 export let userId: string | undefined;
@@ -53,6 +54,19 @@ export async function activate(context: vscode.ExtensionContext) {
       showLoginRegisterWebview(context, "register");
     })
   );
+
+  const commandsProvider = new GenieCommandsProvider();
+  const reloadProvider = new GenieReloadProvider();
+
+  context.subscriptions.push(
+    vscode.window.registerTreeDataProvider("genieCommands", commandsProvider),
+    vscode.window.registerTreeDataProvider("genieReload", reloadProvider),
+
+    vscode.commands.registerCommand("extension.reloadGenie", () => {
+      vscode.commands.executeCommand("workbench.action.reloadWindow");
+    })
+  );
+
 
   loadBaseApi(context);
   console.log("Current BASE_API:", getBaseApi());

@@ -133,6 +133,10 @@
         {
           "id": "genieCommands",
           "name": "Genie Commands"
+        },
+        {
+          "id": "genieReload",
+          "name": "Reload Plugin"
         }
       ]
     }
