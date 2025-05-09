@@ -19,8 +19,6 @@ export function registerArchitectureReviewCommand(context: vscode.ExtensionConte
         if (message.command === 'fetchDocumentation') {
           const { repoUrl, pat, branch } = message.payload;
 
-          console.log("Received inputs:", repoUrl, pat, branch);
-
           const jarPath = path.join(context.extensionPath, 'resources', 'HelloWorld.jar');
           exec(`java -jar "${jarPath}"`, (error, stdout, stderr) => {
             let outputText = '';
@@ -32,8 +30,6 @@ export function registerArchitectureReviewCommand(context: vscode.ExtensionConte
             } else {
               outputText = stdout;
             }
-
-            console.log("JAR Output:", outputText);
 
             panel.webview.postMessage({
               command: 'displayMarkdown',

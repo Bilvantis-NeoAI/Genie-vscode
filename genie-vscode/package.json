@@ -2,7 +2,7 @@
   "name": "genie-vscode-hsbc",
   "displayName": "Genie_vscode",
   "description": "A VS extension to comment code, review code, generate docstrings, unit tests, analyze code metrics, generate logs, and handle errors",
-  "version": "0.0.1",
+  "version": "0.1.2",
   "publisher": "HSBC",
   "type": "commonjs",
   "engines": {
@@ -15,10 +15,6 @@
     "*"
   ],
   "main": "./out/extension.js",
-  "files": [
-    "out/**",
-    "resources/**"
-  ],
   "contributes": {
     "commands": [
       {
