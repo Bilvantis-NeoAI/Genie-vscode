@@ -123,7 +123,9 @@ export function filewiseUnitTestCodeAssistantWebviewContent(content: string, tit
                 `;
             }
         } else {
-            htmlOutput = `<p><strong>No testcases found.</strong></p><pre>${escapeHtml(content)}</pre>`;
+            // htmlOutput = `<p><strong>No testcases found.</strong></p><pre>${escapeHtml(content)}</pre>`;
+            htmlOutput = `<p><strong></strong></p><pre>${escapeHtml(content)}</pre>`;
+
         }
     } catch (err) {
         htmlOutput = `<p style="color:red;">Error parsing content: ${escapeHtml((err as Error).message)}</p>`;
