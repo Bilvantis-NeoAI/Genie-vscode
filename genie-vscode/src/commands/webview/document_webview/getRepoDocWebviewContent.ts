@@ -144,7 +144,7 @@ export function getRepoDocWebviewContent(): string {
   <body>
     <div class="container">
       <h1>📘 Repository Documentation</h1>
-      <p>This panel allows you to fetch documentation for your project by providing the following details.</p>
+      <p>Generate comprehensive documentation for a repository by providing the following details:</p>
 
       <label for="repo_url">Repository URL <span style="color: red;">*</span></label>
       <input type="text" id="repo_url" placeholder="Enter repository URL" />
@@ -157,7 +157,7 @@ export function getRepoDocWebviewContent(): string {
 
       <div class="button-wrapper">
         <button id="submit">Submit</button>
-        <button id="clear">Clear</button>
+        <button id="cancel">Cancel</button>
       </div>
 
       <div id="statusDisplay">
@@ -179,8 +179,8 @@ export function getRepoDocWebviewContent(): string {
         const vscode = acquireVsCodeApi();
 
         const submitBtn = document.getElementById("submit");
-        const clearBtn = document.getElementById("clear");
         const downloadBtn = document.getElementById("download");
+        const cancelBtn = document.getElementById("cancel");
 
         const statusDisplay = document.getElementById("statusDisplay");
         const markdownDisplay = document.getElementById("markdownDisplay");
@@ -194,6 +194,7 @@ export function getRepoDocWebviewContent(): string {
         let jobID = null;
         let pollingInterval = null;
         let latestMarkdown = '';
+        cancelBtn.style.display = 'none';
 
         submitBtn.addEventListener("click", () => {
           const repo_url = repoInput.value.trim();
@@ -221,24 +222,29 @@ export function getRepoDocWebviewContent(): string {
           });
         });
 
-        clearBtn.addEventListener("click", () => {
-          repoInput.value = "";
-          patInput.value = "";
-          branchInput.value = "";
-          statusDisplay.style.display = 'none';
-          markdownDisplay.style.display = 'none';
-          downloadBtn.style.display = 'none';
-          spinner.style.display = 'none';
-          markdownDisplay.innerHTML = "";
+        cancelBtn.addEventListener("click", () => {
+          if (!jobID) {
+            statusDetailsSpan.textContent = "No request is in progress to cancel.";
+            return;
+          }
+          vscode.postMessage({
+            command: "cancelJob",
+            jobID
+          });
+          statusDisplay.style.display = 'block';
+          statusDetailsSpan.textContent = "Cancelling the request...";
+          spinner.style.display = 'inline-block';
           if (pollingInterval) {
             clearInterval(pollingInterval);
             pollingInterval = null;
           }
+           // Reset state
           jobID = null;
           latestMarkdown = '';
-        });
-
-
+          markdownDisplay.style.display = 'none';
+          markdownDisplay.innerHTML = '';
+          downloadBtn.style.display = 'none';
+                });
 
         downloadBtn.addEventListener("click", () => {
           const blob = new Blob([latestMarkdown], { type: "text/markdown" });
@@ -262,7 +268,9 @@ export function getRepoDocWebviewContent(): string {
           const message = event.data;
 
           if (message.command === 'displayJobID') {
+            cancelBtn.style.display = 'inline-block';
             jobID = message.jobId;
+            console.log("Received Job ID:", jobID);
             pollStatus();
             pollingInterval = setInterval(pollStatus, 10000);
           }
@@ -274,6 +282,7 @@ export function getRepoDocWebviewContent(): string {
 
             if (status === 'completed') {
               spinner.style.display = 'none';
+              cancelBtn.style.display = 'none'; 
               if (pollingInterval) clearInterval(pollingInterval);
               vscode.postMessage({
                 command: 'downloadMarkdown',
@@ -281,21 +290,25 @@ export function getRepoDocWebviewContent(): string {
               });
             } else if (status === 'failed') {
               spinner.style.display = 'none';
+              cancelBtn.style.display = 'none'; 
               if (pollingInterval) clearInterval(pollingInterval);
-              statusDetailsSpan.textContent = message.statusDetails || message.Status_display || "Job failed.";
+              statusDetailsSpan.textContent = message.statusDetails || message.Status_display || "Repo documentation request was failed.";
+
+            } else if (status === 'cancelled') {
+              spinner.style.display = 'none';
+              if (pollingInterval) clearInterval(pollingInterval);
+              statusDetailsSpan.textContent = message.statusDetails || message.Status_display || "Repo documentation request was cancelled.";
             } else {
               spinner.style.display = 'inline-block';
             }
+              
           }
 
-
-
           if (message.command === 'displayMarkdown') {
+            cancelBtn.style.display = 'none';
             latestMarkdown = message.markdown || "# No markdown received.";
-
             // Replace all H1s (# Header) with H2s (## Header)
             const modifiedMarkdown = latestMarkdown.replace(/^# (.*$)/gm, "## $1");
-
             markdownDisplay.innerHTML = marked.parse(modifiedMarkdown);
             markdownDisplay.style.display = 'block';
             downloadBtn.style.display = 'inline-block';

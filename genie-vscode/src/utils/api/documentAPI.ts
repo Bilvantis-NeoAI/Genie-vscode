@@ -50,3 +50,16 @@ export async function downloadMarkdown(JobID: string, authToken: string): Promis
       throw new Error(error.response?.data?.detail || error.message || "Failed to download markdown");
   }
 }
+
+export async function cancelRepoDocumentation(jobID: string, authToken: string): Promise<void> {
+  const apiUrl = `${getBaseApi()}/assistant/repo-documentation/cancel`;
+  try {
+    await axios.post(
+      apiUrl,
+      { JobID: jobID },
+      { headers: getAuthHeaders(authToken) }
+    );
+  } catch (error: any) {
+    throw new Error(error.response?.data?.detail || error.message || "Failed to cancel the request");
+  }
+}

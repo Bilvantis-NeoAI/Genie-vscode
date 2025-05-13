@@ -1,6 +1,6 @@
 import * as vscode from "vscode";
 import { getRepoDocWebviewContent } from "../webview/document_webview/getRepoDocWebviewContent";
-import { postRepoDocumentation, postJobStatus, downloadMarkdown } from "../../utils/api/documentAPI";
+import { postRepoDocumentation, postJobStatus, downloadMarkdown , cancelRepoDocumentation } from "../../utils/api/documentAPI";
 
 // Function to handle repository documentation commands
 export function registerRepoDocumentationCommand(context: vscode.ExtensionContext, authToken: string): void {
@@ -71,6 +71,23 @@ export function registerRepoDocumentationCommand(context: vscode.ExtensionContex
             });
           }
         }
+      else if (message.command === 'cancelJob') {
+        const { jobID } = message;
+        try {
+          await cancelRepoDocumentation(jobID, authToken);
+          panel.webview.postMessage({
+            command: 'displayJobStatus',
+            status: 'cancelled',
+            statusDetails: 'Repo documentation request was cancelled.'
+          });
+        } catch (error: any) {
+          panel.webview.postMessage({
+            command: 'displayJobStatus',
+            status: 'failed',
+            statusDetails: error.message || "Failed to cancel the request."
+          });
+        }
+      }
       });
     })
   );
