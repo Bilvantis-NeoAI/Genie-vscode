@@ -15,17 +15,17 @@ export async function postCodeGenerationAssistant(prompt: string, language: stri
   }
 
 export async function postAddCommentsAssistant(code: string, language: string, authToken: string, project_name: any, branch_name: string, options?: { signal?: AbortSignal }): Promise<any> {
-  const response = await axios.post(    
+  const response = await axios.post(
     `${getBaseApi()}/assistant/add-comments`,
     { code, language, project_name, branch_name },
     {
-      headers: getAuthHeaders(authToken), 
+      headers: getAuthHeaders(authToken),
       signal: options?.signal,
     }
   );
   return response.data;
 }
- 
+
 export async function postAddDocStringsAssistant(code: string, language: string, authToken: string, project_name: any, branch_name: string, options?: { signal?: AbortSignal }): Promise<any> {
   const response = await axios.post(
     `${getBaseApi()}/assistant/add-docstrings`,
@@ -37,7 +37,7 @@ export async function postAddDocStringsAssistant(code: string, language: string,
   );
   return response.data;
 }
- 
+
 export async function postExplainCodeAssistant(code: string, language: string, authToken: string, project_name: any, branch_name: string, options?: { signal?: AbortSignal }): Promise<any> {
 const response = await axios.post(
     `${getBaseApi()}/assistant/explain-code`,
@@ -108,6 +108,21 @@ export async function postFilewiseUnitTestCodeAssistant(code: string, language: 
     }
   );
   console.log("response data",response.data);
-  
+
   return response.data;
 }
+
+export async function pollJobStatus(JobID: string, authToken: string, options?: { signal?: AbortSignal }): Promise<any> {
+  const response = await axios.post(
+    `${getBaseApi()}/assistant/file-testCases/status`,  // Post request instead of GET
+    { JobID },  // Pass jobId in the request body as JSON
+    {
+      headers: getAuthHeaders(authToken),
+      signal: options?.signal,
+    }
+  );
+  console.log("Job status response data", response.data);
+
+  return response.data;  // This will return the status information (e.g., { status: 'completed', results: ... })
+}
+
