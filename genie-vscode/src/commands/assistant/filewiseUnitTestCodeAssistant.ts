@@ -92,20 +92,53 @@ export function registerFilewiseUnitTestCodeAssistantCommand(context: vscode.Ext
           let isJobCompleted = false;
           let result: any = null;
 
+          // while (!isJobCompleted && !wasCancelled) {
+          //   const statusResponse = await pollJobStatus(jobId, authToken, { signal: abortController.signal });
+
+          //   if (statusResponse.status.toLowerCase() === "completed") {
+          //     isJobCompleted = true;
+          //     result = statusResponse.results;
+          //     console.log("**** result:", result);
+
+          //   } else if (statusResponse.status.toLowerCase() === "failed") {
+          //     isJobCompleted = true;
+          //     vscode.window.showErrorMessage("Job failed.");
+          //     break;
+          //   } else {
+          //     // Job still in progress, wait for 10 seconds and poll again
+          //     await new Promise(resolve => setTimeout(resolve, 10000));
+          //   }
+          // }
+
           while (!isJobCompleted && !wasCancelled) {
             const statusResponse = await pollJobStatus(jobId, authToken, { signal: abortController.signal });
 
+            console.log("Job status response data", statusResponse);
+
+            // 🔄 Show live status in webview
+            if (panel && statusResponse.Status_display) {
+              // panel.webview.html = filewiseUnitTestCodeAssistantWebviewContent(
+              //   JSON.stringify(statusResponse.Status_display),
+              //   "Filewise Unit Test Code Assistant",
+              //   language
+              // );
+              panel.webview.html = filewiseUnitTestCodeAssistantWebviewContent(
+                JSON.stringify({ status: statusResponse.Status_display }), // 👈 wrap in object
+                "Filewise Unit Test Code Assistant",
+                language
+              );
+
+            }
+
             if (statusResponse.status.toLowerCase() === "completed") {
               isJobCompleted = true;
-              result = statusResponse.results;
-              console.log("**** result:", result);
-
+              result = statusResponse.results; // ✅ Only results
             } else if (statusResponse.status.toLowerCase() === "failed") {
               isJobCompleted = true;
               vscode.window.showErrorMessage("Job failed.");
               break;
             } else {
-              // Job still in progress, wait for 10 seconds and poll again
+              // ⏱️ Wait before next poll
               await new Promise(resolve => setTimeout(resolve, 10000));
             }
           }
