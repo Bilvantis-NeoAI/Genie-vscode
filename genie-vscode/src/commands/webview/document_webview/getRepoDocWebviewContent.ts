@@ -194,6 +194,7 @@ export function getRepoDocWebviewContent(): string {
         let jobID = null;
         let pollingInterval = null;
         let latestMarkdown = '';
+        cancelBtn.style.display = 'none';
 
         submitBtn.addEventListener("click", () => {
           const repo_url = repoInput.value.trim();
@@ -223,7 +224,7 @@ export function getRepoDocWebviewContent(): string {
 
         cancelBtn.addEventListener("click", () => {
           if (!jobID) {
-            statusDetailsSpan.textContent = "No request in progress to cancel.";
+            statusDetailsSpan.textContent = "No request is in progress to cancel.";
             return;
           }
           vscode.postMessage({
@@ -267,6 +268,7 @@ export function getRepoDocWebviewContent(): string {
           const message = event.data;
 
           if (message.command === 'displayJobID') {
+            cancelBtn.style.display = 'inline-block';
             jobID = message.jobId;
             console.log("Received Job ID:", jobID);
             pollStatus();
@@ -280,6 +282,7 @@ export function getRepoDocWebviewContent(): string {
 
             if (status === 'completed') {
               spinner.style.display = 'none';
+              cancelBtn.style.display = 'none';
               if (pollingInterval) clearInterval(pollingInterval);
               vscode.postMessage({
                 command: 'downloadMarkdown',
@@ -287,6 +290,7 @@ export function getRepoDocWebviewContent(): string {
               });
             } else if (status === 'failed') {
               spinner.style.display = 'none';
+              cancelBtn.style.display = 'none';
               if (pollingInterval) clearInterval(pollingInterval);
               statusDetailsSpan.textContent = message.statusDetails || message.Status_display || "Repo documentation request was failed.";
 
@@ -301,11 +305,10 @@ export function getRepoDocWebviewContent(): string {
           }
 
           if (message.command === 'displayMarkdown') {
+            cancelBtn.style.display = 'none';
             latestMarkdown = message.markdown || "# No markdown received.";
-
             // Replace all H1s (# Header) with H2s (## Header)
             const modifiedMarkdown = latestMarkdown.replace(/^# (.*$)/gm, "## $1");
-
             markdownDisplay.innerHTML = marked.parse(modifiedMarkdown);
             markdownDisplay.style.display = 'block';
             downloadBtn.style.display = 'inline-block';
