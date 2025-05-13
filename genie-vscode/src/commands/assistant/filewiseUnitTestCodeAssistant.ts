@@ -48,7 +48,7 @@ export function registerFilewiseUnitTestCodeAssistantCommand(context: vscode.Ext
 
       // Show initial loading screen
       panel.webview.html = filewiseUnitTestCodeAssistantWebviewContent(
-        JSON.stringify({ loading: true }),
+        JSON.stringify({ status: "Initializing..."}),
         "Filewise Unit Test Code Assistant",
         language
       );

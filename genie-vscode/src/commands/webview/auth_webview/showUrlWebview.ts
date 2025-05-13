@@ -59,7 +59,7 @@ export function showUrlWebview(
             <form id="authForm">
                 <div class="form-group">
                     <label for="url">Backend Domain:</label>
-                    <input type="text" id="url" name="url" class="form-control" value='http://34.46.36.105:8000/genieapi' required>
+                    <input type="text" id="url" name="url" class="form-control" value='http://34.46.36.105:3000/genieapi' required>
                 </div>
                 <div class="form-group">
                     <label for="gurl">Git Knowledge Base Domain:</label>
