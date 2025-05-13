@@ -21,7 +21,7 @@ export function getRepoDocWebviewContent(): string {
       }
 
       .container {
-        max-width: 1000px;
+        max-width: 950px;
         width: 100%;
         padding: 30px;
         margin-top: 40px;
@@ -229,8 +229,16 @@ export function getRepoDocWebviewContent(): string {
           markdownDisplay.style.display = 'none';
           downloadBtn.style.display = 'none';
           spinner.style.display = 'none';
-          if (pollingInterval) clearInterval(pollingInterval);
+          markdownDisplay.innerHTML = "";
+          if (pollingInterval) {
+            clearInterval(pollingInterval);
+            pollingInterval = null;
+          }
+          jobID = null;
+          latestMarkdown = '';
         });
+
+
 
         downloadBtn.addEventListener("click", () => {
           const blob = new Blob([latestMarkdown], { type: "text/markdown" });
@@ -259,26 +267,28 @@ export function getRepoDocWebviewContent(): string {
             pollingInterval = setInterval(pollStatus, 10000);
           }
 
-          if (message.command === 'displayError') {
-            statusDisplay.style.display = 'block';
-            statusDetailsSpan.textContent = message.error;
-            spinner.style.display = 'none';
-            if (pollingInterval) clearInterval(pollingInterval);
-          }
-
           if (message.command === 'displayJobStatus') {
             statusDisplay.style.display = 'block';
-            statusDetailsSpan.textContent = message.statusDetails;
-            spinner.style.display = message.status.toLowerCase() === 'completed' ? 'none' : 'inline-block';
+            const status = message.status.toLowerCase();
+            statusDetailsSpan.textContent = message.statusDetails || message.Status_display || "Unknown status.";
 
-            if (message.status.toLowerCase() === 'completed') {
+            if (status === 'completed') {
+              spinner.style.display = 'none';
               if (pollingInterval) clearInterval(pollingInterval);
               vscode.postMessage({
                 command: 'downloadMarkdown',
                 jobID
               });
+            } else if (status === 'failed') {
+              spinner.style.display = 'none';
+              if (pollingInterval) clearInterval(pollingInterval);
+              statusDetailsSpan.textContent = message.statusDetails || message.Status_display || "Job failed.";
+            } else {
+              spinner.style.display = 'inline-block';
             }
           }
+
+
 
           if (message.command === 'displayMarkdown') {
             latestMarkdown = message.markdown || "# No markdown received.";
