@@ -7,15 +7,12 @@ export function filewiseUnitTestCodeAssistantWebviewContent(content: string, tit
                    .replace(/'/g, "&#039;");
     }
 
-
     function renderData(data: any): string {
         if (data === null || data === undefined ||
             (Array.isArray(data) && data.length === 0) ||
             (typeof data === 'object' && Object.keys(data).length === 0)) {
             return `<p><em>Data: No data available</em></p>`;
         }
-
-
 
         function formatValue(val: any): string {
             if (typeof val === 'object' && val !== null) {
@@ -95,56 +92,57 @@ export function filewiseUnitTestCodeAssistantWebviewContent(content: string, tit
 
 
 
-        if (parsed.testcases && Array.isArray(parsed.testcases)) {
-            for (const [index, test] of parsed.testcases.entries()) {
-                htmlOutput += `
-                    <section style="margin-bottom: 40px; padding: 20px; border: 2px solid #555; border-radius: 10px; background-color: #292929;">
-                        <input
-                        type="checkbox"
-                        class="testcase-checkbox"
-                        data-index="${index}"
-                        data-description="${escapeHtml(test.description || '')}"
-                        data-testcase="${escapeHtml(test.testcase || '')}"
-                        data-data='${escapeHtml(JSON.stringify(test.data || []))}'
-                        data-confidence-score="${escapeHtml(String(test.confidence_score || ''))}"
-                        data-intervention-needed="${escapeHtml(String(test.intervention_needed || ''))}"
-                        >
-                        <label>Select this Test Case</label>
-
-                        <h3>Description:</h3>
-                        <p>${escapeHtml(test.description || '')}</p>
-
-                        <h3>Data:</h3>
-                        ${renderData(test.data || [])}
-
-                        <h3>Test Case:</h3>
-                        <pre id="testcase-${index}">${escapeHtml(test.testcase || '')}</pre>
-                    </section>
-                `;
+        if (Array.isArray(parsed.testcases)) {
+            if (parsed.testcases.length > 0) {
+                for (const [index, test] of parsed.testcases.entries()) {
+                    htmlOutput += `
+                        <section style="margin-bottom: 40px; padding: 20px; border: 2px solid #555; border-radius: 10px; background-color: #292929;">
+                            <input
+                                type="checkbox"
+                                class="testcase-checkbox"
+                                data-index="${index}"
+                                data-description="${escapeHtml(test.description || '')}"
+                                data-testcase="${escapeHtml(test.testcase || '')}"
+                                data-data='${escapeHtml(JSON.stringify(test.data || []))}'
+                                data-confidence-score="${escapeHtml(String(test.confidence_score || ''))}"
+                                data-intervention-needed="${escapeHtml(String(test.intervention_needed || ''))}"
+                            >
+                            <label>Select this Test Case</label>
+        
+                            <h3>Description:</h3>
+                            <p>${escapeHtml(test.description || '')}</p>
+        
+                            <h3>Data:</h3>
+                            ${renderData(test.data || [])}
+        
+                            <h3>Test Case:</h3>
+                            <pre id="testcase-${index}">${escapeHtml(test.testcase || '')}</pre>
+                        </section>
+                    `;
+                }
+            } else {
+                htmlOutput = `<div id="no-testcases"><p><strong>No testcases found.</strong></p></div>`;
             }
         } else {
-            // htmlOutput = `<p><strong>No testcases found.</strong></p><pre>${escapeHtml(content)}</pre>`;
-            htmlOutput = `<p><strong></strong></p><pre>${escapeHtml(content)}</pre>`;
-
+            htmlOutput = `<pre>${escapeHtml(content)}</pre>`;
         }
+        
+        
+        
     } catch (err) {
         htmlOutput = `<p style="color:red;">Error parsing content: ${escapeHtml((err as Error).message)}</p>`;
         errorOccurred = true;
     }
 
-    // Determine which buttons to show
+    /// Determine which buttons to show (initially hidden container)
     let downloadButtons = `
+    <div id="download-buttons" style="display: none;">
         <button onclick="downloadPDF()">Download PDF</button>
+        ${language.toLowerCase() === 'python' ? '<button onclick="downloadPython()">Download .py</button>' : ''}
+        ${language.toLowerCase() === 'java' ? '<button onclick="downloadJava()">Download .java</button>' : ''}
+        <button id="reject">Reject</button>
+    </div>
     `;
-
-    if (language.toLowerCase() === 'python') {
-        downloadButtons += `<button onclick="downloadPython()">Download .py</button>`;
-    } else if (language.toLowerCase() === 'java') {
-        downloadButtons += `<button onclick="downloadJava()">Download .java</button>`;
-    }
-
-    // Add Reject button (always shown)
-    downloadButtons += `<button id="reject">Reject</button>`;
 
 
     return `
@@ -215,7 +213,7 @@ export function filewiseUnitTestCodeAssistantWebviewContent(content: string, tit
     <body>
         <h2>${escapeHtml(title)}</h2>
 
-        <label style="display: flex; align-items: center; gap: 8px; margin-bottom: 20px;">
+        <label id="select-all-container" style="display: none; align-items: center; gap: 8px; margin-bottom: 20px;">
         <input type="checkbox" id="select-all-checkbox" onchange="toggleSelectAll(this)">
         Select All Test Cases
         </label>
@@ -373,7 +371,22 @@ export function filewiseUnitTestCodeAssistantWebviewContent(content: string, tit
                 document.getElementById('reject').addEventListener('click', () => {
                     vscode.postMessage({ command: 'reject' });
                 });
+
+                const hasTestCases = document.querySelectorAll('.testcase-checkbox').length > 0;
+
+                if (hasTestCases) {
+                    document.getElementById('download-buttons').style.display = 'block';
+                    document.getElementById('select-all-container').style.display = 'block';
+                } else {
+                    const noTC = document.getElementById('no-testcases');
+                    if (noTC) {
+                        noTC.style.display = 'block';
+                    }
+                }
+
+
             });
+
         </script>
     </body>
     </html>
