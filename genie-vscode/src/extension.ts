@@ -22,7 +22,7 @@ import { LoginRegisterCommandsProvider } from "./commands/sidebarCommandRegister
 import { GenieCommandsProvider } from "./commands/sidebarCommandRegister/GenieCommandsProvider";
 import { registerCkReviewCommand } from "./commands/review/ckReview";
 import { registerFilewiseUnitTestCodeAssistantCommand } from "./commands/assistant/filewiseUnitTestCodeAssistant";
-import { loadBaseApi, getGitKbApi, getKbBaseApi, getBaseApi } from "./auth/config";
+import { loadBaseApi, getKbBaseApi, getBaseApi } from "./auth/config";
 import { registerExplainGitKBCommand } from "./commands/gitKB/explainGitKB";
 import { registerGetCodeGitKBCommand } from "./commands/gitKB/getCodeGitKB";
 import { registerKnowledgeBaseQACommand } from "./commands/KB/queAnsFromKB";
@@ -73,7 +73,6 @@ export async function activate(context: vscode.ExtensionContext) {
 
   loadBaseApi(context);
   console.log("Current BASE_API:", getBaseApi());
-  console.log("Current GBASE API:", getGitKbApi());
   console.log("Current KBase API:", getKbBaseApi());
 
 

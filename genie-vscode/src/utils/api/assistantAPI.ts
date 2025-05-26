@@ -107,22 +107,19 @@ export async function postFilewiseUnitTestCodeAssistant(code: string, language: 
       signal: options?.signal,
     }
   );
-  console.log("response data",response.data);
 
   return response.data;
 }
 
 export async function pollJobStatus(JobID: string, authToken: string, options?: { signal?: AbortSignal }): Promise<any> {
   const response = await axios.post(
-    `${getBaseApi()}/assistant/file-testCases/status`,  // Post request instead of GET
-    { JobID },  // Pass jobId in the request body as JSON
+    `${getBaseApi()}/assistant/file-testCases/status`,
+    { JobID },
     {
       headers: getAuthHeaders(authToken),
       signal: options?.signal,
     }
   );
-  console.log("Job status response data", response.data);
-
-  return response.data;  // This will return the status information (e.g., { status: 'completed', results: ... })
+  return response.data;
 }
 

@@ -61,10 +61,6 @@ export function showUrlWebview(
                     <label for="url">Backend Domain:</label>
                     <input type="text" id="url" name="url" class="form-control" value='http://34.46.36.105:3000/genieapi' required>
                 </div>
-                <div class="form-group">
-                    <label for="gurl">Git Knowledge Base Domain:</label>
-                    <input type="text" id="gurl" name="gurl" class="form-control" value='http://34.46.36.105:3001/gitkbapi' required>
-                </div>
                  <div class="form-group">
                     <label for="kurl">Knowledge Base Domain:</label>
                     <input type="text" id="kurl" name="kurl" class="form-control" value='http://34.60.74.140/kbmsapi' required>
@@ -80,7 +76,6 @@ export function showUrlWebview(
                 authForm.addEventListener('submit', (event) => {
                     event.preventDefault();
                     const userUrl = document.getElementById('url').value;
-                    const GUrl = document.getElementById('gurl').value;
                     const KUrl = document.getElementById('kurl').value;
 
                     fetch(\`\${userUrl}/touch\`, {
@@ -89,7 +84,7 @@ export function showUrlWebview(
                     .then(response => response.json())
                     .then(data => {
                         if (data.message === 'API is valid and operational') {
-                            vscode.postMessage({ command: 'urlRegisterSuccess', message: ' URL Submitted successfully.', userUrl, GUrl, KUrl });
+                            vscode.postMessage({ command: 'urlRegisterSuccess', message: ' URL Submitted successfully.', userUrl, KUrl });
 
                             } else {
                             vscode.postMessage({ command: 'urlRegisterError', error: data.detail || 'URL SUbmiiton failed' });
@@ -114,8 +109,8 @@ export function showUrlWebview(
                 case 'urlRegisterSuccess':
                     vscode.window.showInformationMessage(message.message);
 
-                    if (message.userUrl && message.KUrl && message.GUrl) {
-                        exchangeUrl(context, message.userUrl, message.KUrl, message.GUrl);
+                    if (message.userUrl && message.KUrl) {
+                        exchangeUrl(context, message.userUrl, message.KUrl);
                     }
 
                     context.globalState.update('urlSubmitted', true);

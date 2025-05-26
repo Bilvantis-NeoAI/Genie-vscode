@@ -1,5 +1,5 @@
 import * as vscode from "vscode";
-import { postFilewiseUnitTestCodeAssistant, pollJobStatus } from "../../utils/api/assistantAPI";  // Ensure to update API function names
+import { postFilewiseUnitTestCodeAssistant, pollJobStatus } from "../../utils/api/assistantAPI";
 import { filewiseUnitTestCodeAssistantWebviewContent } from "../webview/assistant_webview/filewiseUnitTestCodeAssistantWebviewContent";
 import { getGitInfo } from "../gitInfo";
 
@@ -37,8 +37,6 @@ export function registerFilewiseUnitTestCodeAssistantCommand(context: vscode.Ext
 
     try {
       abortController = new AbortController();
-
-      // Create the webview panel
       panel = vscode.window.createWebviewPanel(
         "filewiseUnitTestCodeAssistant",
         "Filewise Unit Test Code Assistant",
@@ -46,7 +44,18 @@ export function registerFilewiseUnitTestCodeAssistantCommand(context: vscode.Ext
         { enableScripts: true }
       );
 
-      // Show initial loading screen
+      panel.webview.onDidReceiveMessage(
+        message => {
+          if (message.command === 'reject') {
+            panel?.dispose();
+          } else if (message.command === 'noTestCaseSelected') {
+            vscode.window.showWarningMessage("Please select at least one test case to download.");
+          }
+        },
+        undefined,
+        context.subscriptions
+      );
+
       panel.webview.html = filewiseUnitTestCodeAssistantWebviewContent(
         JSON.stringify({ status: "Initializing..."}),
         "Filewise Unit Test Code Assistant",
@@ -64,10 +73,15 @@ export function registerFilewiseUnitTestCodeAssistantCommand(context: vscode.Ext
         cancel.onCancellationRequested(() => {
           abortController.abort();
           wasCancelled = true;
+          isExecuting = false;
+          if (panel) {
+            panel.dispose();
+          }
+          vscode.window.showWarningMessage("Filewise Unit Test Code process was cancelled.");
         });
 
+
         try {
-          // Initial API call to generate jobId
           const initialResponse = await postFilewiseUnitTestCodeAssistant(
             text,
             language,
@@ -88,18 +102,15 @@ export function registerFilewiseUnitTestCodeAssistantCommand(context: vscode.Ext
             return;
           }
 
-          // Polling API call every 10 seconds
           let isJobCompleted = false;
           let result: any = null;
 
           while (!isJobCompleted && !wasCancelled) {
             const statusResponse = await pollJobStatus(jobId, authToken, { signal: abortController.signal });
 
-
-            // 🔄 Show live status in webview
             if (panel && statusResponse.Status_display) {
               panel.webview.html = filewiseUnitTestCodeAssistantWebviewContent(
-                JSON.stringify({ status: statusResponse.Status_display }), // 👈 wrap in object
+                JSON.stringify({ status: statusResponse.Status_display }),
                 "Filewise Unit Test Code Assistant",
                 language
               );
@@ -108,20 +119,18 @@ export function registerFilewiseUnitTestCodeAssistantCommand(context: vscode.Ext
 
             if (statusResponse.status.toLowerCase() === "completed") {
               isJobCompleted = true;
-              result = statusResponse.results; // ✅ Only results
+              result = statusResponse.results;
             } else if (statusResponse.status.toLowerCase() === "failed") {
               isJobCompleted = true;
-              vscode.window.showErrorMessage("Job failed.");
+              // vscode.window.showErrorMessage("Job failed.");
               break;
             } else {
-              // ⏱️ Wait before next poll
               await new Promise(resolve => setTimeout(resolve, 10000));
             }
           }
 
-          // Show the results in the webview
           if (result && panel) {
-            const formattedContent = JSON.stringify(result, null, 2); // Format results
+            const formattedContent = JSON.stringify(result, null, 2);
             panel.webview.html = filewiseUnitTestCodeAssistantWebviewContent(
               formattedContent,
               "Filewise Unit Test Code Assistant",
@@ -130,7 +139,7 @@ export function registerFilewiseUnitTestCodeAssistantCommand(context: vscode.Ext
           }
 
         } catch (error: any) {
-          if (wasCancelled) {
+          if (wasCancelled || error.name === "AbortError") {
             vscode.window.showWarningMessage("Filewise Unit Test Code process was cancelled.");
             return;
           }
@@ -151,3 +160,4 @@ export function registerFilewiseUnitTestCodeAssistantCommand(context: vscode.Ext
 
   context.subscriptions.push(testCases);
 }
+

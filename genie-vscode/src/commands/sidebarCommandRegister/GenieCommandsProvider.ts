@@ -19,7 +19,7 @@ export class GenieCommandsProvider implements vscode.TreeDataProvider<GenieComma
         new GenieCategory("Review", "list-unordered"),
         new GenieCategory("Git - Knowledge Base", "git-merge"),
         new GenieCategory("Knowledge Base", "book"),
-        new GenieCategory("Documents", "book")
+        new GenieCategory("Documents", "new-file")
       ]);
     } else if (element.label === "Assistant") {
       return Promise.resolve([

@@ -7,15 +7,12 @@ export function filewiseUnitTestCodeAssistantWebviewContent(content: string, tit
                    .replace(/'/g, "&#039;");
     }
 
-
     function renderData(data: any): string {
         if (data === null || data === undefined ||
             (Array.isArray(data) && data.length === 0) ||
             (typeof data === 'object' && Object.keys(data).length === 0)) {
             return `<p><em>Data: No data available</em></p>`;
         }
-
-
 
         function formatValue(val: any): string {
             if (typeof val === 'object' && val !== null) {
@@ -40,7 +37,6 @@ export function filewiseUnitTestCodeAssistantWebviewContent(content: string, tit
             return data.map((item, index) => {
                 let label = `Data ${index + 1}`;
                 if (typeof item === 'object' && item !== null && !Array.isArray(item)) {
-                    // Render object with key-value pairs
                     let rows = Object.entries(item).map(([key, value]) => {
                         return `<tr><td><strong>${escapeHtml(key)}</strong></td><td>${formatValue(value)}</td></tr>`;
                     }).join('');
@@ -55,7 +51,6 @@ export function filewiseUnitTestCodeAssistantWebviewContent(content: string, tit
                         </div>
                     `;
                 } else {
-                    // Render primitive or array
                     return `<div><strong>${label}:</strong> ${escapeHtml(JSON.stringify(item))}</div>`;
                 }
             }).join('');
@@ -85,17 +80,13 @@ export function filewiseUnitTestCodeAssistantWebviewContent(content: string, tit
     try {
         const parsed = JSON.parse(content);
 
-
-        imports = parsed.imports || ""; // Extract imports from response
-
-
+        imports = parsed.imports || "";
         if (Array.isArray(imports)) {
             imports = imports.join('\n');
         }
-
-
-
-        if (parsed.testcases && Array.isArray(parsed.testcases)) {
+        if (parsed.status && !parsed.testcases) {
+            htmlOutput = `<pre style="font-weight:bold;">${escapeHtml(parsed.status)}</pre>`;
+        } else if (parsed.testcases && Array.isArray(parsed.testcases)) {
             for (const [index, test] of parsed.testcases.entries()) {
                 htmlOutput += `
                     <section style="margin-bottom: 40px; padding: 20px; border: 2px solid #555; border-radius: 10px; background-color: #292929;">
@@ -123,28 +114,20 @@ export function filewiseUnitTestCodeAssistantWebviewContent(content: string, tit
                 `;
             }
         } else {
-            // htmlOutput = `<p><strong>No testcases found.</strong></p><pre>${escapeHtml(content)}</pre>`;
-            htmlOutput = `<p><strong></strong></p><pre>${escapeHtml(content)}</pre>`;
-
+            htmlOutput = `<p><strong>No testcases found.</strong></p><pre>${escapeHtml(content)}</pre>`;
         }
     } catch (err) {
         htmlOutput = `<p style="color:red;">Error parsing content: ${escapeHtml((err as Error).message)}</p>`;
-        errorOccurred = true;
     }
 
-    // Determine which buttons to show
     let downloadButtons = `
+    <div id="download-buttons" style="display: none;">
         <button onclick="downloadPDF()">Download PDF</button>
+        ${language.toLowerCase() === 'python' ? '<button onclick="downloadPython()">Download .py</button>' : ''}
+        ${language.toLowerCase() === 'java' ? '<button onclick="downloadJava()">Download .java</button>' : ''}
+        <button id="reject">Reject</button>
+    </div>
     `;
-
-    if (language.toLowerCase() === 'python') {
-        downloadButtons += `<button onclick="downloadPython()">Download .py</button>`;
-    } else if (language.toLowerCase() === 'java') {
-        downloadButtons += `<button onclick="downloadJava()">Download .java</button>`;
-    }
-
-    // Add Reject button (always shown)
-    downloadButtons += `<button id="reject">Reject</button>`;
 
 
     return `
@@ -215,7 +198,7 @@ export function filewiseUnitTestCodeAssistantWebviewContent(content: string, tit
     <body>
         <h2>${escapeHtml(title)}</h2>
 
-        <label style="display: flex; align-items: center; gap: 8px; margin-bottom: 20px;">
+        <label id="select-all-container" style="display: none; align-items: center; gap: 8px; margin-bottom: 20px;">
         <input type="checkbox" id="select-all-checkbox" onchange="toggleSelectAll(this)">
         Select All Test Cases
         </label>
@@ -373,12 +356,28 @@ export function filewiseUnitTestCodeAssistantWebviewContent(content: string, tit
                 document.getElementById('reject').addEventListener('click', () => {
                     vscode.postMessage({ command: 'reject' });
                 });
+
+                const hasTestCases = document.querySelectorAll('.testcase-checkbox').length > 0;
+
+                if (hasTestCases) {
+                    document.getElementById('download-buttons').style.display = 'block';
+                    document.getElementById('select-all-container').style.display = 'block';
+                } else {
+                    const noTC = document.getElementById('no-testcases');
+                    if (noTC) {
+                        noTC.style.display = 'block';
+                    }
+                }
+
+
             });
+
         </script>
     </body>
     </html>
     `;
 }
+
 
 
 
