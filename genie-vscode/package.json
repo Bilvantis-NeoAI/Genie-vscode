@@ -2,7 +2,7 @@
   "name": "neoai-vscode-bilvantis",
   "displayName": "NeoAI",
   "description": "A VS extension to comment code, review code, generate docstrings, unit tests, analyze code metrics, generate logs, and handle errors",
-  "version": "0.0.1",
+  "version": "0.0.3",
   "publisher": "Bilvantis",
   "type": "commonjs",
   "engines": {
@@ -133,6 +133,10 @@
         {
           "id": "genieCommands",
           "name": "NeoAI Commands"
+        },
+        {
+          "id": "genieReload",
+          "name": "Reload Plugin"
         }
       ]
     }

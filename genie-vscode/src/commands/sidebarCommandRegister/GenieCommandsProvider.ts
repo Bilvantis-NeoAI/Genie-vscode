@@ -18,7 +18,8 @@ export class GenieCommandsProvider implements vscode.TreeDataProvider<GenieComma
         new GenieCategory("Assistant", "extensions"),
         new GenieCategory("Review", "list-unordered"),
         new GenieCategory("Git - Knowledge Base", "git-merge"),
-        new GenieCategory("Knowledge Base", "book")
+        new GenieCategory("Knowledge Base", "book"),
+        new GenieCategory("Documents", "new-file")
       ]);
     } else if (element.label === "Assistant") {
       return Promise.resolve([
@@ -44,7 +45,7 @@ export class GenieCommandsProvider implements vscode.TreeDataProvider<GenieComma
       //   new GenieCommand("Security Review", "extension.reviewSecurity", 'lock', 'Identify security vulnerabilities in your code.'),
       //   new GenieCommand("Syntax Review", "extension.reviewSyntax"
       // , 'checklist', 'Check for syntax errors and inconsistencies.'),
-        
+
       // ]);
       if (review_config === 'HSBC') {
         return Promise.resolve([
@@ -74,18 +75,26 @@ export class GenieCommandsProvider implements vscode.TreeDataProvider<GenieComma
           // new GenieCommand("Over All Review", "extension.reviewAll", 'file-code', 'Perform All Reviews in one Feature.'),
         ]);
       }
+
     } else if (element.label === "Git - Knowledge Base") {
       return Promise.resolve([
         new GenieCommand("Explain", "extension.explainGitKB", 'comment', 'Get explanations form Git concepts.'),
         new GenieCommand("Get Code", "extension.getCodeGitKB", 'git-branch', 'Retrieve code snippets from the Git knowledge base.'),
-        
+
       ]);
     } else if (element.label === "Knowledge Base") {
       return Promise.resolve([
         new GenieCommand("Get Response From KB", "extension.knowledgeBaseQueAns", 'search', 'Fetch answers from the Knowledge Base for your queries.'),
 
       ]);
-    }
+
+
+  } else if (element.label === "Documents") {
+    return Promise.resolve([
+      new GenieCommand("Repo Documentation", "extension.repoDocumentation", 'repo-clone', 'Generate comprehensive documentation for a repository.'),
+
+    ]);
+  }
 
     return Promise.resolve([]);
   }

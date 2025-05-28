@@ -22,16 +22,18 @@ import { LoginRegisterCommandsProvider } from "./commands/sidebarCommandRegister
 import { GenieCommandsProvider } from "./commands/sidebarCommandRegister/GenieCommandsProvider";
 import { registerCkReviewCommand } from "./commands/review/ckReview";
 import { registerFilewiseUnitTestCodeAssistantCommand } from "./commands/assistant/filewiseUnitTestCodeAssistant";
-import { loadBaseApi, getGitKbApi, getKbBaseApi, getBaseApi } from "./auth/config";
+import { loadBaseApi, getKbBaseApi, getBaseApi } from "./auth/config";
 import { registerExplainGitKBCommand } from "./commands/gitKB/explainGitKB";
 import { registerGetCodeGitKBCommand } from "./commands/gitKB/getCodeGitKB";
 import { registerKnowledgeBaseQACommand } from "./commands/KB/queAnsFromKB";
 import { registerAllReviewCommand } from "./commands/review/allReview";
+import { registerRepoDocumentationCommand } from "./commands/document/repoDocumentation";
+import { GenieReloadProvider } from "./commands/sidebarCommandRegister/GenieReloadProvider";
 
 
 const jwt = require('jsonwebtoken');
 export let userId: string | undefined;
- 
+
 export async function activate(context: vscode.ExtensionContext) {
   const loginRegisterProvider = new LoginRegisterCommandsProvider();
   // Replace the openLoginPage command registration
@@ -49,23 +51,35 @@ export async function activate(context: vscode.ExtensionContext) {
       showLoginRegisterWebview(context, "login");
     })
   );
- 
+
   context.subscriptions.push(
     vscode.commands.registerCommand("extension.register", () => {
       showLoginRegisterWebview(context, "register");
     })
   );
 
+
+  const commandsProvider = new GenieCommandsProvider();
+  const reloadProvider = new GenieReloadProvider();
+
+  context.subscriptions.push(
+    vscode.window.registerTreeDataProvider("genieCommands", commandsProvider),
+    vscode.window.registerTreeDataProvider("genieReload", reloadProvider),
+
+    vscode.commands.registerCommand("extension.reloadGenie", () => {
+      vscode.commands.executeCommand("workbench.action.reloadWindow");
+    })
+  );
+
   loadBaseApi(context);
   console.log("Current BASE_API:", getBaseApi());
-  console.log("Current GBASE API:", getGitKbApi());
   console.log("Current KBase API:", getKbBaseApi());
-  
+
 
 //   context.globalState.update("authToken", undefined);
 // context.globalState.update("urlSubmitted", false);
   let urlSubmitted = context.globalState.get<boolean>("urlSubmitted") || false;
-  let authToken = context.globalState.get<string>("authToken");  
+  let authToken = context.globalState.get<string>("authToken");
   if (!urlSubmitted) {
     showUrlWebview(context);
   // Wait for the URL submission to complete
@@ -76,13 +90,13 @@ export async function activate(context: vscode.ExtensionContext) {
     };
     await waitForSubmission();
    }
- 
+
    urlSubmitted = context.globalState.get<boolean>("urlSubmitted") || false;
    authToken = context.globalState.get<string>("authToken");
 
    // Proceed after the URL is submitted
   if (urlSubmitted) {
-    if (authToken) {     
+    if (authToken) {
       try {
         const decodedToken = jwt.decode(authToken);
         const tokenExpiration = decodedToken.exp;
@@ -113,15 +127,15 @@ export async function activate(context: vscode.ExtensionContext) {
     showUrlWebview(context);
   }
 }
- 
+
 export function openLoginPage(context: vscode.ExtensionContext) {
   showLoginRegisterWebview(context, "login");
 }
- 
+
 export function openSignUpPage(context: vscode.ExtensionContext) {
   showLoginRegisterWebview(context, "register");
 }
- 
+
 /**
  * Activates all code-related commands using the stored auth token.
  * If the auth token is not available, an error message is shown.
@@ -143,7 +157,7 @@ export function activateCodeCommands(context: vscode.ExtensionContext) {
   registerOrgStdReviewCommand(context, authToken);
   registerCkReviewCommand(context, authToken);
   registerAllReviewCommand(context, authToken);
- 
+
   //Register all Assistant Commands
   registerAddCommentsAssistantCommand(context, authToken);
   registerAddDocstringsAssistantCommand(context, authToken);
@@ -154,7 +168,7 @@ export function activateCodeCommands(context: vscode.ExtensionContext) {
   registerExplainCodeAssistantCommand(context, authToken);
   registerUnittestCodeAssistantCommand(context, authToken);
   registerFilewiseUnitTestCodeAssistantCommand(context, authToken);
-    
+
   //Register Git KB Commands
   registerExplainGitKBCommand(context, authToken);
   registerGetCodeGitKBCommand(context, authToken);
@@ -162,12 +176,14 @@ export function activateCodeCommands(context: vscode.ExtensionContext) {
   //Register KB Commands
   registerKnowledgeBaseQACommand(context, authToken);
 
+  //Register all Documentation Commands
+  registerRepoDocumentationCommand(context, authToken);
+
 }
- 
- 
+
+
 export function deactivate() {}
- 
- 
- 
- 
- 
+
+
+
+

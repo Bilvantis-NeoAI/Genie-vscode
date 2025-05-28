@@ -1,120 +1,163 @@
 import * as vscode from "vscode";
-import { postFilewiseUnitTestCodeAssistant } from "../../utils/api/assistantAPI";
+import { postFilewiseUnitTestCodeAssistant, pollJobStatus } from "../../utils/api/assistantAPI";
 import { filewiseUnitTestCodeAssistantWebviewContent } from "../webview/assistant_webview/filewiseUnitTestCodeAssistantWebviewContent";
 import { getGitInfo } from "../gitInfo";
 
-let abortController = new AbortController(); 
+let abortController = new AbortController();
 let isExecuting = false;
 
 export function registerFilewiseUnitTestCodeAssistantCommand(context: vscode.ExtensionContext, authToken: string) {
   const testCases = vscode.commands.registerCommand("extension.assistantFilewiseUnitTestCode", async () => {
-      if (isExecuting) {
-        vscode.window.showWarningMessage("Filewise Unit Test Code is already in progress.");
-        return;
-      }
-      isExecuting = true;
-      const editor = vscode.window.activeTextEditor;
-      if (!editor) {
-        vscode.window.showWarningMessage("No active editor found!");
-        isExecuting = false;
-        return;
-      }
-      // const selection = editor.selection;
-      const text = editor.document.getText();
-      const language = editor.document.languageId;
-      
-      // Validate if the language is either 'java' or 'python'
-      if (language !== 'java' && language !== 'python') {
-        vscode.window.showErrorMessage('Only Java and Python files are allowed for this operation.');
-        isExecuting = false;
-        return;
-      }
-      
-      const workspacePath = vscode.workspace.workspaceFolders?.[0]?.uri.fsPath || "";
-      const { project_name, branch_name } = await getGitInfo(workspacePath);
+    if (isExecuting) {
+      vscode.window.showWarningMessage("Filewise Unit Test Code is already in progress.");
+      return;
+    }
+    isExecuting = true;
 
-      try {
-        abortController = new AbortController();
+    const editor = vscode.window.activeTextEditor;
+    if (!editor) {
+      vscode.window.showWarningMessage("No active editor found!");
+      isExecuting = false;
+      return;
+    }
 
-        const progressOptions: vscode.ProgressOptions = {
-          location: vscode.ProgressLocation.Notification,
-          title: "Generating Test Cases for given file",
-          cancellable: true,
-        };
+    const text = editor.document.getText();
+    const language = editor.document.languageId;
 
-        await vscode.window.withProgress(progressOptions, async (progress, cancel) => {
-          let wasCancelled = false;
-          cancel.onCancellationRequested(() => {
-            abortController.abort();
-            wasCancelled = true;
-          });
+    if (language !== 'java' && language !== 'python') {
+      vscode.window.showErrorMessage('Only Java and Python files are allowed for this operation.');
+      isExecuting = false;
+      return;
+    }
 
-          try {
-            // Wait for the response before opening the panel
-            const response = await postFilewiseUnitTestCodeAssistant(text, language, authToken, project_name, branch_name, { signal: abortController.signal });
-            if (wasCancelled) {
-              return;
-            }
-            // Open the panel only after receiving a response
-            const panel = vscode.window.createWebviewPanel(
-              "filewiseUnitTestCodeAssistant",
-              "Filewise Unit Test Code Assistant",
-              vscode.ViewColumn.Beside,
-              { enableScripts: true }
-            );
+    const workspacePath = vscode.workspace.workspaceFolders?.[0]?.uri.fsPath || "";
+    const { project_name, branch_name } = await getGitInfo(workspacePath);
 
-            const formattedContent = JSON.stringify(response, null, 2);
-            panel.webview.html = filewiseUnitTestCodeAssistantWebviewContent(formattedContent, "Filewise Unit Test Code Assistant", language);
+    let panel: vscode.WebviewPanel | undefined = undefined;
 
-            // Listen for messages from the webview
-            panel.webview.onDidReceiveMessage((message) => {
-              switch (message.command) {
-                case 'reject':
-                  panel.dispose();
-                  break;
-                case 'noTestCaseSelected':
-                  vscode.window.showErrorMessage(message.message);
-                  break;
-              }
-            });
+    try {
+      abortController = new AbortController();
+      panel = vscode.window.createWebviewPanel(
+        "filewiseUnitTestCodeAssistant",
+        "Filewise Unit Test Code Assistant",
+        vscode.ViewColumn.One,
+        { enableScripts: true }
+      );
 
-          } catch (error: any) {
-            if (wasCancelled) {
-              vscode.window.showWarningMessage("Filewise Unit Test Code process was cancelled.");
-              return; // Stop further execution
-            }
-            // if (error.name === "AbortError" || error === "canceled") {
-            //   wasCancelled = true;
-            // }
-
-            const panel = vscode.window.createWebviewPanel(
-              "filewiseUnitTestCodeAssistant",
-              "Filewise Unit Test Code Assistant",
-              vscode.ViewColumn.Beside,
-              { enableScripts: true }
-            );
-
-            if (error.response && error.response.status === 406) {
-              const { message, error: syntaxError, line_number, offset, content } = error.response.data.detail;
-              const errorMessage = `Error: ${message}\nDetails: ${syntaxError}\nLine: ${line_number}, Offset: ${offset}\nContent: ${content}`;
-              panel.webview.html = filewiseUnitTestCodeAssistantWebviewContent(JSON.stringify({ error: errorMessage }), "Filewise Unit Test Code Assistant", language);
-            } else {
-              const errorMessage = `Error Filewise Unit Test Code: ${error || "An unknown error occurred."}`;
-              panel.webview.postMessage({ command: "error", errorMessage });
-            }
-
-            // if (wasCancelled) {
-            //   vscode.window.showWarningMessage("Filewise Unit Test Code process was cancelled.");
-            // }
+      panel.webview.onDidReceiveMessage(
+        message => {
+          if (message.command === 'reject') {
+            panel?.dispose();
+          } else if (message.command === 'noTestCaseSelected') {
+            vscode.window.showWarningMessage("Please select at least one test case to download.");
           }
+        },
+        undefined,
+        context.subscriptions
+      );
+
+      panel.webview.html = filewiseUnitTestCodeAssistantWebviewContent(
+        JSON.stringify({ status: "Initializing..."}),
+        "Filewise Unit Test Code Assistant",
+        language
+      );
+
+      const progressOptions: vscode.ProgressOptions = {
+        location: vscode.ProgressLocation.Notification,
+        title: "Generating Test Cases for given file",
+        cancellable: true,
+      };
+
+      await vscode.window.withProgress(progressOptions, async (progress, cancel) => {
+        let wasCancelled = false;
+        cancel.onCancellationRequested(() => {
+          abortController.abort();
+          wasCancelled = true;
+          isExecuting = false;
+          if (panel) {
+            panel.dispose();
+          }
+          vscode.window.showWarningMessage("Filewise Unit Test Code process was cancelled.");
         });
- 
-      } catch (error:any) {
-        vscode.window.showErrorMessage(`Error Filewise Unit Test Code: ${error.message || "An unknown error occurred."}`);
-      } finally {
-        isExecuting = false;
-      }
+
+
+        try {
+          const initialResponse = await postFilewiseUnitTestCodeAssistant(
+            text,
+            language,
+            authToken,
+            project_name,
+            branch_name,
+            { signal: abortController.signal }
+          );
+
+          if (wasCancelled) {
+            return;
+          }
+
+          const jobId = initialResponse.JobID;
+
+          if (!jobId) {
+            vscode.window.showErrorMessage("Job ID was not generated.");
+            return;
+          }
+
+          let isJobCompleted = false;
+          let result: any = null;
+
+          while (!isJobCompleted && !wasCancelled) {
+            const statusResponse = await pollJobStatus(jobId, authToken, { signal: abortController.signal });
+
+            if (panel && statusResponse.Status_display) {
+              panel.webview.html = filewiseUnitTestCodeAssistantWebviewContent(
+                JSON.stringify({ status: statusResponse.Status_display }),
+                "Filewise Unit Test Code Assistant",
+                language
+              );
+
+            }
+
+            if (statusResponse.status.toLowerCase() === "completed") {
+              isJobCompleted = true;
+              result = statusResponse.results;
+            } else if (statusResponse.status.toLowerCase() === "failed") {
+              isJobCompleted = true;
+              // vscode.window.showErrorMessage("Job failed.");
+              break;
+            } else {
+              await new Promise(resolve => setTimeout(resolve, 10000));
+            }
+          }
+
+          if (result && panel) {
+            const formattedContent = JSON.stringify(result, null, 2);
+            panel.webview.html = filewiseUnitTestCodeAssistantWebviewContent(
+              formattedContent,
+              "Filewise Unit Test Code Assistant",
+              language
+            );
+          }
+
+        } catch (error: any) {
+          if (wasCancelled || error.name === "AbortError") {
+            vscode.window.showWarningMessage("Filewise Unit Test Code process was cancelled.");
+            return;
+          }
+
+          const errorMessage = `Error Filewise Unit Test Code: ${error.message || "An unknown error occurred."}`;
+          if (panel) {
+            panel.webview.postMessage({ command: "error", errorMessage });
+          }
+        }
+      });
+
+    } catch (error: any) {
+      vscode.window.showErrorMessage(`Error Filewise Unit Test Code: ${error.message || "An unknown error occurred."}`);
+    } finally {
+      isExecuting = false;
+    }
   });
 
   context.subscriptions.push(testCases);
 }
+
