@@ -51,6 +51,7 @@ export async function downloadMarkdown(JobID: string, authToken: string): Promis
   }
 }
 
+
 export async function cancelRepoDocumentation(jobID: string, authToken: string): Promise<void> {
   const apiUrl = `${getBaseApi()}/assistant/repo-documentation/cancel`;
   try {

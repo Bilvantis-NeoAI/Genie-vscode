@@ -282,7 +282,7 @@ export function getRepoDocWebviewContent(): string {
 
             if (status === 'completed') {
               spinner.style.display = 'none';
-              cancelBtn.style.display = 'none'; 
+              cancelBtn.style.display = 'none';
               if (pollingInterval) clearInterval(pollingInterval);
               vscode.postMessage({
                 command: 'downloadMarkdown',
@@ -290,7 +290,7 @@ export function getRepoDocWebviewContent(): string {
               });
             } else if (status === 'failed') {
               spinner.style.display = 'none';
-              cancelBtn.style.display = 'none'; 
+              cancelBtn.style.display = 'none';
               if (pollingInterval) clearInterval(pollingInterval);
               statusDetailsSpan.textContent = message.statusDetails || message.Status_display || "Repo documentation request was failed.";
 
@@ -301,7 +301,7 @@ export function getRepoDocWebviewContent(): string {
             } else {
               spinner.style.display = 'inline-block';
             }
-              
+
           }
 
           if (message.command === 'displayMarkdown') {
