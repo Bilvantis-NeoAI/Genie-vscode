@@ -59,11 +59,11 @@ export function showUrlWebview(
             <form id="authForm">
                 <div class="form-group">
                     <label for="url">Backend Domain:</label>
-                    <input type="text" id="url" name="url" class="form-control" value='http://34.46.36.105:3000/genieapi' required>
+                    <input type="text" id="url" name="url" class="form-control" required>
                 </div>
                  <div class="form-group">
                     <label for="kurl">Knowledge Base Domain:</label>
-                    <input type="text" id="kurl" name="kurl" class="form-control" value='http://34.60.74.140/kbmsapi' required>
+                    <input type="text" id="kurl" name="kurl" class="form-control" required>
                 </div>
                 <button type="submit" class="btn btn-primary btn-block">Submit</button>
             </form>

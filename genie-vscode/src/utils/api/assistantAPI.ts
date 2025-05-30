@@ -98,19 +98,6 @@ export async function postRefactorCodeAssistant(code: string, language: string, 
     return response.data;
     }
 
-export async function postFilewiseUnitTestCodeAssistant(code: string, language: string, authToken: string, project_name: any, branch_name: string, options?: { signal?: AbortSignal }): Promise<any> {
-  const response = await axios.post(
-    `${getBaseApi()}/assistant/file-testCases`,
-    { code, language, project_name, branch_name },
-    {
-      headers: getAuthHeaders(authToken),
-      signal: options?.signal,
-    }
-  );
-
-  return response.data;
-}
-
 export async function pollJobStatus(JobID: string, authToken: string, options?: { signal?: AbortSignal }): Promise<any> {
   const response = await axios.post(
     `${getBaseApi()}/assistant/file-testCases/status`,
@@ -121,5 +108,29 @@ export async function pollJobStatus(JobID: string, authToken: string, options?: 
     }
   );
   return response.data;
+}
+
+export async function postFilewiseUnitTestCodeAssistant(
+  code: string,
+  language: string,
+  authToken: string,
+  project_name: any,
+  branch_name: string,
+  options?: { signal?: AbortSignal }
+): Promise<any> {
+  try {
+    const response = await axios.post(
+      `${getBaseApi()}/assistant/file-testCases`,
+      { code, language, project_name, branch_name },
+      {
+        headers: getAuthHeaders(authToken),
+        signal: options?.signal,
+      }
+    );
+    return response.data;
+  } catch (error: any) {
+    console.error("*** API call failed:", error?.response?.data || error.message || error);
+    throw error;
+  }
 }
 
