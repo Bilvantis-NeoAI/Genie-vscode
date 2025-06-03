@@ -5,7 +5,10 @@ let KB_BASE_API = "";
 
 export const review_config:string = 'HSBC';
 
-export const ANSWER_CONFIG = "chroma";
+// export const ANSWER_CONFIG = "chroma";
+// export const SESSION_ID = "00a20e59-cc63-49d0-a6e5-92a6d9d4856d";
+export const SESSION_ID = "2568ac9e-157f-4a9f-852a-83caabe94dc3";
+export const DB_QUERY = false;
 
 // Getter function for BASE_API
 export const getBaseApi = (): string => BASE_API;

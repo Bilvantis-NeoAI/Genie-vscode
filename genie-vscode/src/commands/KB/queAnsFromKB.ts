@@ -1,5 +1,5 @@
 import * as vscode from "vscode";
-import { ANSWER_CONFIG } from "../../auth/config";
+import { DB_QUERY, SESSION_ID } from "../../auth/config";
 import { knowledgeBaseQA } from "../../utils/api/KBAPI";
 import { knowledgeBaseQAWebviewContent } from "../webview/KB_webview/queAnsFromKBWebviewContent";
 
@@ -7,6 +7,8 @@ let panel: vscode.WebviewPanel | undefined;
 let abortController = new AbortController();
 let isExecuting = false;
 
+const partition_name = "";
+const partition_value = "";
 export function registerKnowledgeBaseQACommand(
   context: vscode.ExtensionContext,
   authToken: string
@@ -18,7 +20,7 @@ export function registerKnowledgeBaseQACommand(
                 vscode.window.showWarningMessage("Get Response From KB is already in progress.");
                 return;
               }
-          
+
         isExecuting = true;
         const editor = vscode.window.activeTextEditor;
 
@@ -28,9 +30,9 @@ export function registerKnowledgeBaseQACommand(
           return;
         }
         const selection = editor.selection;
-        const question = editor.document.getText(selection); // Selected text is the question
+        const query = editor.document.getText(selection); // Selected text is the question
 
-        if (!question.trim()) {
+        if (!query.trim()) {
           vscode.window.showWarningMessage(
             "Please select some text to use as the question."
           );
@@ -45,18 +47,21 @@ export function registerKnowledgeBaseQACommand(
             title: "Getting Response From KB",
             cancellable: true,
           };
-          
+
           await vscode.window.withProgress(progressOptions, async (progress, cancel) => {
             let wasCancelled = false;
             cancel.onCancellationRequested(() => {
               abortController.abort();
-              wasCancelled = true;    
+              wasCancelled = true;
             });
             try{
             // Fetch response from knowledge base API
             const KBresponse = await knowledgeBaseQA(
-              question,
-              ANSWER_CONFIG,
+              query,
+              SESSION_ID,
+              DB_QUERY,
+              partition_name,
+              partition_value,
               authToken, {signal: abortController.signal}
             );
             if (wasCancelled) {
@@ -89,22 +94,22 @@ export function registerKnowledgeBaseQACommand(
                     // return; // Prevent error message when canceled
                   } else {
                     vscode.window.showErrorMessage(`Error Get Response From KB: ${error.message || "An unknown error occurred."}`);
-      
+
                   }
-                  
+
                 } finally {
                   if (wasCancelled) {
                     vscode.window.showWarningMessage("Get Response From KB process was cancelled.");
                   }
-                } 
+                }
         });
       } catch (error:any) {
         vscode.window.showErrorMessage(`Error Get Response From KB: ${error.message || "An unknown error occurred."}`);
-       
+
       } finally {
         isExecuting = false;
     }
-    
+
   });
 
   context.subscriptions.push(knowledgeBaseQueAns);
