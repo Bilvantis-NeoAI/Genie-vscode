@@ -1,12 +1,13 @@
-export function knowledgeBaseQAWebviewContent(question: string, title: string): string {
+export function knowledgeBaseQAWebviewContent(
+  question: string,
+  title: string
+): string {
   interface ParsedContent {
     session_id: string;
     response: string;
   }
 
   let parsedContent: ParsedContent;
-
-
 
   try {
     parsedContent = JSON.parse(question);
@@ -97,14 +98,11 @@ export function knowledgeBaseQAWebviewContent(question: string, title: string): 
 
     <script>
       const json_data = ${JSON.stringify(parsedContent, null, 2)};
-
       document.getElementById("downloadButton").addEventListener("click", () => {
         const docDefinition = {
           pageOrientation: 'landscape',
           content: [
             { text: '${title}', style: 'header' },
-            { text: 'Session ID:', style: 'subheader' },
-            { text: json_data.session_id || 'N/A', style: 'content' },
             { text: 'Answer:', style: 'subheader' },
             { text: json_data.response || 'No response provided.', style: 'content' }
           ],
@@ -115,9 +113,16 @@ export function knowledgeBaseQAWebviewContent(question: string, title: string): 
           }
         };
 
-        pdfMake.createPdf(docDefinition).download('${title}_${new Date().toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' }).replace(/ /g, '_').toLowerCase()}.pdf');
+        pdfMake.createPdf(docDefinition).download('${title}_${new Date()
+          .toLocaleDateString("en-GB", {
+            day: "2-digit",
+            month: "short",
+            year: "numeric",
+          })
+          .replace(/ /g, "_")
+          .toLowerCase()}.pdf');
       });
-    </script>
-  </body>
-  </html>`;
-}
+      </script>
+      </body>
+      </html>`;
+      }
