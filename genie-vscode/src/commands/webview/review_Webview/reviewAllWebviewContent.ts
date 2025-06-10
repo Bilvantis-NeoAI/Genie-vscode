@@ -5,6 +5,8 @@ export function reviewAllWebViewContent(content: string, title: string): string 
         fix: string;
         severity: string;
         status?: string;
+        violationType?: string;
+        policyReference?: string;
     }
 
     interface ParsedContent {
@@ -79,7 +81,7 @@ export function reviewAllWebViewContent(content: string, title: string): string 
 
         td.fix::-moz-scrollbar {
             height: 5px; /* Adjust scrollbar thickness */
-}
+        }
 
         th {
             background-color: #07439C;
@@ -109,6 +111,14 @@ export function reviewAllWebViewContent(content: string, title: string): string 
             border: none;
             border-radius: 5px;
             cursor: pointer;
+        }
+        .violation-type {
+            width: 80px;
+            word-wrap: break-word;
+        }
+        .policy-reference {
+            width: 100px;
+            word-wrap: break-word;
         }
         .download-btn:hover {
             background-color: #035f99;
@@ -142,56 +152,50 @@ export function reviewAllWebViewContent(content: string, title: string): string 
         </br>
         <h1>Issues:</h1>
         ${Object.entries(parsedContent.issues)
-            .map(([category, issues]) =>
-                Array.isArray(issues) && issues.length > 0
-                    ? `<h2>${category.charAt(0).toUpperCase() + category.slice(1)}:</h2>
-                        <div class="table-container">
-                        <table>
-                            <thead>
+            .map(([category, issues]) => {
+                const isCloud = category.toLowerCase().includes('cloud');
+
+                return Array.isArray(issues) && issues.length > 0
+                ? `<h2>${category.charAt(0).toUpperCase() + category.slice(1)}:</h2>
+                    <div class="table-container">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th class="s_no">S.No</th>
+                                <th class="identification">Identification</th>
+                                <th class="explanation">Explanation</th>
+                                <th>Fix</th>
+                                ${isCloud ? '<th class="violation-type">Violation Type</th><th class="policy-reference">Policy Reference</th>' : ''}
+                                <th class="severity">Severity</th>
+                                <th class="status">Status</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            ${issues.map((issue, index) => `
                                 <tr>
-                                    <th class="s_no">S.No</th>
-                                    <th class="identification">Identification</th>
-                                    <th class="explanation">Explanation</th>
-                                    <th>Fix</th>
-                                    <th class="severity">Severity</th>
-                                    <th class="status">Status</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                ${issues
-                                    .map(
-                                        (issue, index) => `
-                                    <tr>
-                                        <td>${index + 1}</td>
-                                        <td>${issue.identification}</td>
-                                        <td>${issue.explanation}</td>
-                                        <td class="fix"><pre>${issue.fix}</pre></td>
-                                        <td class="severity severity-${(issue.severity || '').toLowerCase()}">${issue.severity || 'N/A'}</td>
-                                        <td>
-                                            <select class="status-dropdown" onchange="updateStatus('${category}', ${index}, this.value)">
-                                                <option value="Accept" ${
-                                                  issue.status === "Accept"
-                                                    ? "selected"
-                                                    : ""
-                                                }>Accept</option>
-                                                <option value="Reject" ${
-                                                  issue.status === "Reject"
-                                                    ? "selected"
-                                                    : ""
-                                                }>Reject</option>
-                                            </select>
-                                        </td>
-                                    </tr>
-                                `
-                                    )
-                                    .join('')}
-                            </tbody>
-                        </table>
-                        </div>
-                        `
-                    : ""
-            )
-            .join("")}
+                                    <td>${index + 1}</td>
+                                    <td>${issue.identification}</td>
+                                    <td>${issue.explanation}</td>
+                                    <td class="fix"><pre>${issue.fix}</pre></td>
+                                    ${
+                                        isCloud
+                                        ? `<td class="violation-type">${issue.violationType || '-'}</td><td class="policy-reference">${issue.policyReference || '-'}</td>`
+                                        : ''
+                                    }
+                                    <td class="severity severity-${(issue.severity || '').toLowerCase()}">${issue.severity || 'N/A'}</td>
+                                    <td>
+                                        <select class="status-dropdown" onchange="updateStatus('${category}', ${index}, this.value)">
+                                            <option value="Accept" ${issue.status === "Accept" ? "selected" : ""}>Accept</option>
+                                            <option value="Reject" ${issue.status === "Reject" ? "selected" : ""}>Reject</option>
+                                        </select>
+                                    </td>
+                                </tr>`).join('')}
+                        </tbody>
+                    </table>
+                    </div>`
+                : '';
+            }).join("")}
+
     </div>
 
     <script>
@@ -223,35 +227,52 @@ export function reviewAllWebViewContent(content: string, title: string): string 
                         }
                     },
                     { text: 'Issues:', style: 'subheader', fontSize: 18 },
-                    ...Object.entries(updatedJsonData.issues).flatMap(([category, issues]) => 
-                        issues.length > 0 ? [
-                            { text: category.replace(/_/g, ' ').replace(/^\w/, (c) => c.toUpperCase()) + ':', style: 'subheader' },
-                            {
-                                table: {
-                                    headerRows: 1,
-                                    widths: ['10%', '21%', '21%', '23%', '15%', '10%'],
-                                    body: [
-                                        [
-                                            { text: 'S.No', bold: true, fillColor: '#E9E5E5', fontSize: 10, alignment: 'center' },
-                                            { text: 'Identification', bold: true, fillColor: '#E9E5E5', fontSize: 10, alignment: 'center' },
-                                            { text: 'Explanation', bold: true, fillColor: '#E9E5E5', fontSize: 10, alignment: 'center' },
-                                            { text: 'Fix', bold: true, fillColor: '#E9E5E5', fontSize: 10, alignment: 'center' },
-                                            { text: 'Severity', bold: true, fillColor: '#E9E5E5', fontSize: 10, alignment: 'center' },
-                                            { text: 'Status', bold: true, fillColor: '#E9E5E5', fontSize: 10, alignment: 'center' }
-                                        ],
-                                        ...issues.map((issue, index) => [
-                                            { text: index + 1, fontSize: 10, alignment: 'center' },
-                                            { text: issue.identification, fontSize: 10 },
-                                            { text: issue.explanation, fontSize: 10 },
-                                            { text: issue.fix, fontSize: 10 },
-                                            { text: issue.severity, fontSize: 10, alignment: 'center' },
-                                            { text: issue.status || 'Accept', fontSize: 10, alignment: 'center' }
-                                        ])
-                                    ]
+                    ...Object.entries(updatedJsonData.issues).flatMap(([category, issues]) =>
+                        issues.length > 0
+                            ? [
+                                { text: category.replace(/_/g, ' ').replace(/^\w/, c => c.toUpperCase()) + ':', style: 'subheader' },
+                                {
+                                    table: {
+                                        headerRows: 1,
+                                        widths: category.toLowerCase().includes("cloud")
+                                            ? ['5%', '17%', '16%', '21%', '8%', '13%', '10%', '10%']
+                                            : ['5%', '25%', '25%', '25%', '10%', '10%'],
+                                        body: [
+                                            [
+                                                { text: 'S.No', bold: true, fillColor: '#E9E5E5', fontSize: 10, alignment: 'center' },
+                                                { text: 'Identification', bold: true, fillColor: '#E9E5E5', fontSize: 10, alignment: 'center' },
+                                                { text: 'Explanation', bold: true, fillColor: '#E9E5E5', fontSize: 10, alignment: 'center' },
+                                                { text: 'Fix', bold: true, fillColor: '#E9E5E5', fontSize: 10, alignment: 'center' },
+                                                ...(category.toLowerCase().includes("cloud")
+                                                    ? [
+                                                            { text: 'Violation Type', bold: true, fillColor: '#E9E5E5', fontSize: 10, alignment: 'center' },
+                                                            { text: 'Policy Reference', bold: true, fillColor: '#E9E5E5', fontSize: 10, alignment: 'center' },
+                                                        ]
+                                                    : []),
+                                                { text: 'Severity', bold: true, fillColor: '#E9E5E5', fontSize: 10, alignment: 'center' },
+                                                { text: 'Status', bold: true, fillColor: '#E9E5E5', fontSize: 10, alignment: 'center' }
+                                            ],
+                                            ...issues.map((issue, index) => [
+                                                { text: index + 1, fontSize: 10, alignment: 'center' },
+                                                { text: issue.identification, fontSize: 10 },
+                                                { text: issue.explanation, fontSize: 10 },
+                                                { text: issue.fix, fontSize: 10 },
+                                                ...(category.toLowerCase().includes("cloud")
+                                                    ? [
+                                                            { text: issue.violationType || '-', fontSize: 10 },
+                                                            { text: issue.policyReference || '-', fontSize: 10 },
+                                                        ]
+                                                    : []),
+                                                { text: issue.severity, fontSize: 10, alignment: 'center' },
+                                                { text: issue.status || 'Accept', fontSize: 10, alignment: 'center' }
+                                            ])
+                                        ]
+                                    }
                                 }
-                            }
-                        ] : []
+                            ]
+                            : []
                     )
+
                 ],
                 styles: {
                     header: { fontSize: 18, bold: true, alignment: 'center', margin: [0, 0, 0, 10] },
@@ -260,39 +281,46 @@ export function reviewAllWebViewContent(content: string, title: string): string 
             };
              pdfMake.createPdf(docDefinition).download('${title}_${new Date().toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' }).replace(/ /g, '_').toLowerCase()}.pdf');
         });
-        document.getElementById("downloadButtonExcel").addEventListener("click", () => {
-    const updatedJsonData = {...json_data, issues};
+       document.getElementById("downloadButtonExcel").addEventListener("click", () => {
+        const updatedJsonData = {...json_data, issues};
+        
+        // Prepare data for Excel
+        const flattenedIssues = [];
+        Object.entries(updatedJsonData.issues).forEach(([category, categoryIssues]) => {
+            if (Array.isArray(categoryIssues)) {
+                categoryIssues.forEach((issue, index) => {
+                    flattenedIssues.push({
+                        'S.No': index + 1,
+                        'Category': category,
+                        'Identification': issue.identification || '-',
+                        'Explanation': issue.explanation || '-',
+                        'Fix': issue.fix || '-',
+                        'Violation Type': issue.violationType || '-',
+                        'Policy Reference': issue.policyReference || '-',
+                        'Severity': issue.severity || '-',
+                        'Status': issue.status || 'Accept'
+                    });
+                });
+            }
+        });
 
-    // Create the Issues sheet
-    const issuesSheet = XLSX.utils.json_to_sheet(
-        Object.entries(updatedJsonData.issues).flatMap(([category, issues]) => 
-            issues.map((issue, index) => ({
-                'S.No': index + 1,
-                'Category': category,
-                'Identification': issue.identification,
-                'Explanation': issue.explanation,
-                'Fix': issue.fix,
-                'Severity': issue.severity,
-                'Status': issue.status || 'Accept'
-            }))
-        )
-    );
+        // Create the Issues sheet
+        const issuesSheet = XLSX.utils.json_to_sheet(flattenedIssues);
 
-    // Create the Summary sheet
-    const summarySheet = XLSX.utils.aoa_to_sheet([
-        ['Quality', 'Remarks', 'Overall Severity'],
-        [updatedJsonData.quality, updatedJsonData.remarks, updatedJsonData.overallSeverity]
-    ]);
+        // Create the Summary sheet
+        const summarySheet = XLSX.utils.aoa_to_sheet([
+            ['Quality', 'Remarks', 'Overall Severity'],
+            [updatedJsonData.quality, updatedJsonData.remarks, updatedJsonData.overallSeverity]
+        ]);
 
-    // Create the workbook and append the sheets
-    const workbook = XLSX.utils.book_new();
-    XLSX.utils.book_append_sheet(workbook, issuesSheet, 'Issues');
-    XLSX.utils.book_append_sheet(workbook, summarySheet, 'Summary');
+        // Create the workbook and append the sheets
+        const workbook = XLSX.utils.book_new();
+        XLSX.utils.book_append_sheet(workbook, issuesSheet, 'Issues');
+        XLSX.utils.book_append_sheet(workbook, summarySheet, 'Summary');
 
-    // Write the workbook to a file
-    XLSX.writeFile(workbook, '${title}_${new Date().toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' }).replace(/ /g, '_').toLowerCase()}.xlsx');
-});
-
+        // Write the workbook to a file
+        XLSX.writeFile(workbook, '${title}_${new Date().toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' }).replace(/ /g, '_').toLowerCase()}.xlsx');
+    });
 
     </script>
 </body>
