@@ -1,8 +1,6 @@
 import * as vscode from 'vscode';
 import { activateCodeCommands } from '../../../extension';
-// import { BASE_API } from '../../../auth/config';
 import { getBaseApi } from '../../../auth/config';
-
 import { GenieCommandsProvider } from '../../sidebarCommandRegister/GenieCommandsProvider';
 let activeWebview: vscode.WebviewPanel | null = null; // Keep track of the active webview
  
@@ -16,7 +14,7 @@ export function showLoginRegisterWebview(
     if (activeWebview) {
         activeWebview.dispose(); // Dispose of any existing webview
     }
-   
+ 
     const panel = vscode.window.createWebviewPanel(
         'loginRegisterWebview',
         mode === 'login' ? 'Login' : 'Register',
@@ -28,11 +26,8 @@ export function showLoginRegisterWebview(
     );
  
     // const formAction = mode === 'login' ? `${BASE_API}/auth/login` : `${BASE_API}/auth/register`;
-    
-    // const formAction = mode === 'login' ? `${BASE_API}/auth/login` : `${BASE_API}/auth/register`;
-
     const formAction = mode === 'login' ? `${getBaseApi()}/auth/login` : `${getBaseApi()}/auth/register`;
-
+ 
     const message_html = `
         ${error_message ? `<div class="alert alert-danger" role="alert">${error_message}</div>` : ''}
         ${success_message ? `<div class="alert alert-success" role="alert">${success_message}</div>` : ''}
@@ -48,6 +43,7 @@ export function showLoginRegisterWebview(
         <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
         <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
         <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600&display=swap" rel="stylesheet">
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/crypto-js/4.1.1/crypto-js.min.js"></script>
         <style>
             body {
                 display: flex;
@@ -97,7 +93,7 @@ export function showLoginRegisterWebview(
                 </div>
             </div>
             ` : ''}
-
+ 
             <!-- For Register -->
             ${mode === 'register' ? `
             <div class="row">
@@ -163,11 +159,11 @@ export function showLoginRegisterWebview(
     </div>
 </div>
 ` : ''}
-
+ 
             <!-- Submit Button -->
             <button type="submit" class="btn btn-primary btn-block">${mode === 'login' ? 'Login' : 'Register'}</button>
             </form>
-
+ 
             <div class="auth-link">
                 <p>
                     ${mode === 'login'
@@ -178,13 +174,37 @@ export function showLoginRegisterWebview(
             </div>
         </div>
         <script>
-            const vscode = acquireVsCodeApi();
  
-            function toggleMode(mode) {
-                vscode.postMessage({ command: 'toggle', mode: mode });
+        const vscode = acquireVsCodeApi();
+ 
+        function encryptData(requestData) {
+            try {
+                const key = CryptoJS.enc.Utf8.parse("1234567890123456");
+                const iv = CryptoJS.enc.Utf8.parse("abcdefghijklmnop");
+ 
+                const encrypted = CryptoJS.AES.encrypt(requestData, key, {
+                    iv: iv,
+                    mode: CryptoJS.mode.CBC,
+                    padding: CryptoJS.pad.Pkcs7,
+                });
+ 
+                console.log("Encryption successful: " + encrypted.toString());
+                vscode.postMessage({ command: 'log', message: "Encryption successful: " + encrypted.toString() });
+ 
+                return encrypted.toString();
+            } catch (error) {
+            console.error("Encryption failed: " + error);
+                vscode.postMessage({ command: 'log', message: "Encryption failed: " + error.toString() });
+ 
+                return { status: false, data: error.toString() };
             }
-            
-            document.querySelectorAll('.toggle-password').forEach((button) => {
+        }
+ 
+function toggleMode(mode) {
+    vscode.postMessage({ command: 'toggle', mode: mode });
+}
+ 
+document.querySelectorAll('.toggle-password').forEach((button) => {
     button.addEventListener('click', () => {
         const passwordInput = button.closest('.input-group').querySelector('input');
         const icon = button.querySelector('i');
@@ -199,66 +219,82 @@ export function showLoginRegisterWebview(
         }
     });
 });
-
-            const authForm = document.getElementById('authForm');
-            if (authForm) {
-                authForm.addEventListener('submit', (event) => {
-                    event.preventDefault();
-                    if ('${mode}' === 'register') {
-                        const payload = {
-                            email:document.getElementById('email').value,
-                            full_name: document.getElementById('full_name').value,
-                            password: document.getElementById('password').value,
-                            confirm_password: document.getElementById('confirm_password').value,
-                            username: document.getElementById('username').value,
-                            company_name: document.getElementById('company_name').value,
-
-                            
-                        };
  
-                        fetch('${formAction}', {
-                            method: 'POST',
-                            headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
-                            body: JSON.stringify(payload),
-                        })
-                        .then(response => response.json())
-                        .then(data => {
-                            if (data.message === 'User registered successfully') {
-                                vscode.postMessage({ command: 'loginRegisterSuccess', message: 'Registration successful! Please login.' });
-                            } else {
-                                vscode.postMessage({ command: 'loginRegisterError', error: data.detail || 'Registration failed' });
-                            }
-                        })
-                        .catch(error => {
-                            vscode.postMessage({ command: 'loginRegisterError', error: error.message });
-                        });
-                    } else {
-                        const formData = new FormData(event.target);
-                        fetch('${formAction}', {
-                            method: 'POST',
-                            body: formData,
-                        })
-                        .then(response => response.json())
-                        .then(data => {
-                            if (data && data.access_token) {
-                                vscode.postMessage({ command: 'loginRegisterSuccess', token: data.access_token });
-                            } else {
-                                const errorDetail = data?.detail || 'Login failed! Incorrect login details';
-                                vscode.postMessage({ command: 'loginRegisterError', error: errorDetail });
-                            }
-                        })
-                        .catch(error => {
-                            vscode.postMessage({ command: 'loginRegisterError', error: error.message });
-                        });
+const authForm = document.getElementById('authForm');
+if (authForm) {
+    authForm.addEventListener('submit', (event) => {
+        event.preventDefault();
  
-                    }
-                });
-            }
+        if ('${mode}' === 'register') {
+        const rawPassword = document.getElementById('password').value;
+        const rawConfirmPassword = document.getElementById('confirm_password').value;
+ 
+        const encryptedPassword = encryptData(rawPassword);
+        const encryptedConfirmPassword = encryptData(rawConfirmPassword);
+ 
+            const payload = {
+                email: document.getElementById('email').value,
+                full_name: document.getElementById('full_name').value,
+                password: encryptedPassword,
+                confirm_password: encryptedConfirmPassword,
+                username: document.getElementById('username').value,
+                company_name: document.getElementById('company_name').value,
+            };
+ 
+            fetch('${formAction}', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
+                body: JSON.stringify(payload),
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.message === 'User registered successfully') {
+                    vscode.postMessage({ command: 'loginRegisterSuccess', message: 'Registration successful! Please login.' });
+                } else {
+                    vscode.postMessage({ command: 'loginRegisterError', error: data.detail || 'Registration failed' });
+                }
+            })
+            .catch(error => {
+                vscode.postMessage({ command: 'loginRegisterError', error: error.message });
+            });
+ 
+        } else {
+            const formData = new FormData(event.target);
+            const email = formData.get('email');
+            const password = formData.get('password');
+ 
+            const encryptedPassword = encryptData(password);
+            formData.delete('email');
+            formData.set('username', email);
+            formData.set('password', encryptedPassword);
+            console.log("***", formData);
+ 
+            fetch('${formAction}', {
+                method: 'POST',
+                body: formData,
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data && data.access_token) {
+                    vscode.postMessage({ command: 'loginRegisterSuccess', token: data.access_token });
+                } else {
+                    const errorDetail = data?.detail || 'Login failed! Incorrect login details';
+                    vscode.postMessage({ command: 'loginRegisterError', error: errorDetail });
+                }
+            })
+            .catch(error => {
+                vscode.postMessage({ command: 'loginRegisterError', error: error.message });
+            });
+        }
+    });
+}
+ 
+ 
         </script>
     </body>
     </html>
     `;
-   
+ 
     panel.webview.html = webviewContent;
  
     panel.webview.onDidReceiveMessage(
@@ -293,6 +329,7 @@ export function showLoginRegisterWebview(
         context.subscriptions
     );
 }
+ 
  
  
  
