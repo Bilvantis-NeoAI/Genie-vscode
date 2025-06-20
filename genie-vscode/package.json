@@ -113,7 +113,12 @@
       {
         "command": "extension.fixIt",
         "title": " Debug Review Selected"
+      },
+      {
+        "command": "extension.openChatbot",
+        "title": "Open NeoAI Chatbot"
       }
+
     ],
     "viewsContainers": {
       "activitybar": [
@@ -137,7 +142,8 @@
         {
           "id": "genieReload",
           "name": "Reload Plugin"
-        }
+        },
+        { "id": "neoaiChatbot", "name": "Chatbot" }
       ]
     }
   },

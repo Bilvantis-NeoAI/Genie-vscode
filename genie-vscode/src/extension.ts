@@ -29,6 +29,7 @@ import { registerKnowledgeBaseQACommand } from "./commands/KB/queAnsFromKB";
 import { registerAllReviewCommand } from "./commands/review/allReview";
 import { registerRepoDocumentationCommand } from "./commands/document/repoDocumentation";
 import { GenieReloadProvider } from "./commands/sidebarCommandRegister/GenieReloadProvider";
+import { openChatbotWebview } from "./commands/webview/chatbotWebview";
 
 
 const jwt = require('jsonwebtoken');
@@ -126,6 +127,15 @@ export async function activate(context: vscode.ExtensionContext) {
     // If URL submission hasn't occurred, show URL webview
     showUrlWebview(context);
   }
+
+
+  context.subscriptions.push(
+    vscode.commands.registerCommand("extension.openChatbot", () => {
+      openChatbotWebview(context);
+    })
+  );
+
+
 }
 
 export function openLoginPage(context: vscode.ExtensionContext) {
