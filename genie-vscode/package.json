@@ -142,8 +142,7 @@
         {
           "id": "genieReload",
           "name": "Reload Plugin"
-        },
-        { "id": "neoaiChatbot", "name": "Chatbot" }
+        }
       ]
     }
   },
