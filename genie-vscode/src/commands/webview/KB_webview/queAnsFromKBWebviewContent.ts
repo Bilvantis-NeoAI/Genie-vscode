@@ -5,6 +5,7 @@ export function knowledgeBaseQAWebviewContent(
   interface ParsedContent {
     session_id: string;
     response: string;
+    query: string;
   }
 
   let parsedContent: ParsedContent;
@@ -92,6 +93,8 @@ export function knowledgeBaseQAWebviewContent(
       <div class="button-container">
         <button id="downloadButton" class="download-btn">Download as PDF</button>
       </div>
+      <h2>Question:</h2>
+        <p class="formatted-text">${parsedContent.query  || "No content available"}</p>
       <h2>Answer:</h2>
       ${formatAnswer(parsedContent.response || "No response available.")}
     </div>
@@ -103,6 +106,8 @@ export function knowledgeBaseQAWebviewContent(
           pageOrientation: 'landscape',
           content: [
             { text: '${title}', style: 'header' },
+            { text: 'Question:', style: 'subheader' },
+            { text: json_data.query || 'No question provided.', style: 'content' },
             { text: 'Answer:', style: 'subheader' },
             { text: json_data.response || 'No response provided.', style: 'content' }
           ],

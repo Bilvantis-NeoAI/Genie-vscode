@@ -68,7 +68,12 @@ export function registerKnowledgeBaseQACommand(
               return;
             }
 
-            const formattedContent = JSON.stringify(KBresponse, null, 2);
+            const fullKBresponse = {
+              ...KBresponse,
+              query 
+            };
+
+            const formattedContent = JSON.stringify(fullKBresponse, null, 2);
         if (panel) {
           panel.reveal(vscode.ViewColumn.One);
         }

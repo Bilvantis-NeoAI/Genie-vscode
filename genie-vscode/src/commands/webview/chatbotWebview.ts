@@ -412,7 +412,7 @@ function getWebviewContent(): string {
 
       .message {
       max-width: 95%;
-      padding: 12px;
+      padding: 6px;
       border-radius: 6px;
       white-space: pre-wrap;
       font-size: 13px;
