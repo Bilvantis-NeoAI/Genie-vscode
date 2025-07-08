@@ -1,50 +1,77 @@
 import * as vscode from "vscode";
-import { exec } from 'child_process';
-import * as path from 'path';
-import { architectureReviewWebviewContent } from "../webview/review_Webview/architectureReviewWebviewContent"
+import { exec } from "child_process";
+import * as path from "path";
+import * as fs from "fs";
+
+import { architectureReviewWebviewContent } from "../webview/review_Webview/architectureReviewWebviewContent";
 
 export function registerArchitectureReviewCommand(context: vscode.ExtensionContext) {
-  const runArchitectureReview = vscode.commands.registerCommand('extension.architectureReview', () => {
-    const panel = vscode.window.createWebviewPanel(
-      'ArchitectureReview',
-      'Architecture Review',
-      vscode.ViewColumn.One,
-      { enableScripts: true }
-    );
+  const runArchitectureReview = vscode.commands.registerCommand(
+    "extension.architectureReview",
+    () => {
+      const panel = vscode.window.createWebviewPanel(
+        "ArchitectureReview",
+        "Architecture Review",
+        vscode.ViewColumn.One,
+        { enableScripts: true }
+      );
 
-    panel.webview.html = architectureReviewWebviewContent();
+      panel.webview.html = architectureReviewWebviewContent();
 
-    panel.webview.onDidReceiveMessage(
-      async (message) => {
-        if (message.command === 'fetchDocumentation') {
-          const { repoUrl, pat, branch } = message.payload;
+      panel.webview.onDidReceiveMessage(async (message) => {
+        switch (message.command) {
+          case "selectJavaFile": {
+            const fileUri = await vscode.window.showOpenDialog({
+              canSelectMany: false,
+              openLabel: "Select .java File",
+              filters: { "Java Files": ["java"] }
+            });
+            if (fileUri && fileUri[0]) {
+              panel.webview.postMessage({
+                command: "setJavaPath",
+                path: fileUri[0].fsPath
+              });
+            }
+            break;
+          }
 
-          const jarPath = path.join(context.extensionPath, 'resources', 'HelloWorld.jar');
-          exec(`java -jar "${jarPath}"`, (error, stdout, stderr) => {
-            let outputText = '';
+          case "generateArchitectureReview": {
+            const javaPath = message.javaPath;
 
-            if (error) {
-              outputText = `Error: ${error.message}`;
-            } else if (stderr) {
-              outputText = `stderr: ${stderr}`;
-            } else {
-              outputText = stdout;
+            const jarPath = path.join(context.extensionPath, "resources", "JavaAnalyzer.jar");
+            const javaDir = path.dirname(javaPath);
+            const reportPath = path.join(javaDir, "output.txt");
+
+            if (!fs.existsSync(jarPath)) {
+              vscode.window.showErrorMessage("JAR file not found at: " + jarPath);
+              return;
             }
 
-            panel.webview.postMessage({
-              command: 'displayMarkdown',
-              markdown: outputText
+            exec(`java -jar "${jarPath}" "${javaPath}"`, { cwd: javaDir }, (error, stdout, stderr) => {
+              let output = "";
+
+              if (fs.existsSync(reportPath)) {
+                output = fs.readFileSync(reportPath, "utf-8");
+                // Optionally delete file
+                // fs.unlinkSync(reportPath);
+              } else {
+                output = "Error: Report file not found.";
+                if (stderr) output += `\n[stderr]: ${stderr}`;
+                if (error) output += `\n[error]: ${error.message}`;
+              }
+
+              panel.webview.postMessage({
+                command: "displayReportMarkdown",
+                output
+              });
             });
-          });
+
+            break;
+          }
         }
-      },
-      undefined,
-      context.subscriptions
-    );
-
-
-  });
+      });
+    }
+  );
 
   context.subscriptions.push(runArchitectureReview);
 }
-

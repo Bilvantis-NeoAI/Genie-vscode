@@ -1,118 +1,251 @@
+// export function architectureReviewWebviewContent(): string {
+//   return `
+// <!DOCTYPE html>
+// <html lang="en">
+// <head>
+//   <meta charset="UTF-8" />
+//   <title>Architecture Review</title>
+//   <style>
+//     body {
+//       font-family: 'Poppins', sans-serif;
+//       background-color: #f0f2f5;
+//       color: black;
+//       margin: 0;
+//       padding: 0;
+//       display: flex;
+//       justify-content: center;
+//       align-items: flex-start;
+//       min-height: 100vh;
+//     }
+//     .container {
+//       max-width: 950px;
+//       width: 100%;
+//       padding: 30px;
+//       margin-top: 40px;
+//       margin-bottom: 40px;
+//       box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+//       background-color: #ffffff;
+//       border-radius: 10px;
+//     }
+//     h1 {
+//       font-size: 2rem;
+//       margin-bottom: 12px;
+//       color: #07439C;
+//     }
+//     label {
+//       display: block;
+//       margin-top: 20px;
+//       font-weight: bold;
+//       color: black;
+//     }
+//     .file-path {
+//       font-size: 14px;
+//       color: #333;
+//       margin-top: 6px;
+//       word-break: break-all;
+//     }
+//     .button-wrapper {
+//       text-align: center;
+//       margin-top: 30px;
+//     }
+//     button {
+//       padding: 10px 18px;
+//       font-size: 14px;
+//       background-color: #07439C;
+//       color: #ffffff;
+//       border: none;
+//       border-radius: 4px;
+//       cursor: pointer;
+//       margin: 10px 0;
+//     }
+//     #report_container {
+//       margin-top: 20px;
+//       white-space: pre-wrap;
+//       font-family: monospace;
+//     }
+//   </style>
+// </head>
+// <body>
+//   <div class="container">
+//     <h1>Architecture Review</h1>
+
+//     <label>Select .java File <span style="color: red;">*</span></label>
+//     <button id="select_java">Select Java File</button>
+//     <div id="java_path" class="file-path"></div>
+
+//     <div class="button-wrapper">
+//       <button id="submit">Submit</button>
+//     </div>
+
+//     <div id="report_container"></div>
+//   </div>
+
+//   <script>
+//     const vscode = acquireVsCodeApi();
+//     let javaPath = "";
+
+//     document.getElementById("select_java").addEventListener("click", () => {
+//       vscode.postMessage({ command: "selectJavaFile" });
+//     });
+
+//     document.getElementById("submit").addEventListener("click", () => {
+//       const container = document.getElementById("report_container");
+//       container.innerHTML = "";
+
+//       if (!javaPath) {
+//         alert("Please select a .java file.");
+//         return;
+//       }
+
+//       vscode.postMessage({
+//         command: "generateArchitectureReview",
+//         javaPath
+//       });
+//     });
+
+//     window.addEventListener("message", (event) => {
+//       const message = event.data;
+//       if (message.command === "setJavaPath") {
+//         javaPath = message.path;
+//         document.getElementById("java_path").textContent = javaPath;
+//       } else if (message.command === "displayReportMarkdown") {
+//         const container = document.getElementById("report_container");
+//         container.innerHTML = message.output || "No report content found.";
+//       }
+//     });
+//   </script>
+// </body>
+// </html>`;
+// }
+
+
+
 export function architectureReviewWebviewContent(): string {
   return `
-  <!DOCTYPE html>
-  <html lang="en">
-  <head>
-    <meta charset="UTF-8">
-    <title>Architecture Review</title>
-    <style>
-      body {
-        font-family: sans-serif;
-        padding: 40px;
-        max-width: 600px;
-        margin: auto;
-        background-color: var(--vscode-editor-background);
-        color: var(--vscode-editor-foreground);
-      }
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Architecture Review</title>
+  <style>
+    body {
+      font-family: 'Poppins', sans-serif;
+      background-color: #f0f2f5;
+      color: black;
+      margin: 0;
+      padding: 0;
+      display: flex;
+      justify-content: center;
+      align-items: flex-start;
+      min-height: 100vh;
+    }
+    .container {
+      max-width: 950px;
+      width: 100%;
+      padding: 30px;
+      margin-top: 40px;
+      margin-bottom: 40px;
+      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+      background-color: #ffffff;
+      border-radius: 10px;
+    }
+    h1 {
+      font-size: 2rem;
+      margin-bottom: 12px;
+      color: #07439C;
+    }
+    label {
+      display: block;
+      margin-top: 20px;
+      font-weight: bold;
+      color: black;
+    }
+    .file-select-wrapper {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      margin-top: 10px;
+      flex-wrap: wrap;
+    }
+    .file-path {
+      font-size: 14px;
+      color: #333;
+      max-width: 700px;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+    .button-wrapper {
+      text-align: center;
+      margin-top: 30px;
+    }
+    button {
+      padding: 10px 18px;
+      font-size: 14px;
+      background-color: #07439C;
+      color: #ffffff;
+      border: none;
+      border-radius: 4px;
+      cursor: pointer;
+    }
+    #report_container {
+      margin-top: 20px;
+      white-space: pre-wrap;
+      font-family: monospace;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>Architecture Review</h1>
 
-      h1 {
-        font-size: 1.5rem;
-        text-align: center;
-        margin-bottom: 30px;
-      }
-
-      .form-field {
-        margin-bottom: 20px;
-      }
-
-      label {
-        font-weight: bold;
-        display: block;
-        margin-bottom: 5px;
-      }
-
-      input {
-        width: 100%;
-        padding: 10px;
-        font-size: 14px;
-        border: 1px solid #ccc;
-        border-radius: 4px;
-      }
-
-      button {
-        width: 100%;
-        padding: 12px;
-        font-size: 16px;
-        background-color: var(--vscode-button-background);
-        color: var(--vscode-button-foreground);
-        border: none;
-        border-radius: 4px;
-        cursor: pointer;
-      }
-
-      button:hover {
-        background-color: var(--vscode-button-hoverBackground);
-      }
-
-      textarea {
-        margin-top: 30px;
-        width: 100%;
-        height: 200px;
-        padding: 10px;
-        font-size: 14px;
-        border: 1px solid #ccc;
-        border-radius: 4px;
-        background-color: #f8f8f8;
-      }
-    </style>
-  </head>
-  <body>
-    <h1>📘 Architecture Review</h1>
-
-    <div class="form-field">
-      <label for="repoUrl">Repository URL</label>
-      <input type="text" id="repoUrl" placeholder="e.g. https://github.com/user/repo">
+    <label>Select .java File <span style="color: red;">*</span></label>
+    <div class="file-select-wrapper">
+      <button id="select_java">Select Java File</button>
+      <div id="java_path" class="file-path"></div>
     </div>
 
-    <div class="form-field">
-      <label for="pat">GitHub Personal Access Token (PAT)</label>
-      <input type="password" id="pat" placeholder="Enter your PAT">
+    <div class="button-wrapper">
+      <button id="submit">Submit</button>
     </div>
 
-    <div class="form-field">
-      <label for="branch">Branch Name</label>
-      <input type="text" id="branch" placeholder="e.g. main">
-    </div>
+    <div id="report_container"></div>
+  </div>
 
-    <button id="submit">Submit</button>
+  <script>
+    const vscode = acquireVsCodeApi();
+    let javaPath = "";
 
-    <textarea id="markdownDisplay" readonly placeholder="Output will appear here..."></textarea>
+    document.getElementById("select_java").addEventListener("click", () => {
+      vscode.postMessage({ command: "selectJavaFile" });
+    });
 
-    <script>
-      const vscode = acquireVsCodeApi();
+    document.getElementById("submit").addEventListener("click", () => {
+      const container = document.getElementById("report_container");
+      container.innerHTML = "";
 
-      document.getElementById("submit").addEventListener("click", () => {
-        const payload = {
-          repoUrl: document.getElementById("repoUrl").value,
-          pat: document.getElementById("pat").value,
-          branch: document.getElementById("branch").value
-        };
+      if (!javaPath) {
+        alert("Please select a .java file.");
+        return;
+      }
 
-        vscode.postMessage({
-          command: 'fetchDocumentation',
-          payload: payload
-        });
+      vscode.postMessage({
+        command: "generateArchitectureReview",
+        javaPath
       });
+    });
 
-      window.addEventListener('message', event => {
-        const message = event.data;
-        if (message.command === 'displayMarkdown') {
-          document.getElementById("markdownDisplay").value = message.markdown || "No content received.";
-        }
-      });
-    </script>
-  </body>
-  </html>
-  `;
+    window.addEventListener("message", (event) => {
+      const message = event.data;
+      if (message.command === "setJavaPath") {
+        javaPath = message.path;
+        document.getElementById("java_path").textContent = javaPath;
+      } else if (message.command === "displayReportMarkdown") {
+        const container = document.getElementById("report_container");
+        container.innerHTML = message.output || "No report content found.";
+      }
+    });
+  </script>
+</body>
+</html>`;
 }
-
