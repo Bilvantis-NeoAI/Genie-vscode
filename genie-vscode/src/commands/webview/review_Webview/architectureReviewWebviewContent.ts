@@ -38,11 +38,20 @@
 //       font-weight: bold;
 //       color: black;
 //     }
+//     .file-select-wrapper {
+//       display: flex;
+//       align-items: center;
+//       gap: 10px;
+//       margin-top: 10px;
+//       flex-wrap: wrap;
+//     }
 //     .file-path {
 //       font-size: 14px;
 //       color: #333;
-//       margin-top: 6px;
-//       word-break: break-all;
+//       max-width: 700px;
+//       overflow: hidden;
+//       text-overflow: ellipsis;
+//       white-space: nowrap;
 //     }
 //     .button-wrapper {
 //       text-align: center;
@@ -56,7 +65,6 @@
 //       border: none;
 //       border-radius: 4px;
 //       cursor: pointer;
-//       margin: 10px 0;
 //     }
 //     #report_container {
 //       margin-top: 20px;
@@ -70,8 +78,10 @@
 //     <h1>Architecture Review</h1>
 
 //     <label>Select .java File <span style="color: red;">*</span></label>
-//     <button id="select_java">Select Java File</button>
-//     <div id="java_path" class="file-path"></div>
+//     <div class="file-select-wrapper">
+//       <button id="select_java">Select Java File</button>
+//       <div id="java_path" class="file-path"></div>
+//     </div>
 
 //     <div class="button-wrapper">
 //       <button id="submit">Submit</button>
@@ -117,7 +127,6 @@
 // </body>
 // </html>`;
 // }
-
 
 
 export function architectureReviewWebviewContent(): string {
@@ -199,9 +208,9 @@ export function architectureReviewWebviewContent(): string {
   <div class="container">
     <h1>Architecture Review</h1>
 
-    <label>Select .java File <span style="color: red;">*</span></label>
+    <label>Select Java File or Folder <span style="color: red;">*</span></label>
     <div class="file-select-wrapper">
-      <button id="select_java">Select Java File</button>
+      <button id="select_path">Select Path</button>
       <div id="java_path" class="file-path"></div>
     </div>
 
@@ -214,32 +223,32 @@ export function architectureReviewWebviewContent(): string {
 
   <script>
     const vscode = acquireVsCodeApi();
-    let javaPath = "";
+    let selectedPath = "";
 
-    document.getElementById("select_java").addEventListener("click", () => {
-      vscode.postMessage({ command: "selectJavaFile" });
+    document.getElementById("select_path").addEventListener("click", () => {
+      vscode.postMessage({ command: "selectJavaOrFolder" });
     });
 
     document.getElementById("submit").addEventListener("click", () => {
       const container = document.getElementById("report_container");
       container.innerHTML = "";
 
-      if (!javaPath) {
-        alert("Please select a .java file.");
+      if (!selectedPath) {
+        alert("Please select a .java file or folder.");
         return;
       }
 
       vscode.postMessage({
         command: "generateArchitectureReview",
-        javaPath
+        path: selectedPath
       });
     });
 
     window.addEventListener("message", (event) => {
       const message = event.data;
-      if (message.command === "setJavaPath") {
-        javaPath = message.path;
-        document.getElementById("java_path").textContent = javaPath;
+      if (message.command === "setSelectedPath") {
+        selectedPath = message.path;
+        document.getElementById("java_path").textContent = selectedPath;
       } else if (message.command === "displayReportMarkdown") {
         const container = document.getElementById("report_container");
         container.innerHTML = message.output || "No report content found.";
