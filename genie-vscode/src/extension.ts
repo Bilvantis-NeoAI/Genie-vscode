@@ -372,34 +372,93 @@ class AssistantActionProvider implements vscode.CodeActionProvider {
 
     const selectedText = document.getText(range);
 
-    const explainAction = new vscode.CodeAction("🤖 Explain Code", vscode.CodeActionKind.QuickFix);
+    const docstringAction = new vscode.CodeAction("Add Docstring", vscode.CodeActionKind.QuickFix);
+    docstringAction.command = {
+      title: "Add Docstring",
+      command: "extension.addDocstrings",
+      arguments: [selectedText]
+    };
+
+    const errorHandlerAction = new vscode.CodeAction("Error Handler", vscode.CodeActionKind.QuickFix);
+    errorHandlerAction.command = {
+      title: "Error Handler",
+      command: "extension.errorHandling",
+      arguments: [selectedText]
+    };
+
+    const addLoggingAction = new vscode.CodeAction("Add Logging", vscode.CodeActionKind.QuickFix);
+    addLoggingAction.command = {
+      title: "Add Logging",
+      command: "extension.addLogging",
+      arguments: [selectedText]
+    };
+
+    const codeGenerationAction = new vscode.CodeAction("Code Generation", vscode.CodeActionKind.QuickFix);
+    codeGenerationAction.command = {
+      title: "Code Generation",
+      command: "extension.codeGeneration",
+      arguments: [selectedText]
+    };
+
+    const commentAction = new vscode.CodeAction("Add Comments", vscode.CodeActionKind.QuickFix);
+    commentAction.command = {
+      title: "Add Comments",
+      command: "extension.addComments",
+      arguments: [selectedText]
+    };
+
+    const explainAction = new vscode.CodeAction("Explain Code", vscode.CodeActionKind.QuickFix);
     explainAction.command = {
       title: "Explain Code",
       command: "extension.explainCode",
       arguments: [selectedText]
     };
 
-    const refactorAction = new vscode.CodeAction("🔧 Refactor Code", vscode.CodeActionKind.QuickFix);
+    const refactorAction = new vscode.CodeAction("Refactor Code", vscode.CodeActionKind.QuickFix);
     refactorAction.command = {
       title: "Refactor Code",
-      command: "extension.refactorCodeAssistant",
+      command: "extension.refactorCode",
       arguments: [selectedText]
     };
 
-    const commentAction = new vscode.CodeAction("💬 Add Comments", vscode.CodeActionKind.QuickFix);
-    commentAction.command = {
-      title: "Add Comments",
-      command: "extension.addCommentsCodeAssistant",
+    const unittestCodeAction = new vscode.CodeAction("Unit Test Code", vscode.CodeActionKind.QuickFix);
+    unittestCodeAction.command = {
+      title: "Unit Test Code",
+      command: "extension.unittestCode",
       arguments: [selectedText]
     };
 
-    const docstringAction = new vscode.CodeAction("📘 Add Docstring", vscode.CodeActionKind.QuickFix);
-    docstringAction.command = {
-      title: "Add Docstring",
-      command: "extension.addDocstringAssistant",
+
+    const overallReviewAction = new vscode.CodeAction("Overall Review", vscode.CodeActionKind.QuickFix);
+    overallReviewAction.command = {
+      title: "Overall Review",
+      command: "extension.overallReview",
       arguments: [selectedText]
     };
 
-    return [explainAction, refactorAction, commentAction, docstringAction];
+
+    const explainGitKBAction = new vscode.CodeAction("Get Response From Git KB", vscode.CodeActionKind.QuickFix);
+    explainGitKBAction.command = {
+      title: "Get Response From Git KB",
+      command: "extension.explainGitKB",
+      arguments: [selectedText]
+    };
+
+    const getCodeGitKBAction = new vscode.CodeAction("Get Code From Git KB", vscode.CodeActionKind.QuickFix);
+    getCodeGitKBAction.command = {
+      title: "Get Code From Git KB",
+      command: "extension.getCodeGitKB",
+      arguments: [selectedText]
+    };
+
+    const knowledgeBaseQueAnsAction = new vscode.CodeAction("Get Response From KB", vscode.CodeActionKind.QuickFix);
+    knowledgeBaseQueAnsAction.command = {
+      title: "Get Response From KB",
+      command: "extension.knowledgeBaseQueAns",
+      arguments: [selectedText]
+    };
+
+
+    return [docstringAction, errorHandlerAction, addLoggingAction, codeGenerationAction, commentAction, explainAction, refactorAction, unittestCodeAction, overallReviewAction, explainGitKBAction, getCodeGitKBAction, knowledgeBaseQueAnsAction ];
   }
 }
