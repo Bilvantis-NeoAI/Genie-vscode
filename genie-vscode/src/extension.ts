@@ -432,7 +432,7 @@ class AssistantActionProvider implements vscode.CodeActionProvider {
     const overallReviewAction = new vscode.CodeAction("Overall Review", vscode.CodeActionKind.QuickFix);
     overallReviewAction.command = {
       title: "Overall Review",
-      command: "extension.overallReview",
+      command: "extension.reviewAll",
       arguments: [selectedText]
     };
 
