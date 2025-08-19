@@ -1,0 +1,80 @@
+name: Build & Commit VSIX
+
+on:
+  push:
+    branches:
+      - hsbc/actions   # ✅ fixed typo (matches your branch name)
+    paths-ignore:
+      - 'artifacts/**'
+      - 'package.json'
+      - 'package-lock.json'
+
+permissions:
+  contents: write
+
+jobs:
+  build-vsix:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Use Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 18
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Bump version (patch)
+        run: |
+          echo "Current version: $(node -p \"require('./package.json').version\")"
+          npm version patch --no-git-tag-version
+          echo "New version: $(node -p \"require('./package.json').version\")"
+
+      - name: Install vsce
+        run: npm i -g @vscode/vsce
+
+      - name: Package VSIX
+        run: vsce package
+
+      - name: Move VSIX to artifacts folder   # ✅ moved before SharePoint upload
+        run: |
+          mkdir -p artifacts
+          mv ./*.vsix artifacts/
+
+      - name: Install jq                      # ✅ required for SharePoint upload
+        run: sudo apt-get install -y jq
+
+      - name: Upload VSIX to SharePoint
+        env:
+          TENANT_ID: ${{ secrets.SP_TENANT_ID }}
+          CLIENT_ID: ${{ secrets.SP_CLIENT_ID }}
+          CLIENT_SECRET: ${{ secrets.SP_CLIENT_SECRET }}
+          SITE_ID: ${{ secrets.SP_SITE_ID }}
+          DRIVE_ID: ${{ secrets.SP_DRIVE_ID }}
+        run: |
+          TOKEN=$(curl -s -X POST -d "client_id=$CLIENT_ID&scope=https://graph.microsoft.com/.default&client_secret=$CLIENT_SECRET&grant_type=client_credentials" https://login.microsoftonline.com/$TENANT_ID/oauth2/v2.0/token | jq -r .access_token)
+          FILE=$(ls artifacts/*.vsix)
+          curl -X PUT -H "Authorization: Bearer $TOKEN" \
+               -H "Content-Type: application/octet-stream" \
+               --data-binary @"$FILE" \
+               "https://graph.microsoft.com/v1.0/sites/$SITE_ID/drives/$DRIVE_ID/root:/${FILE##*/}:/content"
+
+      - name: Upload VSIX as workflow artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: vsix-build
+          path: artifacts/*.vsix
+
+      - name: Commit and push artifacts
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add -f artifacts/*.vsix package.json package-lock.json
+          git commit -m "chore: build VSIX and bump version [skip ci]" || echo "No changes to commit"
+          git push
