@@ -3,7 +3,7 @@ name: Build & Commit VSIX
 on:
   push:
     branches:
-      - hsbc/actions   # ✅ fixed typo (matches your branch name)
+      - hsbc/actions
     paths-ignore:
       - 'artifacts/**'
       - 'package.json'
@@ -28,9 +28,11 @@ jobs:
           node-version: 18
 
       - name: Install dependencies
+        working-directory: genie-vscode
         run: npm ci
 
       - name: Bump version (patch)
+        working-directory: genie-vscode
         run: |
           echo "Current version: $(node -p \"require('./package.json').version\")"
           npm version patch --no-git-tag-version
@@ -40,14 +42,15 @@ jobs:
         run: npm i -g @vscode/vsce
 
       - name: Package VSIX
+        working-directory: genie-vscode
         run: vsce package
 
-      - name: Move VSIX to artifacts folder   # ✅ moved before SharePoint upload
+      - name: Move VSIX to artifacts folder
         run: |
           mkdir -p artifacts
-          mv ./*.vsix artifacts/
+          mv genie-vscode/*.vsix artifacts/
 
-      - name: Install jq                      # ✅ required for SharePoint upload
+      - name: Install jq
         run: sudo apt-get install -y jq
 
       - name: Upload VSIX to SharePoint
@@ -75,6 +78,6 @@ jobs:
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
-          git add -f artifacts/*.vsix package.json package-lock.json
+          git add -f artifacts/*.vsix genie-vscode/package.json genie-vscode/package-lock.json
           git commit -m "chore: build VSIX and bump version [skip ci]" || echo "No changes to commit"
           git push
