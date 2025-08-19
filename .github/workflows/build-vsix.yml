@@ -69,21 +69,6 @@ jobs:
       - name: Install jq
         run: sudo apt-get install -y jq
 
-      - name: Upload VSIX to SharePoint
-        env:
-          TENANT_ID: ${{ secrets.SP_TENANT_ID }}
-          CLIENT_ID: ${{ secrets.SP_CLIENT_ID }}
-          CLIENT_SECRET: ${{ secrets.SP_CLIENT_SECRET }}
-          SITE_ID: ${{ secrets.SP_SITE_ID }}
-          DRIVE_ID: ${{ secrets.SP_DRIVE_ID }}
-        run: |
-          TOKEN=$(curl -s -X POST -d "client_id=$CLIENT_ID&scope=https://graph.microsoft.com/.default&client_secret=$CLIENT_SECRET&grant_type=client_credentials" https://login.microsoftonline.com/$TENANT_ID/oauth2/v2.0/token | jq -r .access_token)
-          FILE=$(ls artifacts/*.vsix)
-          curl -X PUT -H "Authorization: Bearer $TOKEN" \
-               -H "Content-Type: application/octet-stream" \
-               --data-binary @"$FILE" \
-               "https://graph.microsoft.com/v1.0/sites/$SITE_ID/drives/$DRIVE_ID/root:/${FILE##*/}:/content"
-
       - name: Upload VSIX as workflow artifact
         uses: actions/upload-artifact@v4
         with:
