@@ -32,11 +32,14 @@ jobs:
         run: npm ci
 
       - name: Bump version (patch)
-        working-directory: genie-vscode
         run: |
-          echo "Current version: $(node -p \"require('./package.json').version\")"
-          npm version patch --no-git-tag-version
-          echo "New version: $(node -p \"require('./package.json').version\")"
+          echo "🔹 Current version: $(node -p "require('./package.json').version")"
+          npm version patch -m "chore: bump version to %s [skip ci]"
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git push origin HEAD:${GITHUB_REF##*/}
+        shell: bash
+
 
       - name: Install vsce
         run: npm i -g @vscode/vsce
