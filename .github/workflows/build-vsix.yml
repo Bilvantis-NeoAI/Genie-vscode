@@ -32,6 +32,7 @@ jobs:
         run: npm ci
 
       - name: Bump version (patch)
+        working-directory: genie-vscode
         run: |
           echo "🔹 Current version: $(node -p "require('./package.json').version")"
           npm version patch -m "chore: bump version to %s [skip ci]"
