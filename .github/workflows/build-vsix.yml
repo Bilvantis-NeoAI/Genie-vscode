@@ -43,7 +43,7 @@ jobs:
 
 
       - name: Install vsce
-        run: npm i -g @vscode/vsce
+        run: npm i -g @vscode/vsce@2.15.0
 
       - name: Package VSIX
         working-directory: genie-vscode
