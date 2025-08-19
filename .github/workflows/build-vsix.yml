@@ -27,7 +27,7 @@ jobs:
       - name: Use Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: 18
+          node-version: 20   # ✅ upgraded to Node.js 20
 
       - name: Install dependencies
         working-directory: genie-vscode
@@ -46,7 +46,7 @@ jobs:
           git push origin HEAD:hsbc/actions      # ✅ push updated version
 
       - name: Install vsce
-        run: npm i -g @vscode/vsce@2.15.0
+        run: npm i -g @vscode/vsce   # ✅ latest vsce now works fine with Node 20
 
       - name: Package VSIX
         working-directory: genie-vscode
