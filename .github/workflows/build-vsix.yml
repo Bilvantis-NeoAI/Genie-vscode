@@ -33,11 +33,37 @@ jobs:
         working-directory: genie-vscode
         run: npm ci
 
-      - name: Bump version (patch)
+      - name: Custom bump version
         working-directory: genie-vscode
         run: |
-          echo "🔹 Current version: $(node -p "require('./package.json').version")"
-          npm version patch -m "chore: bump version to %s [skip ci]"
+          version=$(node -p "require('./package.json').version")
+          echo "🔹 Current version: $version"
+
+          # Split version into parts
+          IFS='.' read -r major minor patch <<< "$version"
+
+          # Apply rollover logic for patch → minor
+          if [ "$patch" -ge 9 ]; then
+            patch=0
+            minor=$((minor + 1))
+          else
+            patch=$((patch + 1))
+          fi
+
+          # Apply rollover logic for minor → major
+          if [ "$minor" -ge 9 ]; then
+            minor=0
+            major=$((major + 1))
+          fi
+
+          new_version="$major.$minor.$patch"
+          echo "🔹 New version: $new_version"
+
+          # Update package.json and package-lock.json
+          npm version "$new_version" --no-git-tag-version
+          git add package.json package-lock.json
+          git commit -m "chore: bump version to $new_version [skip ci]"
+
 
       - name: Commit bumped version
         run: |
