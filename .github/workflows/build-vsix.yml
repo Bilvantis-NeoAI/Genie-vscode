@@ -65,6 +65,7 @@ jobs:
         run: |
           mkdir -p artifacts
           mv genie-vscode/*.vsix artifacts/
+          ls -l artifacts
 
       - name: Upload VSIX as workflow artifact
         uses: actions/upload-artifact@v4
