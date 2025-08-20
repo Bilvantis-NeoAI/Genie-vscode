@@ -3,7 +3,7 @@ name: Build & Commit VSIX
 on:
   push:
     branches:
-      - hsbc/actions
+      - hsbc/actions  #List required branch(es) here. Workflow gets activated when code is pushed to these branches. 
     paths-ignore:
       - 'artifacts/**'
       - 'package.json'
