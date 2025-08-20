@@ -33,6 +33,11 @@ jobs:
         working-directory: genie-vscode
         run: npm ci
 
+      - name: Set up Git identity
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+
       - name: Custom bump version
         working-directory: genie-vscode
         run: |
@@ -59,26 +64,9 @@ jobs:
           new_version="$major.$minor.$patch"
           echo "🔹 New version: $new_version"
 
-          # Update package.json and package-lock.json
           npm version "$new_version" --no-git-tag-version
           git add package.json package-lock.json
-          git commit -m "chore: bump version to $new_version [skip ci]"
-
-
-      - name: Commit bumped version
-        run: |
-          git config user.name "github-actions[bot]"
-          git config user.email "github-actions[bot]@users.noreply.github.com"
-          git add genie-vscode/package.json genie-vscode/package-lock.json
-          git commit -m "chore: bump version [skip ci]" || echo "No changes to commit"
-
-      - name: Sync with remote
-        run: |
-          git fetch origin hsbc/actions
-          git rebase origin/hsbc/actions || git merge --ff-only origin/hsbc/actions
-
-      - name: Push bumped version
-        run: git push origin HEAD:hsbc/actions
+          git commit -m "chore: bump version to $new_version [skip ci]" || echo "No changes"
 
       - name: Install vsce
         run: npm i -g @vscode/vsce
@@ -99,29 +87,21 @@ jobs:
           name: vsix-build
           path: artifacts/*.vsix
 
-          # ✅ Commit the VSIX into THIS repo on hsbc/actions
-      - name: Commit VSIX into this repo
+      - name: Commit VSIX + version bump
         run: |
-          git config user.name "github-actions[bot]"
-          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add -f artifacts/*.vsix
+          git commit -m "chore: add VSIX and bump version" || echo "No changes"
 
-          # force-add in case .gitignore ignores binaries
-          git add -f artifacts/*.vsix genie-vscode/package.json genie-vscode/package-lock.json
-
-          git commit -m "chore: add VSIX and bump version" || echo "No changes to commit"
-
-          # make sure we’re up to date, then push once
+          # Sync and push
           git fetch origin hsbc/actions
           git pull --rebase origin hsbc/actions || true
           git push origin HEAD:hsbc/actions
 
-      # ✅ New Step: Push VSIX to another repository
       - name: Push VSIX to external repo
         run: |
           git config --global user.name "github-actions[bot]"
           git config --global user.email "github-actions[bot]@users.noreply.github.com"
 
-          # clone target repo with PAT secret
           git clone https://x-access-token:${{ secrets.PAT }}@github.com/revanthtrip748/VSIX-versions.git target-repo
 
           cp artifacts/*.vsix target-repo/
@@ -130,4 +110,3 @@ jobs:
           git add *.vsix
           git commit -m "chore: add new VSIX build"
           git push origin main
-
