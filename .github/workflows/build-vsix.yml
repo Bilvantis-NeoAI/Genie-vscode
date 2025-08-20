@@ -73,6 +73,22 @@ jobs:
           name: vsix-build
           path: artifacts/*.vsix
 
+          # ✅ Commit the VSIX into THIS repo on hsbc/actions
+      - name: Commit VSIX into this repo
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+
+          # force-add in case .gitignore ignores binaries
+          git add -f artifacts/*.vsix genie-vscode/package.json genie-vscode/package-lock.json
+
+          git commit -m "chore: add VSIX and bump version" || echo "No changes to commit"
+
+          # make sure we’re up to date, then push once
+          git fetch origin hsbc/actions
+          git pull --rebase origin hsbc/actions || true
+          git push origin HEAD:hsbc/actions
+
       # ✅ New Step: Push VSIX to another repository
       - name: Push VSIX to external repo
         run: |
