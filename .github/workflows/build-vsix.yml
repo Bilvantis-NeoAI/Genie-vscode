@@ -125,24 +125,36 @@ jobs:
         uses: actions/checkout@v4
         with:
           repository: revanthtrip748/VSIX-versions
-          token: ${{ secrets.PAT }}   # PAT with write access
-          path: target-repo
+          token: ${{ secrets.PAT }}   # must have repo write access
+          path: vsix-versions
           ref: main
 
       - name: Push VSIX to external repo
         run: |
-          git config user.name "github-actions[bot]"
-          git config user.email "github-actions[bot]@users.noreply.github.com"
+          set -e
+          git config --global user.name "github-actions[bot]"
+          git config --global user.email "github-actions[bot]@users.noreply.github.com"
 
-          # Ensure artifacts exist
-          ls -lh artifacts || echo "No artifacts directory found!"
+          echo "✅ Listing artifacts:"
+          ls -lh artifacts || echo "⚠️ No artifacts directory found"
 
-          # Copy vsix files into the external repo (overwrite if exists)
-          cp -f artifacts/*.vsix target-repo/ || echo "No VSIX files found!"
+          echo "✅ Copying VSIX to target repo"
+          cp -f artifacts/*.vsix vsix-versions/ || echo "⚠️ No VSIX files found"
 
-          cd target-repo
-          git add -A
-          git commit -m "chore: add new VSIX build $(date +'%Y-%m-%d %H:%M:%S')" || echo "No changes to commit"
-          git push origin main
+          cd vsix-versions
+
+          echo "✅ Checking git status before commit"
+          git status
+
+          # Only commit if there are changes
+          if ! git diff --quiet || ! git diff --cached --quiet; then
+            git add -A
+            git commit -m "chore: add new VSIX build $(date +'%Y-%m-%d %H:%M:%S')"
+            git push origin main
+            echo "🚀 Pushed new VSIX to external repo"
+          else
+            echo "ℹ️ No changes to commit"
+          fi
+
 
 
