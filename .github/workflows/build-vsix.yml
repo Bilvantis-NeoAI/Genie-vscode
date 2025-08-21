@@ -121,6 +121,14 @@ jobs:
           git push origin HEAD:hsbc/actions
 
       # Step 11: Push VSIX files to an external repository (VSIX-versions)
+      - name: Checkout external repo
+        uses: actions/checkout@v4
+        with:
+          repository: revanthtrip748/VSIX-versions
+          token: ${{ secrets.PAT }}   # Needs PAT with write access
+          path: target-repo
+          ref: main                   # Ensure we are on main branch
+
       - name: Push VSIX to external repo
         run: |
           # Configure identity
@@ -138,20 +146,13 @@ jobs:
           LATEST_FILE=$(ls -t artifacts/*.vsix | head -n1)
           BASENAME=$(basename "$LATEST_FILE")
 
-          # Clone external repo
-          git clone https://x-access-token:${{ secrets.PAT }}@github.com/revanthtrip748/VSIX-versions.git target-repo
-          cd target-repo
-
-          # Ensure branch is correct
-          git checkout main
-
-          # Make sure version folder exists
-          mkdir -p "vsix-files/$VERSION_FOLDER"
+          # Make sure version folder exists in external repo
+          mkdir -p "target-repo/vsix-files/$VERSION_FOLDER"
 
           # Copy file with original name
-          cp "../$LATEST_FILE" "vsix-files/$VERSION_FOLDER/$BASENAME"
+          cp "$LATEST_FILE" "target-repo/vsix-files/$VERSION_FOLDER/$BASENAME"
 
-          # Commit and push
+          cd target-repo
           git add "vsix-files/$VERSION_FOLDER/$BASENAME"
           git commit -m "Add VSIX $BASENAME for version $FULL_VERSION" || echo "No changes"
           git push origin main
