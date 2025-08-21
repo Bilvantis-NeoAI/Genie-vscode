@@ -135,7 +135,7 @@ jobs:
           echo "🔹 Major.Minor: $VERSION_FOLDER"
 
           # Find the latest VSIX file (already built)
-          LATEST_FILE=$(ls -t *.vsix | head -n1)
+          LATEST_FILE=$(ls -t artifacts/*.vsix | head -n1)
           BASENAME=$(basename "$LATEST_FILE")
 
           # Copy with original name
