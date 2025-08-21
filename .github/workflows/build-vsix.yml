@@ -120,7 +120,7 @@ jobs:
           git pull --rebase origin hsbc/actions || true
           git push origin HEAD:hsbc/actions
 
-            # Step 11: Push VSIX files to an external repository (VSIX-versions)
+      # Step 11: Push VSIX files to an external repository (VSIX-versions)
       - name: Push VSIX to external repo (manual clone method)
         run: |
           set -e
@@ -129,7 +129,7 @@ jobs:
 
           echo "✅ Cloning external repo"
           git clone https://x-access-token:${{ secrets.PAT }}@github.com/revanthtrip748/VSIX-versions.git vsix-versions
-          cd vsix-versions
+          cd vsix-versions/vsix-files
 
           echo "✅ Copying VSIX"
           cp -f ../artifacts/*.vsix . || echo "⚠️ No VSIX files found"
