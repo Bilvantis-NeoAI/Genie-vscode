@@ -139,10 +139,11 @@ jobs:
           # Ensure the version folder exists
           mkdir -p target-repo/vsix-files/$VERSION_FOLDER
 
-          # Copy ONLY the latest vsix file into the version folder, renamed to <version>.vsix
-          cp artifacts/*.vsix "target-repo/vsix-files/$VERSION_FOLDER/$FULL_VERSION.vsix"
+          # Copy ONLY the latest vsix file into the version folder
+          LATEST_FILE=$(ls -t artifacts/*.vsix | head -n1)
+          cp "$LATEST_FILE" "target-repo/vsix-files/$VERSION_FOLDER"
 
           cd target-repo
           git add vsix-files/$VERSION_FOLDER/$FULL_VERSION.vsix
-          git commit -m "chore: add VSIX $FULL_VERSION" || echo "No changes to commit"
+          git commit -m "chore: add VSIX $FULL_VERSION"
           git push origin main || echo "No changes to push"
