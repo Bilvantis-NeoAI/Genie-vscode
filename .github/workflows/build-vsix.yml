@@ -134,11 +134,15 @@ jobs:
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
 
-          # Copy vsix files into the external repo
-          cp artifacts/*.vsix target-repo/
+          # Ensure artifacts exist
+          ls -lh artifacts || echo "No artifacts directory found!"
+
+          # Copy vsix files into the external repo (overwrite if exists)
+          cp -f artifacts/*.vsix target-repo/ || echo "No VSIX files found!"
 
           cd target-repo
-          git add *.vsix
-          git commit -m "chore: add new VSIX build" || echo "No changes to commit"
+          git add -A
+          git commit -m "chore: add new VSIX build $(date +'%Y-%m-%d %H:%M:%S')" || echo "No changes to commit"
           git push origin main
+
 
