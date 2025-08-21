@@ -127,13 +127,26 @@ jobs:
           git config --global user.name "github-actions[bot]"
           git config --global user.email "github-actions[bot]@users.noreply.github.com"
 
+          # Remove old clone if it exists (avoid "already exists" error)
+          rm -rf target-repo
+
           # Clone external repo using PAT (with write permissions)
           git clone https://x-access-token:${{ secrets.PAT }}@github.com/revanthtrip748/VSIX-versions.git target-repo
 
-          # Copy vsix files into the external repo
-          cp artifacts/*.vsix target-repo/vsix-files
+          # Derive versions
+          FULL_VERSION=$(jq -r .version genie-vscode/package.json)
+          VERSION_FOLDER=$(echo "$FULL_VERSION" | cut -d. -f1-2)
+
+          echo "🔹 Full version: $FULL_VERSION"
+          echo "🔹 Major.Minor: $VERSION_FOLDER"
+
+          # Make sure version folder exists
+          mkdir -p "target-repo/vsix-files/$VERSION_FOLDER"
+
+          # Copy VSIX files into the external repo
+          cp artifacts/*.vsix "target-repo/vsix-files/$VERSION_FOLDER/"
 
           cd target-repo
-          git add *.vsix
-          git commit -m "chore: add new VSIX build"
+          git add "vsix-files/$VERSION_FOLDER/"*.vsix
+          git commit -m "Add VSIX build $FULL_VERSION" || echo "No changes"
           git push origin main
