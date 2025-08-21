@@ -125,22 +125,24 @@ jobs:
         run: |
           # Extract version from THIS repo before cloning external one
           VERSION=$(jq -r .version genie-vscode/package.json)
-          echo "🔹 Version: $VERSION"
+          MAJOR_MINOR=$(echo $VERSION | cut -d. -f1,2)
+          echo "🔹 Full version: $VERSION"
+          echo "🔹 Major.Minor: $MAJOR_MINOR"
 
           # Configure identity for commits in target repo
           git config --global user.name "github-actions[bot]"
           git config --global user.email "github-actions[bot]@users.noreply.github.com"
 
-          # Clone external repo using PAT (with write permissions)
+          # Clone external repo
           git clone https://x-access-token:${{ secrets.PAT }}@github.com/revanthtrip748/VSIX-versions.git target-repo
 
-          # Make versioned folder
-          mkdir -p target-repo/vsix-files/$VERSION
+          # Make major.minor folder
+          mkdir -p target-repo/vsix-files/$MAJOR_MINOR
 
-          # Copy vsix files into the versioned folder
-          cp artifacts/*.vsix target-repo/vsix-files/$VERSION/
+          # Copy ONLY latest vsix file (replace older if rerun)
+          cp artifacts/*.vsix target-repo/vsix-files/$MAJOR_MINOR/$VERSION.vsix
 
           cd target-repo
-          git add vsix-files/$VERSION
-          git commit -m "chore: add VSIX build for version $VERSION" || echo "No changes to commit"
+          git add vsix-files/$MAJOR_MINOR/$VERSION.vsix
+          git commit -m "chore: add VSIX build $VERSION under $MAJOR_MINOR" || echo "No changes to commit"
           git push origin main
