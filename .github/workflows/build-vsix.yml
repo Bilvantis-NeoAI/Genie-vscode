@@ -128,7 +128,7 @@ jobs:
           git config user.email "github-actions[bot]@users.noreply.github.com"
 
           # Derive versions
-          FULL_VERSION=$(jq -r .version package.json)
+          FULL_VERSION=$(jq -r .version genie-vscode/package.json)
           VERSION_FOLDER=$(echo "$FULL_VERSION" | cut -d. -f1-2)
 
           echo "🔹 Full version: $FULL_VERSION"
