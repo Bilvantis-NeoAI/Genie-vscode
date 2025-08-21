@@ -130,8 +130,10 @@ jobs:
           ref: main
 
       - name: Push VSIX to external repo
+        shell: bash   # ✅ Force bash so the script works on all runners
         run: |
-          set -e
+          set -euo pipefail
+
           git config --global user.name "github-actions[bot]"
           git config --global user.email "github-actions[bot]@users.noreply.github.com"
 
@@ -155,6 +157,7 @@ jobs:
           else
             echo "ℹ️ No changes to commit"
           fi
+
 
 
 
