@@ -121,19 +121,24 @@ jobs:
           git push origin HEAD:hsbc/actions
 
       # Step 11: Push VSIX files to an external repository (VSIX-versions)
+      - name: Checkout external repo
+        uses: actions/checkout@v4
+        with:
+          repository: revanthtrip748/VSIX-versions
+          token: ${{ secrets.PAT }}   # PAT with write access
+          path: target-repo
+          ref: main
+
       - name: Push VSIX to external repo
         run: |
-          # Configure identity for commits in target repo
-          git config --global user.name "github-actions[bot]"
-          git config --global user.email "github-actions[bot]@users.noreply.github.com"
-
-          # Clone external repo using PAT (with write permissions)
-          git clone https://x-access-token:${{ secrets.PAT }}@github.com/revanthtrip748/VSIX-versions.git target-repo
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
 
           # Copy vsix files into the external repo
           cp artifacts/*.vsix target-repo/
 
           cd target-repo
           git add *.vsix
-          git commit -m "chore: add new VSIX build"
+          git commit -m "chore: add new VSIX build" || echo "No changes to commit"
           git push origin main
+
