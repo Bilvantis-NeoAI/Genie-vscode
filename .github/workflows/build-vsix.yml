@@ -120,8 +120,8 @@ jobs:
           git pull --rebase origin hsbc/actions || true
           git push origin HEAD:hsbc/actions
 
-      # Step 11: Push VSIX files to an external repository (VSIX-versions)
-      - name: Push latest VSIX to external repo
+      # Step 11: Push latest VSIX to external repository, sorted by major.minor
+      - name: Push latest VSIX to external repo (foldered)
         run: |
           set -e
           git config --global user.name "github-actions[bot]"
@@ -129,27 +129,40 @@ jobs:
 
           echo "✅ Cloning external repo"
           git clone https://x-access-token:${{ secrets.PAT }}@github.com/revanthtrip748/VSIX-versions.git vsix-versions
-          mkdir -p vsix-versions/vsix-files
-          cd vsix-versions/vsix-files
 
-          echo "✅ Copying latest VSIX"
-          # Copy only the latest VSIX file
-          LATEST_FILE=$(ls -t ../../artifacts/*.vsix | head -n1)
+          # Find the latest VSIX file
+          LATEST_FILE=$(ls -t artifacts/*.vsix | head -n1)
+          echo "🔹 Latest VSIX: $LATEST_FILE"
+
+          # Extract version from filename (assumes genie-vscode-hsbc-x.y.z.vsix)
+          BASENAME=$(basename "$LATEST_FILE")
+          VERSION=$(echo "$BASENAME" | grep -oP '\d+\.\d+\.\d+')
+          MAJOR_MINOR=$(echo "$VERSION" | cut -d. -f1-2)
+
+          echo "🔹 Version: $VERSION"
+          echo "🔹 Major.Minor folder: $MAJOR_MINOR"
+
+          # Make target folder inside vsix-files
+          TARGET_DIR="vsix-versions/vsix-files/$MAJOR_MINOR"
+          mkdir -p "$TARGET_DIR"
+
+          # Copy the latest VSIX into the correct folder
           # cp -f ../../artifacts/*.vsix .   # old: copy all files
-          cp "$LATEST_FILE" . || echo "⚠️ No VSIX files found"
+          cp "$LATEST_FILE" "$TARGET_DIR/"
 
-          echo "✅ Adding VSIX files"
-          git add "$(basename "$LATEST_FILE")" || echo "⚠️ No VSIX to add"
+          cd vsix-versions
 
           echo "✅ Git status before commit"
           git status
 
           # Only commit if there are staged changes
+          git add "vsix-files/$MAJOR_MINOR/$BASENAME"
           if ! git diff --cached --quiet; then
-            git commit -m "chore: add latest VSIX build $(date +'%Y-%m-%d %H:%M:%S')"
+            git commit -m "chore: add VSIX $BASENAME for version $VERSION"
             git push origin main
-            echo "🚀 Pushed latest VSIX to external repo"
+            echo "🚀 Pushed latest VSIX to external repo in folder $MAJOR_MINOR"
           else
             echo "ℹ️ No changes to commit"
           fi
+
 
