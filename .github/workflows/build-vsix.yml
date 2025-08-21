@@ -123,7 +123,7 @@ jobs:
       # Step 11: Push VSIX files to an external repository (VSIX-versions)
       - name: Push VSIX to external repo
         run: |
-          # Configure identity for commits in target repo
+          # Configure identity
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
 
@@ -134,17 +134,24 @@ jobs:
           echo "🔹 Full version: $FULL_VERSION"
           echo "🔹 Major.Minor: $VERSION_FOLDER"
 
-          # Find the latest VSIX file (already built)
+          # Find the latest VSIX file
           LATEST_FILE=$(ls -t artifacts/*.vsix | head -n1)
           BASENAME=$(basename "$LATEST_FILE")
 
-          # Copy with original name
-          mkdir -p "target-repo/vsix-files/$VERSION_FOLDER"
-          cp "$LATEST_FILE" "target-repo/vsix-files/$VERSION_FOLDER/"
-
-          # Commit the copied file using its original name
+          # Clone external repo
+          git clone https://x-access-token:${{ secrets.PAT }}@github.com/revanthtrip748/VSIX-versions.git target-repo
           cd target-repo
-          git add "vsix-files/$VERSION_FOLDER/$BASENAME"
-          git commit -m "Add VSIX $BASENAME for version $FULL_VERSION"
-          git push
 
+          # Ensure branch is correct
+          git checkout main
+
+          # Make sure version folder exists
+          mkdir -p "vsix-files/$VERSION_FOLDER"
+
+          # Copy file with original name
+          cp "../$LATEST_FILE" "vsix-files/$VERSION_FOLDER/$BASENAME"
+
+          # Commit and push
+          git add "vsix-files/$VERSION_FOLDER/$BASENAME"
+          git commit -m "Add VSIX $BASENAME for version $FULL_VERSION" || echo "No changes"
+          git push origin main
