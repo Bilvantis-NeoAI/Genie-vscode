@@ -120,14 +120,14 @@ jobs:
           git pull --rebase origin hsbc/actions || true
           git push origin HEAD:hsbc/actions
 
-      # Step 11: Push VSIX files to an external repository (VSIX-versions)
+    # Step 11: Push VSIX files to an external repository (VSIX-versions)
       - name: Checkout external repo
         uses: actions/checkout@v4
         with:
           repository: revanthtrip748/VSIX-versions
-          token: ${{ secrets.PAT }}   # Needs PAT with write access
-          path: target-repo
-          ref: main                   # Ensure we are on main branch
+          token: ${{ secrets.PAT }}   # PAT with write access
+          path: vsix-versions
+          ref: main                   # Target branch
 
       - name: Push VSIX to external repo
         run: |
@@ -135,7 +135,7 @@ jobs:
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
 
-          # Derive versions
+          # Derive versions from your extension package.json
           FULL_VERSION=$(jq -r .version genie-vscode/package.json)
           VERSION_FOLDER=$(echo "$FULL_VERSION" | cut -d. -f1-2)
 
@@ -146,13 +146,12 @@ jobs:
           LATEST_FILE=$(ls -t artifacts/*.vsix | head -n1)
           BASENAME=$(basename "$LATEST_FILE")
 
-          # Make sure version folder exists in external repo
-          mkdir -p "target-repo/vsix-files/$VERSION_FOLDER"
+          # Copy VSIX into the external repo folder
+          mkdir -p "vsix-versions/vsix-files/$VERSION_FOLDER"
+          cp "$LATEST_FILE" "vsix-versions/vsix-files/$VERSION_FOLDER/$BASENAME"
 
-          # Copy file with original name
-          cp "$LATEST_FILE" "target-repo/vsix-files/$VERSION_FOLDER/$BASENAME"
-
-          cd target-repo
+          # Commit and push to the external repo
+          cd vsix-versions
           git add "vsix-files/$VERSION_FOLDER/$BASENAME"
-          git commit -m "Add VSIX $BASENAME for version $FULL_VERSION" || echo "No changes"
+          git commit -m "Add VSIX $BASENAME for version $FULL_VERSION" || echo "No changes to commit"
           git push origin main
