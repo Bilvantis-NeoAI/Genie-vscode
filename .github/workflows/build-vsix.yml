@@ -124,7 +124,7 @@ jobs:
       - name: Push VSIX to external repo
         run: |
           # Extract version from THIS repo before cloning external one
-          VERSION=$(jq -r .version package.json)
+          VERSION=$(jq -r .version genie-vscode/package.json)
           echo "🔹 Version: $VERSION"
 
           # Configure identity for commits in target repo
