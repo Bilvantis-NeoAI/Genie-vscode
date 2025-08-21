@@ -121,35 +121,24 @@ jobs:
           git push origin HEAD:hsbc/actions
 
       # Step 11: Push VSIX files to an external repository (VSIX-versions)
-      - name: Checkout external repo
-        uses: actions/checkout@v4
-        with:
-          repository: revanthtrip748/VSIX-versions
-          token: ${{ secrets.PAT }}   # must have repo write access
-          path: vsix-versions
-          ref: main
-
-      - name: Push VSIX to external repo
-        shell: bash   # ✅ Force bash so the script works on all runners
+      - name: Push VSIX to external repo (manual clone method)
         run: |
-          set -euo pipefail
-
+          set -e
           git config --global user.name "github-actions[bot]"
           git config --global user.email "github-actions[bot]@users.noreply.github.com"
 
-          echo "✅ Listing artifacts:"
-          ls -lh artifacts || echo "⚠️ No artifacts directory found"
-
-          echo "✅ Copying VSIX to target repo"
-          cp -f artifacts/*.vsix vsix-versions/ || echo "⚠️ No VSIX files found"
-
+          echo "✅ Cloning external repo"
+          git clone https://x-access-token:${{ secrets.PAT }}@github.com/revanthtrip748/VSIX-versions.git vsix-versions
           cd vsix-versions
 
-          echo "✅ Checking git status before commit"
+          echo "✅ Copying VSIX"
+          cp -f ../artifacts/*.vsix . || echo "⚠️ No VSIX files found"
+
+          echo "✅ Git status before commit"
           git status
 
           # Only commit if there are changes
-          if ! git diff --quiet || ! git diff --cached --quiet; then
+          if ! git diff --quiet; then
             git add -A
             git commit -m "chore: add new VSIX build $(date +'%Y-%m-%d %H:%M:%S')"
             git push origin main
@@ -157,6 +146,7 @@ jobs:
           else
             echo "ℹ️ No changes to commit"
           fi
+
 
 
 
