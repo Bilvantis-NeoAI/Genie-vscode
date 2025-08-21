@@ -123,6 +123,10 @@ jobs:
       # Step 11: Push VSIX files to an external repository (VSIX-versions)
       - name: Push VSIX to external repo
         run: |
+          # Extract version from THIS repo before cloning external one
+          VERSION=$(jq -r .version package.json)
+          echo "🔹 Version: $VERSION"
+
           # Configure identity for commits in target repo
           git config --global user.name "github-actions[bot]"
           git config --global user.email "github-actions[bot]@users.noreply.github.com"
@@ -130,18 +134,13 @@ jobs:
           # Clone external repo using PAT (with write permissions)
           git clone https://x-access-token:${{ secrets.PAT }}@github.com/revanthtrip748/VSIX-versions.git target-repo
 
-          # Extract version from package.json (adjust path if needed)
-          VERSION=$(jq -r .version package.json)
-          echo "Detected version: $VERSION"
-
-          # Create versioned folder inside vsix-files/
+          # Make versioned folder
           mkdir -p target-repo/vsix-files/$VERSION
 
-          # Copy .vsix into versioned folder
+          # Copy vsix files into the versioned folder
           cp artifacts/*.vsix target-repo/vsix-files/$VERSION/
 
           cd target-repo
-          git add vsix-files/$VERSION/*.vsix
-          git commit -m "chore: add VSIX build for version $VERSION" || echo "No changes"
+          git add vsix-files/$VERSION
+          git commit -m "chore: add VSIX build for version $VERSION" || echo "No changes to commit"
           git push origin main
-
