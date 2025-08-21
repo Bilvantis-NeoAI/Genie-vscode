@@ -120,7 +120,7 @@ jobs:
           git pull --rebase origin hsbc/actions || true
           git push origin HEAD:hsbc/actions
 
-      # Step 11: Push VSIX files to an external repository (VSIX-versions)
+            # Step 11: Push VSIX files to an external repository (VSIX-versions)
       - name: Push VSIX to external repo (manual clone method)
         run: |
           set -e
@@ -134,12 +134,14 @@ jobs:
           echo "✅ Copying VSIX"
           cp -f ../artifacts/*.vsix . || echo "⚠️ No VSIX files found"
 
+          echo "✅ Adding VSIX files"
+          git add *.vsix || echo "⚠️ No VSIX to add"
+
           echo "✅ Git status before commit"
           git status
 
-          # Only commit if there are changes
-          if ! git diff --quiet; then
-            git add -A
+          # Only commit if there are staged changes
+          if ! git diff --cached --quiet; then
             git commit -m "chore: add new VSIX build $(date +'%Y-%m-%d %H:%M:%S')"
             git push origin main
             echo "🚀 Pushed new VSIX to external repo"
