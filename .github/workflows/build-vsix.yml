@@ -140,8 +140,7 @@ jobs:
           mkdir -p target-repo/vsix-files/$VERSION_FOLDER
 
           # Copy ONLY the latest vsix file into the version folder
-          LATEST_FILE=$(ls -t artifacts/*.vsix | head -n1)
-          cp "$LATEST_FILE" "target-repo/vsix-files/$VERSION_FOLDER/$FULL_VERSION.vsix"
+          cp artifacts/*.vsix target-repo/vsix-files/$VERSION_FOLDER/
 
           cd target-repo
           git add vsix-files/$VERSION_FOLDER/$FULL_VERSION.vsix
