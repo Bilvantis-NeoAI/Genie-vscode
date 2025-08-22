@@ -1,8 +1,6 @@
 # Name of the GitHub Actions workflow
 name: Build & Commit VSIX
 
-# Trigger workflow on pushes to hsbc/actions branch,
-# except when only changes occur in artifacts/, package.json, or package-lock.json
 on:
   push:
     branches:
@@ -12,115 +10,72 @@ on:
       - 'package.json'
       - 'package-lock.json'
 
-# Grant the workflow write access to the repo contents (needed for git push)
 permissions:
   contents: write
 
 jobs:
   build-vsix:
-    runs-on: ubuntu-latest   # Run the job on the latest Ubuntu runner
+    runs-on: ubuntu-latest
 
     steps:
-      # Step 1: Checkout the current repository on hsbc/actions branch
+      # Step 1: Checkout repo
       - name: Checkout source repo
         uses: actions/checkout@v4
         with:
-          token: ${{ secrets.GITHUB_TOKEN }}  # Use built-in GitHub Actions token
-          fetch-depth: 0                      # Fetch full history for version bumping
-          ref: hsbc/actions                   # Ensure we are on the right branch
+          token: ${{ secrets.GITHUB_TOKEN }}
+          fetch-depth: 0
+          ref: hsbc/actions
 
-      # Step 2: Install Node.js 20 so we can build/package the extension
+      # Step 2: Node.js
       - name: Use Node.js
         uses: actions/setup-node@v4
         with:
           node-version: 20
 
-      # Step 3: Install project dependencies inside genie-vscode folder
+      # Step 3: Install dependencies
       - name: Install dependencies
         working-directory: genie-vscode
         run: npm ci
 
-      # Step 4: Configure git identity for commits made by this workflow
+      # Step 4: Git identity
       - name: Set up Git identity
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
 
-      # Step 5: Custom logic to bump semantic version (major.minor.patch)
-      # - increments patch
-      # - if patch ≥ 9, reset patch and increment minor
-      # - if minor ≥ 9, reset minor and increment major
-      - name: Custom bump version
-        working-directory: genie-vscode
-        run: |
-          version=$(node -p "require('./package.json').version")
-          echo "🔹 Current version: $version"
-
-          # Split version string into major, minor, patch
-          IFS='.' read -r major minor patch <<< "$version"
-
-          # Increment patch; rollover to minor if ≥9
-          if [ "$patch" -ge 9 ]; then
-            patch=0
-            minor=$((minor + 1))
-          else
-            patch=$((patch + 1))
-          fi
-
-          # Increment minor; rollover to major if ≥9
-          if [ "$minor" -ge 9 ]; then
-            minor=0
-            major=$((major + 1))
-          fi
-
-          # Construct new version string
-          new_version="$major.$minor.$patch"
-          echo "🔹 New version: $new_version"
-
-          # Update package.json and package-lock.json but don’t create git tags
-          npm version "$new_version" --no-git-tag-version
-
-          # Stage and commit version bump
-          git add package.json package-lock.json
-          git commit -m "chore: bump version to $new_version [skip ci]" || echo "No changes"
-
-      # Step 6: Install vsce (VS Code extension packaging CLI)
+      # Step 5: Install vsce
       - name: Install vsce
         run: npm i -g @vscode/vsce
 
-      # Step 7: Package the extension into a .vsix file
+      # Step 6: Package VSIX (uses current version in package.json)
       - name: Package VSIX
         working-directory: genie-vscode
         run: vsce package
 
-      # Step 8: Move generated .vsix file(s) into artifacts/ folder
+      # Step 7: Move VSIX to artifacts folder
       - name: Move VSIX to artifacts folder
         run: |
           mkdir -p artifacts
           mv genie-vscode/*.vsix artifacts/
           ls -l artifacts
 
-      # Step 9: Upload .vsix as workflow artifact (downloadable from Actions UI)
+      # Step 8: Upload as workflow artifact
       - name: Upload VSIX as workflow artifact
         uses: actions/upload-artifact@v4
         with:
           name: vsix-build
           path: artifacts/*.vsix
 
-      # Step 10: Commit the VSIX file(s) + version bump into this repo on hsbc/actions
-      - name: Commit VSIX + version bump
+      # Step 9: Commit VSIX file(s) to repo
+      - name: Commit VSIX
         run: |
-          # Force add .vsix even if .gitignore blocks binaries
           git add -f artifacts/*.vsix
-
-          git commit -m "chore: add VSIX and bump version" || echo "No changes"
-
-          # Ensure we’re up to date, then push changes
+          git commit -m "chore: add VSIX build" || echo "No changes"
           git fetch origin hsbc/actions
           git pull --rebase origin hsbc/actions || true
           git push origin HEAD:hsbc/actions
 
-      # Step 11: Push latest VSIX to external repository, sorted by major.minor
+      # Step 10: Push latest VSIX to external repo, sorted by major.minor
       - name: Push latest VSIX to external repo (foldered)
         run: |
           set -e
@@ -130,11 +85,9 @@ jobs:
           echo "✅ Cloning external repo"
           git clone https://x-access-token:${{ secrets.PAT }}@github.com/revanthtrip748/VSIX-versions.git vsix-versions
 
-          # Find the latest VSIX file
           LATEST_FILE=$(ls -t artifacts/*.vsix | head -n1)
           echo "🔹 Latest VSIX: $LATEST_FILE"
 
-          # Extract version from filename (assumes genie-vscode-hsbc-x.y.z.vsix)
           BASENAME=$(basename "$LATEST_FILE")
           VERSION=$(echo "$BASENAME" | grep -oP '\d+\.\d+\.\d+')
           MAJOR_MINOR=$(echo "$VERSION" | cut -d. -f1-2)
@@ -142,20 +95,11 @@ jobs:
           echo "🔹 Version: $VERSION"
           echo "🔹 Major.Minor folder: $MAJOR_MINOR"
 
-          # Make target folder inside vsix-files
           TARGET_DIR="vsix-versions/vsix-files/$MAJOR_MINOR"
           mkdir -p "$TARGET_DIR"
-
-          # Copy the latest VSIX into the correct folder
-          # cp -f ../../artifacts/*.vsix .   # old: copy all files
           cp "$LATEST_FILE" "$TARGET_DIR/"
 
           cd vsix-versions
-
-          echo "✅ Git status before commit"
-          git status
-
-          # Only commit if there are staged changes
           git add "vsix-files/$MAJOR_MINOR/$BASENAME"
           if ! git diff --cached --quiet; then
             git commit -m "chore: add VSIX $BASENAME for version $VERSION"
@@ -165,4 +109,30 @@ jobs:
             echo "ℹ️ No changes to commit"
           fi
 
+      # Step 11: Bump version only AFTER success
+      - name: Bump version for next build
+        if: success()
+        working-directory: genie-vscode
+        run: |
+          version=$(node -p "require('./package.json').version")
+          echo "🔹 Current version: $version"
 
+          IFS='.' read -r major minor patch <<< "$version"
+          if [ "$patch" -ge 9 ]; then
+            patch=0
+            minor=$((minor + 1))
+          else
+            patch=$((patch + 1))
+          fi
+          if [ "$minor" -ge 9 ]; then
+            minor=0
+            major=$((major + 1))
+          fi
+
+          new_version="$major.$minor.$patch"
+          echo "🔹 Next version: $new_version"
+
+          npm version "$new_version" --no-git-tag-version
+          git add package.json package-lock.json
+          git commit -m "chore: bump version to $new_version [skip ci]" || echo "No changes"
+          git push origin HEAD:hsbc/actions
