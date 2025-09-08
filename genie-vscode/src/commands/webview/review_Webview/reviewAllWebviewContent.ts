@@ -94,9 +94,9 @@ export function reviewAllWebViewContent(content: string, title: string): string 
         td.identification, td.explanation {
             max-width: 100px;
             word-wrap: break-word;
-        }  
-        .quality {width: 100px}  
-        .overall_severity { width: 150px}    
+        }
+        .quality {width: 100px}
+        .overall_severity { width: 150px}
         .s_no {width: 40px}
         .severity { width: 80px}
         .status { width: 80px}
@@ -152,49 +152,56 @@ export function reviewAllWebViewContent(content: string, title: string): string 
         </br>
         <h1>Issues:</h1>
         ${Object.entries(parsedContent.issues)
-            .map(([category, issues]) => {
-                const isCloud = category.toLowerCase().includes('cloud');
+    .map(([category, issues]) => {
+        if (!Array.isArray(issues) || issues.length === 0) return '';
 
-                return Array.isArray(issues) && issues.length > 0
-                ? `<h2>${category.charAt(0).toUpperCase() + category.slice(1)}:</h2>
-                    <div class="table-container">
-                    <table>
-                        <thead>
-                            <tr>
-                                <th class="s_no">S.No</th>
-                                <th class="identification">Identification</th>
-                                <th class="explanation">Explanation</th>
-                                <th>Fix</th>
-                                ${isCloud ? '<th class="violation-type">Violation Type</th><th class="policy-reference">Policy Reference</th>' : ''}
-                                <th class="severity">Severity</th>
-                                <th class="status">Status</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            ${issues.map((issue, index) => `
-                                <tr>
-                                    <td>${index + 1}</td>
-                                    <td>${issue.identification}</td>
-                                    <td>${issue.explanation}</td>
-                                    <td class="fix"><pre>${issue.fix}</pre></td>
-                                    ${
-                                        isCloud
-                                        ? `<td class="violation-type">${issue.violationType || '-'}</td><td class="policy-reference">${issue.policyReference || '-'}</td>`
-                                        : ''
-                                    }
-                                    <td class="severity severity-${(issue.severity || '').toLowerCase()}">${issue.severity || 'N/A'}</td>
-                                    <td>
-                                        <select class="status-dropdown" onchange="updateStatus('${category}', ${index}, this.value)">
-                                            <option value="Accept" ${issue.status === "Accept" ? "selected" : ""}>Accept</option>
-                                            <option value="Reject" ${issue.status === "Reject" ? "selected" : ""}>Reject</option>
-                                        </select>
-                                    </td>
-                                </tr>`).join('')}
-                        </tbody>
-                    </table>
-                    </div>`
-                : '';
-            }).join("")}
+        // Collect all unique extra keys for this category (excluding standard ones)
+        const standardKeys = ['identification', 'explanation', 'fix', 'severity', 'status'];
+        const extraKeys = Array.from(
+            new Set(
+                issues.flatMap(issue =>
+                    Object.keys(issue).filter(
+                        key => !standardKeys.includes(key)
+                    )
+                )
+            )
+        );
+
+        return `
+        <h2>${category.charAt(0).toUpperCase() + category.slice(1)}:</h2>
+        <div class="table-container">
+        <table>
+            <thead>
+                <tr>
+                    <th class="s_no">S.No</th>
+                    <th class="identification">Identification</th>
+                    <th class="explanation">Explanation</th>
+                    <th>Fix</th>
+                    ${extraKeys.map(key => `<th class="${key.replace(/_/g, '-')}">${key.replace(/([A-Z])/g, ' $1').replace(/^./, str => str.toUpperCase())}</th>`).join('')}
+                    <th class="severity">Severity</th>
+                    <th class="status">Status</th>
+                </tr>
+            </thead>
+            <tbody>
+                ${issues.map((issue, index) => `
+                    <tr>
+                        <td>${index + 1}</td>
+                        <td>${issue.identification || '-'}</td>
+                        <td>${issue.explanation || '-'}</td>
+                        <td class="fix"><pre>${issue.fix || '-'}</pre></td>
+                        ${extraKeys.map(key => `<td class="${key.replace(/_/g, '-')}">${issue[key] || '-'}</td>`).join('')}
+                        <td class="severity severity-${(issue.severity || '').toLowerCase()}">${issue.severity || 'N/A'}</td>
+                        <td>
+                            <select class="status-dropdown" onchange="updateStatus('${category}', ${index}, this.value)">
+                                <option value="Accept" ${issue.status === "Accept" ? "selected" : ""}>Accept</option>
+                                <option value="Reject" ${issue.status === "Reject" ? "selected" : ""}>Reject</option>
+                            </select>
+                        </td>
+                    </tr>`).join('')}
+            </tbody>
+        </table>
+        </div>`;
+    }).join("")}
 
     </div>
 
@@ -283,7 +290,7 @@ export function reviewAllWebViewContent(content: string, title: string): string 
         });
        document.getElementById("downloadButtonExcel").addEventListener("click", () => {
         const updatedJsonData = {...json_data, issues};
-        
+
         // Prepare data for Excel
         const flattenedIssues = [];
         Object.entries(updatedJsonData.issues).forEach(([category, categoryIssues]) => {
