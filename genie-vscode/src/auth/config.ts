@@ -4,6 +4,7 @@ let BASE_API = "";
 
 export const review_config:string = 'HSBC';
 export const ANSWER_CONFIG = "chroma";
+export const fieldIgnore = ['score'];
 
 export const getBaseApi = (): string => BASE_API;
 

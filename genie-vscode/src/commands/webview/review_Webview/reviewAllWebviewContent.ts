@@ -1,3 +1,5 @@
+import { fieldIgnore } from "../../../auth/config";
+
 export function reviewAllWebViewContent(content: string, title: string): string {
     interface issues {
         identification: string;
@@ -177,7 +179,7 @@ export function reviewAllWebViewContent(content: string, title: string): string 
                     <th class="identification">Identification</th>
                     <th class="explanation">Explanation</th>
                     <th>Fix</th>
-                    ${extraKeys.map(key => `<th class="${key.replace(/_/g, '-')}">${key.replace(/([A-Z])/g, ' $1').replace(/^./, str => str.toUpperCase())}</th>`).join('')}
+                    ${extraKeys.filter(key => !fieldIgnore.includes(key)).map(key => `<th class="${key.replace(/_/g, '-')}">${key.replace(/([A-Z])/g, ' $1').replace(/^./, str => str.toUpperCase())}</th>`).join('')}
                     <th class="severity">Severity</th>
                     <th class="status">Status</th>
                 </tr>
@@ -189,7 +191,7 @@ export function reviewAllWebViewContent(content: string, title: string): string 
                         <td>${issue.identification || '-'}</td>
                         <td>${issue.explanation || '-'}</td>
                         <td class="fix"><pre>${issue.fix || '-'}</pre></td>
-                        ${extraKeys.map(key => `<td class="${key.replace(/_/g, '-')}">${issue[key] || '-'}</td>`).join('')}
+                        ${extraKeys.filter(key => !fieldIgnore.includes(key)).map(key => `<td class="${key.replace(/_/g, '-')}">${issue[key] || '-'}</td>`).join('')}                        
                         <td class="severity severity-${(issue.severity || '').toLowerCase()}">${issue.severity || 'N/A'}</td>
                         <td>
                             <select class="status-dropdown" onchange="updateStatus('${category}', ${index}, this.value)">
