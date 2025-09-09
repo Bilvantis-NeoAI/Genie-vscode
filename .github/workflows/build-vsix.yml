@@ -79,7 +79,7 @@ jobs:
           git pull --rebase origin hsbc/actions || true
           git push origin HEAD:hsbc/actions
 
-      # Step 10: Push the latest VSIX to an external repo (sorted into major.minor folders)
+      # Step 10: Push latest VSIX to external repo (flat into vsix-files)
       - name: Push latest VSIX to external repo
         run: |
           set -e
@@ -93,27 +93,20 @@ jobs:
           LATEST_FILE=$(ls -t artifacts/*.vsix | head -n1)
           echo "🔹 Latest VSIX: $LATEST_FILE"
 
-          # Extract version from filename (assumes format genie-vscode-hsbc-x.y.z.vsix)
+          # Extract filename
           BASENAME=$(basename "$LATEST_FILE")
-          VERSION=$(echo "$BASENAME" | grep -oP '\d+\.\d+\.\d+')
-          MAJOR_MINOR=$(echo "$VERSION" | cut -d. -f1-2)
 
-          echo "🔹 Version: $VERSION"
-          echo "🔹 Major.Minor folder: $MAJOR_MINOR"
-
-          # Create the folder for that major.minor version if it doesn’t exist
-          TARGET_DIR="vsix-versions/vsix-files/$MAJOR_MINOR"
+          # Copy the latest VSIX into vsix-files folder
+          TARGET_DIR="vsix-versions/vsix-files"
           mkdir -p "$TARGET_DIR"
-
-          # Copy the latest VSIX into the versioned folder
           cp "$LATEST_FILE" "$TARGET_DIR/"
 
           cd vsix-versions
-          git add "vsix-files/$MAJOR_MINOR/$BASENAME"
+          git add "vsix-files/$BASENAME"
           if ! git diff --cached --quiet; then
-            git commit -m "chore: add VSIX $BASENAME for version $VERSION"
+            git commit -m "chore: add VSIX $BASENAME"
             git push origin main
-            echo "🚀 Pushed latest VSIX to external repo in folder $MAJOR_MINOR"
+            echo "🚀 Pushed latest VSIX to external repo (vsix-files)"
           else
             echo "ℹ️ No changes to commit"
           fi
