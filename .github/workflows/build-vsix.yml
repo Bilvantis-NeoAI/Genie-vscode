@@ -79,7 +79,7 @@ jobs:
       #     git pull --rebase origin hsbc/poc/vsix_build_actions || true
       #     git push origin HEAD:hsbc/poc/vsix_build_actions
 
-            # Step 10: Push latest VSIX to external repo (flat into vsix-files)
+            # Step 10: Push latest VSIX to external repo (flat into vsix_build_files)
       - name: Push latest VSIX to external repo
         run: |
           set -e
@@ -96,17 +96,17 @@ jobs:
           # Extract filename
           BASENAME=$(basename "$LATEST_FILE")
 
-          # Copy the latest VSIX into vsix-files folder
-          TARGET_DIR="vsix-versions/vsix-files"
+          # Copy the latest VSIX into vsix_build_files folder
+          TARGET_DIR="vsix-versions/vsix_build_files"
           mkdir -p "$TARGET_DIR"
           cp "$LATEST_FILE" "$TARGET_DIR/"
 
           cd vsix-versions
-          git add "vsix-files/$BASENAME"
+          git add "vsix_build_files/$BASENAME"
           if ! git diff --cached --quiet; then
             git commit -m "chore: add VSIX $BASENAME"
             git push origin main
-            echo "🚀 Pushed latest VSIX to external repo (vsix-files)"
+            echo "🚀 Pushed latest VSIX to external repo (vsix_build_files)"
           else
             echo "ℹ️ No changes to commit"
           fi
