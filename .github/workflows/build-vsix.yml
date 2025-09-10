@@ -55,12 +55,12 @@ jobs:
         working-directory: genie-vscode
         run: vsce package
 
-      # # Step 7: Move generated VSIX file(s) into the artifacts/ folder
-      # - name: Move VSIX to artifacts folder
-      #   run: |
-      #     mkdir -p artifacts
-      #     mv genie-vscode/*.vsix artifacts/
-      #     ls -l artifacts   # List files for debugging
+      # Step 7: Move generated VSIX file(s) into the vsix_package_versions/ folder inside the repo
+      - name: Move VSIX to vsix_package_versions folder
+        run: |
+          mkdir -p genie-vscode/vsix_package_versions
+          mv genie-vscode/*.vsix genie-vscode/vsix_package_versions/
+          ls -l genie-vscode/vsix_package_versions   # List files for debugging
 
       # Step 8: Upload the VSIX file(s) as workflow artifacts
       # (these are downloadable directly from the Actions UI)
