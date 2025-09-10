@@ -35,7 +35,7 @@ jobs:
         with:
           node-version: 20
 
-      # Step 3: Install dependencies inside the extension folder
+      # Step 3: Install dependencies inside extension folder
       - name: Install dependencies
         working-directory: genie-vscode
         run: npm ci
