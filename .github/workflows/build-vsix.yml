@@ -55,12 +55,12 @@ jobs:
         working-directory: genie-vscode
         run: vsce package
 
-      # Step 7: Move generated VSIX file(s) into the artifacts/ folder
-      - name: Move VSIX to artifacts folder
-        run: |
-          mkdir -p artifacts
-          mv genie-vscode/*.vsix artifacts/
-          ls -l artifacts   # List files for debugging
+      # # Step 7: Move generated VSIX file(s) into the artifacts/ folder
+      # - name: Move VSIX to artifacts folder
+      #   run: |
+      #     mkdir -p artifacts
+      #     mv genie-vscode/*.vsix artifacts/
+      #     ls -l artifacts   # List files for debugging
 
       # Step 8: Upload the VSIX file(s) as workflow artifacts
       # (these are downloadable directly from the Actions UI)
@@ -71,13 +71,13 @@ jobs:
       #     path: artifacts/*.vsix
 
       # Step 9: Commit the VSIX file(s) to this repo (hsbc/actions branch)
-      - name: Commit VSIX
-        run: |
-          git add -f artifacts/*.vsix       # Force add even if .gitignore blocks binaries
-          git commit -m "chore: add VSIX build" || echo "No changes"
-          git fetch origin hsbc/poc/vsix_build_actions
-          git pull --rebase origin hsbc/poc/vsix_build_actions || true
-          git push origin HEAD:hsbc/poc/vsix_build_actions
+      # - name: Commit VSIX
+      #   run: |
+      #     git add -f artifacts/*.vsix       # Force add even if .gitignore blocks binaries
+      #     git commit -m "chore: add VSIX build" || echo "No changes"
+      #     git fetch origin hsbc/poc/vsix_build_actions
+      #     git pull --rebase origin hsbc/poc/vsix_build_actions || true
+      #     git push origin HEAD:hsbc/poc/vsix_build_actions
 
       # Step 10: Push latest VSIX to external repo (flat into vsix-files)
       - name: Push latest VSIX to external repo
