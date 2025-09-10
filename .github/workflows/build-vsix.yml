@@ -79,7 +79,7 @@ jobs:
       #     git pull --rebase origin hsbc/poc/vsix_build_actions || true
       #     git push origin HEAD:hsbc/poc/vsix_build_actions
 
-      # Step 10: Push latest VSIX to external repo (flat into vsix-files)
+            # Step 10: Push latest VSIX to external repo (flat into vsix-files)
       - name: Push latest VSIX to external repo
         run: |
           set -e
@@ -89,8 +89,8 @@ jobs:
           echo "✅ Cloning external repo"
           git clone https://x-access-token:${{ secrets.PAT }}@github.com/revanthtrip748/VSIX-versions.git vsix-versions
 
-          # Find the latest VSIX file from artifacts
-          LATEST_FILE=$(ls -t artifacts/*.vsix | head -n1)
+          # Find the latest VSIX file directly from genie-vscode (no artifacts step)
+          LATEST_FILE=$(ls -t genie-vscode/*.vsix | head -n1)
           echo "🔹 Latest VSIX: $LATEST_FILE"
 
           # Extract filename
@@ -110,6 +110,7 @@ jobs:
           else
             echo "ℹ️ No changes to commit"
           fi
+
 
       # Step 11: Bump version for the next build, but ONLY if everything succeeded
       - name: Bump version for next build
