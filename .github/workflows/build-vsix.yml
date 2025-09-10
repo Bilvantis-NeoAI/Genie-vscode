@@ -79,7 +79,19 @@ jobs:
       #     git pull --rebase origin hsbc/poc/arch_repo || true
       #     git push origin HEAD:hsbc/poc/arch_repo
 
-      # Step 10: Push latest VSIX to external repo (flat into vsix_build_files)
+      # Step 10a: Commit VSIX into this repo under genie-vscode/vsix_package_versions/
+      - name: Commit VSIX to this repo
+        run: |
+          git add genie-vscode/vsix_package_versions/*.vsix
+          if ! git diff --cached --quiet; then
+            git commit -m "chore: add VSIX package(s) to vsix_package_versions"
+            git push origin HEAD:hsbc/poc/arch_repo
+            echo "🚀 Pushed VSIX to this repo under genie-vscode/vsix_package_versions/"
+          else
+            echo "ℹ️ No new VSIX to commit in this repo"
+          fi
+
+      # Step 10b: Push latest VSIX to external repo (flat into vsix_build_files)
       - name: Push latest VSIX to external repo
         run: |
           set -e
@@ -89,14 +101,12 @@ jobs:
           echo "✅ Cloning external repo"
           git clone https://x-access-token:${{ secrets.PAT }}@github.com/revanthtrip748/VSIX-versions.git vsix-versions
 
-          # Find the latest VSIX file from genie-vscode/vsix_package_versions
+          # Find the latest VSIX file directly from genie-vscode/vsix_package_versions
           LATEST_FILE=$(ls -t genie-vscode/vsix_package_versions/*.vsix | head -n1)
           echo "🔹 Latest VSIX: $LATEST_FILE"
 
-          # Extract filename
           BASENAME=$(basename "$LATEST_FILE")
 
-          # Copy the latest VSIX into vsix_build_files folder in external repo
           TARGET_DIR="vsix-versions/vsix_build_files"
           mkdir -p "$TARGET_DIR"
           cp "$LATEST_FILE" "$TARGET_DIR/"
@@ -108,7 +118,7 @@ jobs:
             git push origin main
             echo "🚀 Pushed latest VSIX to external repo (vsix_build_files)"
           else
-            echo "ℹ️ No changes to commit"
+            echo "ℹ️ No changes to commit in external repo"
           fi
 
 
