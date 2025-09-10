@@ -64,11 +64,11 @@ jobs:
 
       # Step 8: Upload the VSIX file(s) as workflow artifacts
       # (these are downloadable directly from the Actions UI)
-      - name: Upload VSIX as workflow artifact
-        uses: actions/upload-artifact@v4
-        with:
-          name: vsix-build
-          path: artifacts/*.vsix
+      # - name: Upload VSIX as workflow artifact
+      #   uses: actions/upload-artifact@v4
+      #   with:
+      #     name: vsix-build
+      #     path: artifacts/*.vsix
 
       # Step 9: Commit the VSIX file(s) to this repo (hsbc/actions branch)
       - name: Commit VSIX
