@@ -27,7 +27,7 @@ jobs:
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
           fetch-depth: 0   # Full history needed for version bump commits
-          ref: hsbc/actions
+          ref: hsbc/poc/vsix_build_actions
 
       # Step 2: Set up Node.js 20 (required for building VS Code extensions)
       - name: Use Node.js
@@ -75,9 +75,9 @@ jobs:
         run: |
           git add -f artifacts/*.vsix       # Force add even if .gitignore blocks binaries
           git commit -m "chore: add VSIX build" || echo "No changes"
-          git fetch origin hsbc/actions
-          git pull --rebase origin hsbc/actions || true
-          git push origin HEAD:hsbc/actions
+          git fetch origin hsbc/poc/vsix_build_actions
+          git pull --rebase origin hsbc/poc/vsix_build_actions || true
+          git push origin HEAD:hsbc/poc/vsix_build_actions
 
       # Step 10: Push latest VSIX to external repo (flat into vsix-files)
       - name: Push latest VSIX to external repo
@@ -142,4 +142,4 @@ jobs:
           npm version "$new_version" --no-git-tag-version
           git add package.json package-lock.json
           git commit -m "chore: bump version to $new_version [skip ci]" || echo "No changes"
-          git push origin HEAD:hsbc/actions
+          git push origin HEAD:hsbc/poc/vsix_build_actions
