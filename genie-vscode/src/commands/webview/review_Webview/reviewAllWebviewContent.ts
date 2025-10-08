@@ -9,7 +9,6 @@ export function reviewAllWebViewContent(content: string, title: string): string 
         status?: string;
         violationType?: string;
         policyReference?: string;
-
     }
 
     interface ParsedContent {
@@ -155,7 +154,7 @@ export function reviewAllWebViewContent(content: string, title: string): string 
         </br>
         <h1>Issues:</h1>
         ${Object.entries(parsedContent.issues)
-    .map(([category, issues]) => {
+    .map(([category, issues]) => {        
         if (!Array.isArray(issues) || issues.length === 0) return '';
 
         // Collect all unique extra keys for this category (excluding standard ones)
@@ -307,6 +306,7 @@ export function reviewAllWebViewContent(content: string, title: string): string 
             };
              pdfMake.createPdf(docDefinition).download('${title}_${new Date().toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' }).replace(/ /g, '_').toLowerCase()}.pdf');
         });
+        
        document.getElementById("downloadButtonExcel").addEventListener("click", () => {
         const updatedJsonData = {...json_data, issues};
         const flattenedIssues = [];
