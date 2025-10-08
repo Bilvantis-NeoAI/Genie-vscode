@@ -114,25 +114,25 @@ jobs:
           git clone https://x-access-token:${{ secrets.PAT1 }}@github.com/Jagannath173/vsix_version.git vsix-versions
           cd vsix-versions
 
-          TARGET_DIR="vsix_build_files"
-          mkdir -p "$TARGET_DIR"
-
-          echo "Copying latest VSIX from source repo"
-          cp ../genie-vscode/vsix_package_versions/*.vsix "$TARGET_DIR/"
-          ls -l "$TARGET_DIR"
-      
-          # Add this check for empty repo
+           # Ensure branch exists if repo is empty
           if [ -z "$(git rev-parse --quiet --verify HEAD)" ]; then
             git checkout -b main
           fi
       
+          # Prepare folder inside external repo
+          TARGET_DIR="vsix_build_files"
+          mkdir -p "$TARGET_DIR"
+      
+          # Copy the latest VSIX from your source repo
+          cp ../genie-vscode/vsix_package_versions/*.vsix "$TARGET_DIR/"
+          ls -l "$TARGET_DIR"
+      
+          # Add and commit
           git add "$TARGET_DIR"/*.vsix
-          
           if ! git diff --cached --quiet; then
             git commit -m "chore: add VSIX $(basename ../genie-vscode/vsix_package_versions/*.vsix)"
-            # First push to empty repo needs -u
             git push -u origin main
-            echo "Pushed latest VSIX to external repo (vsix_build_files)"
+            echo "✅ VSIX pushed to external repo (vsix_build_files)"
           else
             echo "No changes to commit in external repo"
           fi
