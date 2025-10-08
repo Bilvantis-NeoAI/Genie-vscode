@@ -110,8 +110,9 @@ jobs:
           git config --global user.name "github-actions[bot]"
           git config --global user.email "github-actions[bot]@users.noreply.github.com"
 
+          ENCODED_PAT=$(python3 -c "import urllib.parse, os; print(urllib.parse.quote(os.getenv('PAT1')))")
           echo "Cloning external repo"
-          git clone https://x-access-token:${{ secrets.PAT1 }}@github.com/Jagannath173/vsix_version.git vsix-versions
+          git clone https://x-access-token:${ENCODED_PAT}@github.com/Jagannath173/vsix_version.git vsix-versions
 
           # Find the latest VSIX file directly from genie-vscode/vsix_package_versions
           LATEST_FILE=$(ls -t genie-vscode/vsix_package_versions/*.vsix | head -n1)
@@ -166,3 +167,4 @@ jobs:
           git add package.json package-lock.json
           git commit -m "chore: bump version to $new_version [skip ci]" || echo "No changes"
           git push origin HEAD:hsbc/poc/jp_08102025
+        
