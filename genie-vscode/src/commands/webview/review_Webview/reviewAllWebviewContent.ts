@@ -309,8 +309,6 @@ export function reviewAllWebViewContent(content: string, title: string): string 
         });
        document.getElementById("downloadButtonExcel").addEventListener("click", () => {
         const updatedJsonData = {...json_data, issues};
-
-        // Prepare data for Excel
         const flattenedIssues = [];
         Object.entries(updatedJsonData.issues).forEach(([category, categoryIssues]) => {
             if (Array.isArray(categoryIssues)) {
@@ -322,8 +320,6 @@ export function reviewAllWebViewContent(content: string, title: string): string 
                         'Explanation': issue.explanation || '-',
                         'Fix': issue.fix || '-'
                     };
-
-                    // Add extra columns based on category
                     if (category.toLowerCase().includes("bigquery")) {
                         baseRow['Violation Type'] = issue.violationType || '-';
                         baseRow['Rule Reference'] = issue.policyReference || issue.ruleReference || '-';
@@ -333,30 +329,21 @@ export function reviewAllWebViewContent(content: string, title: string): string 
                         baseRow['Violation Type'] = issue.violationType || '-';
                         baseRow['Policy Reference'] = issue.policyReference || '-';
                     }
-
                     baseRow['Severity'] = issue.severity || '-';
                     baseRow['Status'] = issue.status || 'Accept';
-
                     flattenedIssues.push(baseRow);
                 });
             }
         });
-
-        // Create the Issues sheet
         const issuesSheet = XLSX.utils.json_to_sheet(flattenedIssues);
-
-        // Create the Summary sheet
         const summarySheet = XLSX.utils.aoa_to_sheet([
             ['Quality', 'Remarks', 'Overall Severity'],
             [updatedJsonData.quality, updatedJsonData.remarks, updatedJsonData.overallSeverity]
         ]);
 
-        // Create the workbook and append the sheets
         const workbook = XLSX.utils.book_new();
         XLSX.utils.book_append_sheet(workbook, issuesSheet, 'Issues');
         XLSX.utils.book_append_sheet(workbook, summarySheet, 'Summary');
-
-        // Write the workbook to a file
         XLSX.writeFile(workbook, '${title}_${new Date().toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' }).replace(/ /g, '_').toLowerCase()}.xlsx');
     });
 
