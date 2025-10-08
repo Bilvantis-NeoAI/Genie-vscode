@@ -153,7 +153,7 @@ export function reviewAllWebViewContent(content: string, title: string): string 
         </table>
         </br>
         <h1>Issues:</h1>
-        ${Object.entries(parsedContent.issues)
+        ${Object.entries(parsedContent.issues)    //Parsed the objects in the ObjectReference
     .map(([category, issues]) => {        
         if (!Array.isArray(issues) || issues.length === 0) return '';
 
@@ -214,6 +214,8 @@ export function reviewAllWebViewContent(content: string, title: string): string 
         function updateStatus(category, index, value) {
             issues[category][index].status = value;
         }
+
+        //Download the PDF File
 
         document.getElementById("downloadButton").addEventListener("click", () => {
             const updatedJsonData = {...json_data, issues};
@@ -306,7 +308,9 @@ export function reviewAllWebViewContent(content: string, title: string): string 
             };
              pdfMake.createPdf(docDefinition).download('${title}_${new Date().toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' }).replace(/ /g, '_').toLowerCase()}.pdf');
         });
-        
+
+        //Download the Excel file 
+
        document.getElementById("downloadButtonExcel").addEventListener("click", () => {
         const updatedJsonData = {...json_data, issues};
         const flattenedIssues = [];
