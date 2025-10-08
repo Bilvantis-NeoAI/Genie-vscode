@@ -9,6 +9,7 @@ export function reviewAllWebViewContent(content: string, title: string): string 
         status?: string;
         violationType?: string;
         policyReference?: string;
+
     }
 
     interface ParsedContent {
@@ -191,7 +192,7 @@ export function reviewAllWebViewContent(content: string, title: string): string 
                         <td>${issue.identification || '-'}</td>
                         <td>${issue.explanation || '-'}</td>
                         <td class="fix"><pre>${issue.fix || '-'}</pre></td>
-                        ${extraKeys.filter(key => !fieldIgnore.includes(key)).map(key => `<td class="${key.replace(/_/g, '-')}">${issue[key] || '-'}</td>`).join('')}                        
+                        ${extraKeys.filter(key => !fieldIgnore.includes(key)).map(key => `<td class="${key.replace(/_/g, '-')}">${issue[key] || '-'}</td>`).join('')}
                         <td class="severity severity-${(issue.severity || '').toLowerCase()}">${issue.severity || 'N/A'}</td>
                         <td>
                             <select class="status-dropdown" onchange="updateStatus('${category}', ${index}, this.value)">
@@ -244,8 +245,10 @@ export function reviewAllWebViewContent(content: string, title: string): string 
                                     table: {
                                         headerRows: 1,
                                         widths: category.toLowerCase().includes("cloud")
-                                            ? ['5%', '17%', '16%', '21%', '8%', '13%', '10%', '10%']
-                                            : ['5%', '25%', '25%', '25%', '10%', '10%'],
+                                            ? ['5%', '17%', '16%', '21%', '8%', '13%', '10%', '10%'] // 8 columns
+                                            : category.toLowerCase().includes("bigquery")
+                                                ? ['5%', '15%', '15%', '15%', '8%', '8%', '8%', '8%','8%', '10%'] // 9 columns
+                                                : ['5%', '25%', '25%', '25%', '10%', '10%'],
                                         body: [
                                             [
                                                 { text: 'S.No', bold: true, fillColor: '#E9E5E5', fontSize: 10, alignment: 'center' },
@@ -257,7 +260,14 @@ export function reviewAllWebViewContent(content: string, title: string): string 
                                                             { text: 'Violation Type', bold: true, fillColor: '#E9E5E5', fontSize: 10, alignment: 'center' },
                                                             { text: 'Policy Reference', bold: true, fillColor: '#E9E5E5', fontSize: 10, alignment: 'center' },
                                                         ]
-                                                    : []),
+                                                    :  category.toLowerCase().includes("bigquery")
+                                                        ? [
+                                                            { text: 'Violation Type', bold: true, fillColor: '#E9E5E5', fontSize: 10, alignment: 'center' },
+                                                            { text: 'Rule Reference', bold: true, fillColor: '#E9E5E5', fontSize: 10, alignment: 'center' },
+                                                            { text: 'Cost Impact', bold: true, fillColor: '#E9E5E5', fontSize: 10, alignment: 'center' },
+                                                            { text: 'Optimization Priority', bold: true, fillColor: '#E9E5E5', fontSize: 10, alignment: 'center' },
+                                                        ]
+                                                        : []),
                                                 { text: 'Severity', bold: true, fillColor: '#E9E5E5', fontSize: 10, alignment: 'center' },
                                                 { text: 'Status', bold: true, fillColor: '#E9E5E5', fontSize: 10, alignment: 'center' }
                                             ],
@@ -271,7 +281,14 @@ export function reviewAllWebViewContent(content: string, title: string): string 
                                                             { text: issue.violationType || '-', fontSize: 10 },
                                                             { text: issue.policyReference || '-', fontSize: 10 },
                                                         ]
-                                                    : []),
+                                                     : category.toLowerCase().includes("bigquery")
+                                                        ? [
+                                                            { text: issue.violationType || '-', fontSize: 10 },
+                                                            { text: issue.policyReference || issue.ruleReference || '-', fontSize: 10 },
+                                                            { text: issue.costImpact || '-', fontSize: 10, alignment: 'center' },
+                                                            { text: issue.optimizationPriority || '-', fontSize: 10, alignment: 'center' },
+                                                        ]
+                                                        : []),
                                                 { text: issue.severity, fontSize: 10, alignment: 'center' },
                                                 { text: issue.status || 'Accept', fontSize: 10, alignment: 'center' }
                                             ])
@@ -298,17 +315,29 @@ export function reviewAllWebViewContent(content: string, title: string): string 
         Object.entries(updatedJsonData.issues).forEach(([category, categoryIssues]) => {
             if (Array.isArray(categoryIssues)) {
                 categoryIssues.forEach((issue, index) => {
-                    flattenedIssues.push({
+                    const baseRow = {
                         'S.No': index + 1,
                         'Category': category,
                         'Identification': issue.identification || '-',
                         'Explanation': issue.explanation || '-',
-                        'Fix': issue.fix || '-',
-                        'Violation Type': issue.violationType || '-',
-                        'Policy Reference': issue.policyReference || '-',
-                        'Severity': issue.severity || '-',
-                        'Status': issue.status || 'Accept'
-                    });
+                        'Fix': issue.fix || '-'
+                    };
+
+                    // Add extra columns based on category
+                    if (category.toLowerCase().includes("bigquery")) {
+                        baseRow['Violation Type'] = issue.violationType || '-';
+                        baseRow['Rule Reference'] = issue.policyReference || issue.ruleReference || '-';
+                        baseRow['Cost Impact'] = issue.costImpact || '-';
+                        baseRow['Optimization Priority'] = issue.optimizationPriority || '-';
+                    } else if (category.toLowerCase().includes("cloud")) {
+                        baseRow['Violation Type'] = issue.violationType || '-';
+                        baseRow['Policy Reference'] = issue.policyReference || '-';
+                    }
+
+                    baseRow['Severity'] = issue.severity || '-';
+                    baseRow['Status'] = issue.status || 'Accept';
+
+                    flattenedIssues.push(baseRow);
                 });
             }
         });
