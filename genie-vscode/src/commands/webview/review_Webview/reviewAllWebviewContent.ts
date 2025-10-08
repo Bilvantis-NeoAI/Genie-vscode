@@ -155,7 +155,6 @@ export function reviewAllWebViewContent(content: string, title: string): string 
         <h1>Issues:</h1>
         ${Object.entries(parsedContent.issues)    //Parsed the objects in the ObjectReference
     .map(([category, issues]) => {        
-        console.log(category);
         if (!Array.isArray(issues) || issues.length === 0) return '';
 
         // Collect all unique extra keys for this category (excluding standard ones)
