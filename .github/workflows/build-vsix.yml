@@ -113,22 +113,37 @@ jobs:
          
           echo "Cloning external repo"
           git clone https://x-access-token:${{ secrets.PAT }}@github.com/Jagannath173/vsix_version.git vsix-versions
+          cd vsix-versions
+
+          #Check the repository is epmty or not
+          
+          if [ ! -d ".git" ]; then
+            git init
+            git remote add origin https://x-access-token:${{ secrets.PAT }}@github.com/Jagannath173/vsix_version.git
+            echo "Initialized new Git repository"
+          fi
+          cd ..
+
+          #Create a versioned directory
+          TARGET_DIR="vsix-versions/vsix_build_files"
+          mkdir -p "$TARGET_DIR"
 
           # Find the latest VSIX file directly from genie-vscode/vsix_package_versions
           LATEST_FILE=$(ls -t genie-vscode/vsix_package_versions/*.vsix | head -n1)
-          echo "🔹 Latest VSIX: $LATEST_FILE"
+          echo "Latest VSIX: $LATEST_FILE"
 
           BASENAME=$(basename "$LATEST_FILE")
+          cp "$LATEST_FILE" "$TARGET_DIR/$BASENAME"
 
-          TARGET_DIR="vsix-versions/vsix_build_files"
-          mkdir -p "$TARGET_DIR"
-          cp "$LATEST_FILE" "$TARGET_DIR/"
+          echo "Copied $BASENAME to $VERSION_DIR"
 
+          #Commit and Push the changes
           cd vsix-versions
           git add "vsix_build_files/$BASENAME"
           if ! git diff --cached --quiet; then
             git commit -m "chore: add VSIX $BASENAME"
-            git push origin main
+            git branch -M main || true
+            git push -u origin main
             echo "Pushed latest VSIX to external repo (vsix_build_files)"
           else
             echo "No changes to commit in external repo"
