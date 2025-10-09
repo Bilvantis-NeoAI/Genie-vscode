@@ -30,8 +30,13 @@ export function registerFilewiseUnitTestCodeAssistantCommand(context: vscode.Ext
       return;
     }
 
+    console.log("***Language:",language);
+    
+
     const workspacePath = vscode.workspace.workspaceFolders?.[0]?.uri.fsPath || "";
     const { project_name, branch_name } = await getGitInfo(workspacePath);
+
+    console.log(`Project name:${project_name} Branch_name:${branch_name}`);
 
     let panel: vscode.WebviewPanel | undefined = undefined;
 
@@ -47,7 +52,7 @@ export function registerFilewiseUnitTestCodeAssistantCommand(context: vscode.Ext
       panel.webview.onDidReceiveMessage(
         message => {
           if (message.command === 'reject') {
-            panel?.dispose();
+            panel?.dispose(); 
           } else if (message.command === 'noTestCaseSelected') {
             vscode.window.showWarningMessage("Please select at least one test case to download.");
           }
@@ -67,6 +72,8 @@ export function registerFilewiseUnitTestCodeAssistantCommand(context: vscode.Ext
         title: "Generating Test Cases for given file",
         cancellable: true,
       };
+
+      console.log("***ProgressOptions are",progressOptions);
 
       await vscode.window.withProgress(progressOptions, async (progress, cancel) => {
         let wasCancelled = false;
@@ -90,6 +97,8 @@ export function registerFilewiseUnitTestCodeAssistantCommand(context: vscode.Ext
             branch_name,
             { signal: abortController.signal }
           );
+
+          console.log("***initial Response",initialResponse);
 
           if (wasCancelled) {
             return;

@@ -6,6 +6,9 @@ const execAsync = promisify(exec);
 
 export async function getGitInfo(workspacePath: string) {
   try {
+
+    console.log("***Running getGitInfo for:", workspacePath);
+
     // Retrieve Git repository path
     const { stdout: gitRepoPath } = await execAsync("git rev-parse --show-toplevel", { cwd: workspacePath });
     // Retrieve the current branch name
@@ -15,15 +18,17 @@ export async function getGitInfo(workspacePath: string) {
     const gitPath = gitRepoPath.trim();
     const branch_name = branchName.trim();
     const project_name = gitPath.split(/[\\/]/).pop();
+
+    console.log(`Project name:${project_name} Branch_name:${branch_name}`);
     return { project_name, branch_name };
   } catch (error) {
     // console.error("Error retrieving Git information:", error);
     // throw new Error("Unable to fetch Git information.");
     // throw new Error("Unable to fetch Git info. Please open the project from the project folder of Git.");
     // const gitPath="NA";
-    const branch_name='NA';
-    const project_name="NA";
-    return { project_name, branch_name};
+    const branch_name = 'NA';
+    const project_name = "NA";
+    return { project_name, branch_name };
   }
 }
 
