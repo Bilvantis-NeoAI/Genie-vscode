@@ -191,7 +191,8 @@ function getHtml(localVersion: string, latestVersion: string): string {
         Download the updated VSIX from the releases page and install it manually.
     </div>
 
-    <p><a href="https://lia-github.systems.uk.hsbc/IWPP-HSBC-Intelligent-Automation/codegenie_vsext_versions/releases" target="_blank"><b>Open Releases Page</b></a></p>
+    
+    <p><a href="https://github.com/Jagannath173/vsix_version/releases" target="_blank"><b>Open Releases Page</b></a></p>
 
     <div class="actions">
         <button id="accept">Download Update</button>

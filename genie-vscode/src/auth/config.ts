@@ -30,6 +30,8 @@ export const loadBaseApi = (context: vscode.ExtensionContext) => {
 // Git token action get, set and access
 export const getGitToken = (): string => GHE_TOKEN;
 
+console.log("The getting GHE Token is : ",GHE_TOKEN);
+
 export const setGitToken = (gitToken: string): void => {
     GHE_TOKEN = gitToken;
     console.log("GHE_TOKEN set", GHE_TOKEN);

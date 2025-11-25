@@ -10,7 +10,7 @@ export async function fetchLatestVersion() {
     const GHE_TOKEN = getGitToken();
     console.log("Using GHE TOKEN", GHE_TOKEN);
 
-    const GHE_API_URL = "https://lia-github.systems.uk.hsbc/api/v3/repos/IWPP-HSBC-Intelligent-Automation/codegenie_vsext_versions/releases/latest";
+    const GHE_API_URL = "https://api.github.com/repos/Jagannath173/vsix_version/releases/latest";
 
     if (!GHE_TOKEN || !GHE_API_URL) {
         throw new Error("Missing GHE_TOKEN or GHE_API_URL");
@@ -23,7 +23,7 @@ export async function fetchLatestVersion() {
     try {
         const response = await axios.get(GHE_API_URL, {
             headers: {
-                Authorization: `token ${GHE_TOKEN}`,
+                Authorization: `Bearer ${GHE_TOKEN}`,
                 Accept: "application/vnd.github+json",
             },
             httpsAgent: new https.Agent({
@@ -44,7 +44,10 @@ export async function fetchLatestVersion() {
 }
 
 export async function fetchStaticGitToken(): Promise<{ git_token: string }> {
-    const STATIC_TOKEN = "ghp_3bM2DblwVzCjD1ZPEyM9hwp9kc02kko0r";
+    const STATIC_TOKEN = process.env.STATIC_GIT_TOKEN;
     console.log("returning static token:", STATIC_TOKEN);
+    if (!STATIC_TOKEN) {
+        throw new Error("STATIC_GIT_TOKEN environment variable is not set");
+    }
     return { git_token: STATIC_TOKEN };
 }

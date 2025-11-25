@@ -36,6 +36,7 @@ export let userId: string | undefined;
 export async function activate(context: vscode.ExtensionContext) {
   loadGitToken(context);
   const canProceed = await checkExtensionVersion(context);
+  console.log("The proceed token is : ",canProceed);
   if (!canProceed) {
     return;
   } 

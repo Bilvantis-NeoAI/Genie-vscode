@@ -25,7 +25,7 @@ export async function checkExtensionVersion(context: vscode.ExtensionContext): P
             const accepted = await showUpdateWebview(context, localVersion, latestVersion);
             if (accepted) {
                 await vscode.env.openExternal(
-                    vscode.Uri.parse("https://lia-github.systems.uk.hsbc/IWPP-HSBC-Intelligent-Automation/codegenie_vsext_versions/releases")
+                    vscode.Uri.parse("https://github.com/Jagannath173/vsix_version/releases")
                 );
                 return true;
             } else {
