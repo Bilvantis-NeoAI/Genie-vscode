@@ -52,14 +52,16 @@ export async function downloadMarkdown(JobID: string, authToken: string): Promis
 }
 
 
-export async function cancelRepoDocumentation(jobID: string, authToken: string): Promise<void> {
+export async function cancelRepoDocumentation(jobID: string, authToken: string): Promise<{job_id?:String,JobID?:string,status?:string,message?:string,Status_display?:string}> {
   const apiUrl = `${getBaseApi()}/assistant/repo-documentation/cancel`;
   try {
-    await axios.post(
+   const response =  await axios.post(
       apiUrl,
-      { JobID: jobID },
+      {job_id:jobID},
+      // { JobID: jobID },
       { headers: getAuthHeaders(authToken) }
     );
+    return response.data;
   } catch (error: any) {
     throw new Error(error.response?.data?.detail || error.message || "Failed to cancel the request");
   }

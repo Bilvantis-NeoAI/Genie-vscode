@@ -1,7 +1,7 @@
 
 import * as vscode from "vscode";
 import { getRepoDocWebviewContent } from "../webview/document_webview/getRepoDocWebviewContent";
-import { postRepoDocumentation, postJobStatus, downloadMarkdown , cancelRepoDocumentation } from "../../utils/api/documentAPI";
+import { postRepoDocumentation, postJobStatus, downloadMarkdown, cancelRepoDocumentation } from "../../utils/api/documentAPI";
 
 // Function to handle repository documentation commands
 export function registerRepoDocumentationCommand(context: vscode.ExtensionContext, authToken: string): void {
@@ -25,14 +25,14 @@ export function registerRepoDocumentationCommand(context: vscode.ExtensionContex
           const { repo_url, pat, branch } = message;
           try {
             const response = await postRepoDocumentation(repo_url, pat, branch, authToken);
-            const jobId = response?.JobID;
+            const jobId = response?.JobID || response.job_id;
             panel.webview.postMessage({
               command: 'displayJobID',
-              jobId: jobId || "No Job ID received"
+              jobId
             });
           } catch (error: any) {
             panel.webview.postMessage({
-              command: 'displayError',
+              command: 'displayJobStatus',
               error: error.message || "Failed to fetch documentation"
             });
           }
@@ -67,28 +67,28 @@ export function registerRepoDocumentationCommand(context: vscode.ExtensionContex
             });
           } catch (error: any) {
             panel.webview.postMessage({
-              command: 'displayError',
+              command: 'displayJobStatus',
               error: error.message || "Failed to download markdown"
             });
           }
         }
-      else if (message.command === 'cancelJob') {
-        const { jobID } = message;
-        try {
-          await cancelRepoDocumentation(jobID, authToken);
-          panel.webview.postMessage({
-            command: 'displayJobStatus',
-            status: 'cancelled',
-            statusDetails: 'Repo documentation request was cancelled.'
-          });
-        } catch (error: any) {
-          panel.webview.postMessage({
-            command: 'displayJobStatus',
-            status: 'failed',
-            statusDetails: error.message || "Failed to cancel the request."
-          });
+        else if (message.command === 'cancelJob') {
+          const { jobID } = message;
+          try {
+            const cancelResponse = await cancelRepoDocumentation(jobID, authToken);
+            panel.webview.postMessage({
+              command: 'displayJobStatus',
+              status: cancelResponse.status || 'cancelled',
+              statusDetails: cancelResponse.message ||  'Repo documentation request was cancelled.'
+            });
+          } catch (error: any) {
+            panel.webview.postMessage({
+              command: 'displayJobStatus',
+              status: 'failed',
+              statusDetails: error.message || "Failed to cancel the request."
+            });
+          }
         }
-      }
       });
     })
   );

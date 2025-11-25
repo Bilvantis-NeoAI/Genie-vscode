@@ -22,16 +22,23 @@ import { LoginRegisterCommandsProvider } from "./commands/sidebarCommandRegister
 import { GenieCommandsProvider } from "./commands/sidebarCommandRegister/GenieCommandsProvider";
 import { registerCkReviewCommand } from "./commands/review/ckReview";
 import { registerFilewiseUnitTestCodeAssistantCommand } from "./commands/assistant/filewiseUnitTestCodeAssistant";
-import { loadBaseApi, exchangeUrl, getBaseApi } from "./auth/config";
+import { loadBaseApi, exchangeUrl, getBaseApi, loadGitToken } from "./auth/config";
 import { registerAllReviewCommand } from "./commands/review/allReview";
-import { registerArchitectureReviewCommand } from "./commands/review/architectureReview"
+import { registerArchitectureReviewCommand } from "./commands/review/architectureReview";
 import { registerRepoDocumentationCommand } from "./commands/document/repoDocumentation";
 import { GenieReloadProvider } from "./commands/sidebarCommandRegister/GenieReloadProvider";
+import { checkExtensionVersion } from "./commands/version/versionCheck";
+
 
 const jwt = require('jsonwebtoken');
 export let userId: string | undefined;
 
 export async function activate(context: vscode.ExtensionContext) {
+  loadGitToken(context);
+  const canProceed = await checkExtensionVersion(context);
+  if (!canProceed) {
+    return;
+  } 
   const loginRegisterProvider = new LoginRegisterCommandsProvider();
   // Replace the openLoginPage command registration
   vscode.window.registerTreeDataProvider("loginRegisterCommands", loginRegisterProvider);
@@ -71,25 +78,25 @@ export async function activate(context: vscode.ExtensionContext) {
   loadBaseApi(context);
   console.log("Current BASE_API:", getBaseApi());
 
-//   context.globalState.update("authToken", undefined);
-// context.globalState.update("urlSubmitted", false);
+  //   context.globalState.update("authToken", undefined);
+  // context.globalState.update("urlSubmitted", false);
   let urlSubmitted = context.globalState.get<boolean>("urlSubmitted") || false;
   let authToken = context.globalState.get<string>("authToken");
   if (!urlSubmitted) {
     showUrlWebview(context);
-  // Wait for the URL submission to complete
+    // Wait for the URL submission to complete
     const waitForSubmission = async () => {
-    while (!context.globalState.get("urlSubmitted", false)) {
-      await new Promise((resolve) => setTimeout(resolve, 100)); // Small delay for polling
-    }
+      while (!context.globalState.get("urlSubmitted", false)) {
+        await new Promise((resolve) => setTimeout(resolve, 100)); // Small delay for polling
+      }
     };
     await waitForSubmission();
-   }
+  }
 
-   urlSubmitted = context.globalState.get<boolean>("urlSubmitted") || false;
-   authToken = context.globalState.get<string>("authToken");
+  urlSubmitted = context.globalState.get<boolean>("urlSubmitted") || false;
+  authToken = context.globalState.get<string>("authToken");
 
-   // Proceed after the URL is submitted
+  // Proceed after the URL is submitted
   if (urlSubmitted) {
     if (authToken) {
       try {
@@ -97,26 +104,26 @@ export async function activate(context: vscode.ExtensionContext) {
         const tokenExpiration = decodedToken.exp;
         userId = decodedToken.userId;
         const currentTime = Math.floor(Date.now() / 1000);
-          // Token is expired, clear it
-          if (currentTime > tokenExpiration) {
+        // Token is expired, clear it
+        if (currentTime > tokenExpiration) {
           context.globalState.update('authToken', undefined);
           context.globalState.update('urlSubmitted', false);
           console.log("The token is expired and has been cleared.", context.globalState.get<string>("authToken"));
         } else {
-            console.log("The token is still valid.");
+          console.log("The token is still valid.");
         }
-        } catch (error) {
-          console.error("Failed to decode the token:", error);
-        }
+      } catch (error) {
+        console.error("Failed to decode the token:", error);
+      }
       activateCodeCommands(context);
       // Register the sidebar provider for Genie commands
       const genieProvider = new GenieCommandsProvider();
       vscode.window.registerTreeDataProvider("genieCommands", genieProvider);
-      } else {
-        // Show login/register if authToken is missing
-        // showLoginRegisterWebview(context, "login");
-        showLoginPrompt(context);
-      }
+    } else {
+      // Show login/register if authToken is missing
+      // showLoginRegisterWebview(context, "login");
+      showLoginPrompt(context);
+    }
   } else {
     // If URL submission hasn't occurred, show URL webview
     showUrlWebview(context);
@@ -170,8 +177,5 @@ export function activateCodeCommands(context: vscode.ExtensionContext) {
 }
 
 
-export function deactivate() {}
-
-
-
+export function deactivate() { }
 

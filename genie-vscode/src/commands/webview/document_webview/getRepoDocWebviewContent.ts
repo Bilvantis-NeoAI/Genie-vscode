@@ -97,6 +97,22 @@ export function getRepoDocWebviewContent(): string {
         white-space: pre-wrap;
       }
 
+      #statusDisplay {
+        display: none;
+        text-align: center；
+        white-space: pre-wraps
+        margin-top: 20px;
+        padding: 12px 16px;
+        background: #ffffff；
+        border-radius: 8px;
+        font-size: 14px;
+        min-height: 42px;
+        color: black;
+      }
+      #statusDisplay.info {color:black; border:none; }
+      #statusDisplay.success {color:black; border:none; }
+      #statusDisplay.error { color:black; border:none; }
+
       #spinner {
         width: 20px;
         height: 20px;
@@ -196,6 +212,13 @@ export function getRepoDocWebviewContent(): string {
         let latestMarkdown = '';
         cancelBtn.style.display = 'none';
 
+        function setStatus(msg, type = 'info', spinning = false) { 
+          statusDisplay.className = type;
+          statusDisplay.style.display = 'block';
+          statusDetailsSpan.textContent = msg;
+          spinner.style.display = spinning ? 'inline-block':'none';
+        }
+
         submitBtn.addEventListener("click", () => {
           const repo_url = repoInput.value.trim();
           const pat = patInput.value.trim();
@@ -207,6 +230,10 @@ export function getRepoDocWebviewContent(): string {
             spinner.style.display = 'none';
             return;
           }
+
+          setStatus("Submitting request...",'info', true);
+          markdownDisplay.style.display = 'none';
+          downloadBtn.style.display = 'none';
 
           statusDisplay.style.display = 'block';
           statusDetailsSpan.textContent = 'Submitting...';
@@ -269,7 +296,10 @@ export function getRepoDocWebviewContent(): string {
 
           if (message.command === 'displayJobID') {
             cancelBtn.style.display = 'inline-block';
-            jobID = message.jobId;
+            jobID = message.jobId || message.job_id;
+            statusDisplay.style.Display = 'block';
+            statusDisplaySpan.textContent = 'Job ID: ' + jobID + ' started.';
+            spinner.style.display = 'none';
             console.log("Received Job ID:", jobID);
             pollStatus();
             pollingInterval = setInterval(pollStatus, 10000);
@@ -277,8 +307,14 @@ export function getRepoDocWebviewContent(): string {
 
           if (message.command === 'displayJobStatus') {
             statusDisplay.style.display = 'block';
-            const status = message.status.toLowerCase();
-            statusDetailsSpan.textContent = message.statusDetails || message.Status_display || "Unknown status.";
+            const status = (message.status || '').toLowerCase();
+
+            let details = message.statusDetails || message.message || message.Status_display || "Unknown status.";
+
+            if(typeOf details = "object"){
+              details = details.detail || details.message || details.status || details.info || JSON.stringify(details);
+            }
+            statusDetailsSpan.textContent = details;
 
             if (status === 'completed') {
               spinner.style.display = 'none';
