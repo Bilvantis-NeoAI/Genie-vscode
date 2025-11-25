@@ -7,7 +7,7 @@ name: Build & Commit VSIX
 on:
   push:
     branches:
-      - hsbc/poc/jp_08102025
+      - hsbc/version_check
     paths-ignore:          # Skip triggering if only these files change
       - 'artifacts/**'
       - 'package.json'
@@ -27,9 +27,9 @@ jobs:
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
           fetch-depth: 0   # Full history needed for version bump commits
-          ref: hsbc/poc/jp_08102025
+          ref: hsbc/version_check
       - name: Log - Trigger start
-        run: echo " GitHub Action triggered for branch hsbc/poc/jp_08102025"
+        run: echo " GitHub Action triggered for branch hsbc/version_check"
 
       # Step 2: Set up Node.js 20 (required for building VS Code extensions)
       - name: Use Node.js
@@ -57,6 +57,38 @@ jobs:
         run: npm i -g @vscode/vsce
       - name: Log - VSCE installed
         run: echo "VSCE CLI installed"
+
+      # Bump the version without packaging 
+      - name: Bump version 
+        working-directory: genie-vscode
+        run: |
+          version=$(node -p "require('./package.json').version")
+          echo "🔹 Current version: $version"
+
+          IFS='.' read -r major minor patch <<< "$version"
+
+          if [ "$patch" -ge 9 ]; then
+            patch=0
+            minor=$((minor + 1))
+          else
+            patch=$((patch + 1))
+          fi
+
+          if [ "$minor" -ge 9 ]; then
+            minor=0
+            major=$((major + 1))
+          fi
+
+          #construct new version
+          new_version="$major.$minor.$patch"
+          echo "🔹 NEW version (used for packaging): $new_version"
+
+          npm version "$new_version" --no-git-tag-version
+          git add package.json package-lock.json
+          git commit -m "chore: bump version to $new_version"
+          git push origin HEAD:hsbc/version_check
+
+          echo "version=$new_version" >> $GITHUB_ENV
 
       # Step 6: Package the extension into a .vsix (uses version in package.json)
       - name: Package VSIX
@@ -97,7 +129,7 @@ jobs:
           git add genie-vscode/vsix_package_versions/*.vsix
           if ! git diff --cached --quiet; then
             git commit -m "chore: add VSIX package(s) to vsix_package_versions"
-            git push origin HEAD:hsbc/poc/jp_08102025
+            git push origin HEAD:hsbc/version_check
             echo "Pushed VSIX to this repo under genie-vscode/vsix_package_versions/"
           else
             echo "No new VSIX to commit in this repo"
@@ -135,7 +167,7 @@ jobs:
           BASENAME=$(basename "$LATEST_FILE")
           cp "$LATEST_FILE" "$TARGET_DIR/$BASENAME"
 
-          echo "Copied $BASENAME to $VERSION_DIR"
+          echo "Copied $BASENAME to $TARGET_DIR"
 
           #Commit and Push the changes
           cd vsix-versions
@@ -149,37 +181,13 @@ jobs:
             echo "No changes to commit in external repo"
           fi
 
-
-      # Step 11: Bump version for the next build, but ONLY if everything succeeded
-      - name: Bump version for next build
-        if: success()
-        working-directory: genie-vscode
-        run: |
-          version=$(node -p "require('./package.json').version")
-          echo "🔹 Current version: $version"
-
-          # Split version into major.minor.patch
-          IFS='.' read -r major minor patch <<< "$version"
-
-          # Increment patch (roll over to minor/major if needed)
-          if [ "$patch" -ge 9 ]; then
-            patch=0
-            minor=$((minor + 1))
-          else
-            patch=$((patch + 1))
-          fi
-          if [ "$minor" -ge 9 ]; then
-            minor=0
-            major=$((major + 1))
-          fi
-
-          # Construct new version
-          new_version="$major.$minor.$patch"
-          echo "🔹 Next version: $new_version"
-
-          # Update package.json + package-lock.json, commit, and push
-          npm version "$new_version" --no-git-tag-version
-          git add package.json package-lock.json
-          git commit -m "chore: bump version to $new_version [skip ci]" || echo "No changes"
-          git push origin HEAD:hsbc/poc/jp_08102025
-        
+      #Push the latest changes to the releases tag
+      - name: Create GitHub Release
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: v${{ env.version }}
+          name: Release v${{ env.version }}
+          files: genie-vscode/vsix_package_versions/*.vsix
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      
