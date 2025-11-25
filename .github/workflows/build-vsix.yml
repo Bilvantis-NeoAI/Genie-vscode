@@ -182,12 +182,12 @@ jobs:
           fi
 
       #Push the latest changes to the releases tag
-      - name: Create GitHub Release
+      - name: Create Release in EXTERNAL REPO
         uses: softprops/action-gh-release@v2
         with:
-          tag_name: v${{ env.version }}
-          name: Release v${{ env.version }}
-          files: genie-vscode/vsix_package_versions/*.vsix
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          token: ${{ secrets.PAT }}   # Use PAT because repo is different
+          tag_name: "v${{ env.version }}"
+          name: "Release v${{ env.version }}"
+          files: "genie-vscode/vsix_package_versions/*.vsix"
+          repository: "Jagannath173/vsix_version"
       
